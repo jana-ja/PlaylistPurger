@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
-class DasViewModel() : ViewModel() {
+class PlaylistOverviewViewModel() : ViewModel() {
     val TAG = "DasViewModel"
 
     val api = SpotifyApi.retrofitService

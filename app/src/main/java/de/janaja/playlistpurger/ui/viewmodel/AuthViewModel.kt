@@ -1,6 +1,11 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
+import android.app.Activity.RESULT_OK
+import android.util.Log
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
+import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +30,7 @@ class AuthViewModel(
         _isLoggedIn.value = true
     }
 
-    fun login() {
+    fun startLoginProcess() {
         val builder = AuthorizationRequest.Builder(
             CLIENT_ID,
             AuthorizationResponse.Type.TOKEN,
@@ -37,5 +42,34 @@ class AuthViewModel(
         val request: AuthorizationRequest = builder.build()
 
         onStartLoginActivity(REQUEST_CODE, request)
+    }
+
+    fun handleLoginResult(result: ActivityResult) {
+        // Check if result comes from the correct activity
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            // apparently don't need to check with request code if ActivityResult comes from spotify's login activity
+//                    val resultCode = result.resultCode
+//                    val data = result.data
+            val response: AuthorizationResponse =
+                AuthorizationClient.getResponse(result.resultCode, result.data)
+//                    result
+            when (response.type) {
+                // Response was successful and contains auth token
+                AuthorizationResponse.Type.TOKEN -> {
+                    println("Success! ${AuthorizationResponse.Type.TOKEN}")
+                }
+                // Auth flow returned an error
+                AuthorizationResponse.Type.ERROR -> {
+                    println("Error")
+                    println(AuthorizationResponse.Type.ERROR)
+                }
+                // Most likely auth flow was cancelled
+                else -> {
+                    println("Auth flow canceled")
+                }
+            }
+        } else {
+            println("No result returned")
+        }
     }
 }
