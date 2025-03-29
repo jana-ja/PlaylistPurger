@@ -55,6 +55,12 @@ class PlaylistOverviewViewModel(application: Application) : AndroidViewModel(app
             try {
                 val budf = api.getCatImagesWithHeader("Bearer " + token)
                 playlists.value = budf.items
+
+                // TODO response check und auf 401 reagieren
+                var blub = ""
+                budf.items.forEach { blub += "\n\t$it" }
+
+                Log.d(TAG, "loadAllPlaylists: $blub")
             } catch (e: Exception) {
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
 //                Log.e(TAG, "loadAllPlaylists: ${e.stackTrace.}")

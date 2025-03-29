@@ -1,10 +1,16 @@
 package de.janaja.playlistpurger.data.model
 
 data class Playlist(
-//    val collaborative: Boolean,
-//    val description: String,
-//    val id: String,
-    val name: String
+    val id: String,
+    val name: String,
+    val description: String,
+    val collaborative: Boolean,
+    val public: Boolean,
+    val images: List<PlaylistImage>,
+    // owner TODO
+    val tracks: PlaylistTracks,
+    val owner: PlaylistOwner,
+    val type: String,
 )
 
 
