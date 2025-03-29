@@ -43,6 +43,12 @@ android {
     buildFeatures {
         compose = true
     }
+
+//        configurations {
+//            implementation.exclude(module:'proto-google-common-protos')
+//            implementation.exclude module:'protobuf-java'
+//        }
+
 }
 
 dependencies {
@@ -77,7 +83,12 @@ dependencies {
     // async image
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    // All other dependencies for your app should also be here:
-//    implementation (libs.androidx.browser)
-//    implementation (libs.androidx.appcompat)
+//    // encrypted shared preferences
+//    implementation(libs.androidx.security.crypto.ktx){
+//        exclude(group= "com.google.protobuf", module= "protobuf-javalite")
+//
+//    }
+    // data store
+    implementation(libs.androidx.datastore.preferences)
+
 }
