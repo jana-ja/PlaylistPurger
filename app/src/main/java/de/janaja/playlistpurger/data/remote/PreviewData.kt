@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.data.remote
 
 import de.janaja.playlistpurger.data.model.Playlist
-import de.janaja.playlistpurger.data.model.PlaylistOwner
+import de.janaja.playlistpurger.data.model.User
 import de.janaja.playlistpurger.data.model.PlaylistTracks
 
 object PreviewData {
@@ -13,7 +13,7 @@ object PreviewData {
         public = false,
         images = listOf(),
         tracks = PlaylistTracks("", 0),
-        owner = PlaylistOwner(
+        owner = User(
             id = "id",
             displayName = "Name"
         ),

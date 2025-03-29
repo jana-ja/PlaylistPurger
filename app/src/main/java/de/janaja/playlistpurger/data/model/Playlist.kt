@@ -9,7 +9,7 @@ data class Playlist(
     val images: List<PlaylistImage>,
     // owner TODO
     val tracks: PlaylistTracks,
-    val owner: PlaylistOwner,
+    val owner: User,
     val type: String,
 )
 

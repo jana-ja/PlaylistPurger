@@ -3,12 +3,15 @@ package de.janaja.playlistpurger.data.remote
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import de.janaja.playlistpurger.data.model.PlaylistResponse
+import de.janaja.playlistpurger.data.model.TracksResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val BASE_URL = "https://api.spotify.com/v1/"
@@ -40,6 +43,13 @@ interface SpotifyApiService {
         @Header("Authorization") token: String,
 //        @Query("limit") limit: Int = 5
     ): PlaylistResponse
+
+    // https://api.spotify.com/v1/playlists/7CLB5HWtSm5gMvUtYKutkQ/tracks
+    @GET("playlists/{playlist_id}/tracks")
+    suspend fun getTracksForPlaylist(
+        @Header("Authorization") token: String,
+        @Path("playlist_id") playlistId: String,
+    ) : TracksResponse
 
 
 }

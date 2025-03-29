@@ -2,10 +2,10 @@ package de.janaja.playlistpurger.data.model
 
 import com.squareup.moshi.Json
 
-data class PlaylistOwner(
+data class User(
     val id: String,
     @Json(name = "display_name")
-    val displayName: String,
+    val displayName: String = "Unknown User", // in playlist tracks: added by hat dieses field nicht
 )
 /*
 "owner": {

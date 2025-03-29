@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
+import de.janaja.playlistpurger.ui.screen.TrackListScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,6 +33,11 @@ object MenuRoute
 
 @Serializable
 object PlaylistOverviewRoute
+
+@Serializable
+data class TrackListRoute(
+    val playlistId: String
+)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,11 +68,19 @@ fun AppStart(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<PlaylistOverviewRoute> {
-                PlaylistOverviewScreen()
+                PlaylistOverviewScreen(
+                    onNavToTrackList = { playlistId ->
+                        navController.navigate(TrackListRoute(playlistId))
+                    }
+                )
             }
 
             composable<MenuRoute> {
 
+            }
+
+            composable<TrackListRoute> {
+                TrackListScreen()
             }
 
         }
