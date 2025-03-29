@@ -38,47 +38,41 @@ class AuthViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    // FLOW emittet nur wenn es consumer gibt!
     private val tokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
+    // hier könnte man direkt noch onEach oder map dran hängen
+
 //    val tokenStateFlow = tokenFlow
 //        .stateIn(
 //            scope = viewModelScope,
 //            started = SharingStarted.WhileSubscribed(),
-//            initialValue = ""
+//            initialValue = null
 //        )
 
     init {
-        checkAuth()
-    }
-
-    fun checkAuth() {
         viewModelScope.launch {
-        // do I have a saved token?
             tokenFlow.collect { value ->
+                Log.d(TAG, "token collect: $value")
+                Log.d(TAG, "try receive token from data store")
+
                 if (value == null) {
-                    Log.d(TAG, ": did not find token")
-
-
+                    Log.d(TAG, "did not find token in data store")
+                    _isLoggedIn.value = false
                 } else {
-                    Log.d(TAG, ": found token")
+                    Log.d(TAG, "found token in data store")
                     checkToken()
+                    // TODO erst check
+                    _isLoggedIn.value = true
                 }
                 Log.d(TAG, "token: $value")
                 _isLoading.value = false
             }
         }
-
-
-        // ist das token noch gültig?
-
-        // rein in die app
-        _isLoggedIn.value = true
     }
 
     private fun checkToken() {
-
+        // TODO implement
     }
-
-
 
     fun startLoginProcess() {
         val builder = AuthorizationRequest.Builder(
@@ -107,7 +101,10 @@ class AuthViewModel(
                 // Response was successful and contains auth token
                 AuthorizationResponse.Type.TOKEN -> {
                     viewModelScope.launch {
-                        dataStorePreferences.putSecurePreference(DatastoreKeys.accessToken, response.accessToken)
+                        dataStorePreferences.putSecurePreference(
+                            DatastoreKeys.accessToken,
+                            response.accessToken
+                        )
                         println("Success! ${AuthorizationResponse.Type.TOKEN}")
                     }
                 }
@@ -128,32 +125,9 @@ class AuthViewModel(
 
     fun logout() {
         // delete token
-    }
-
-    /*
-    private val dataStore = application.dataStore
-
-    private val nameFlow: Flow<String> = dataStore.data
-        .map { preferences ->
-            preferences[DatastoreKeys.userName] ?: ""
-        }
-
-    val nameStateFlow = nameFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = ""
-        )
-
-        fun updateName(name: String) {
         viewModelScope.launch {
-            dataStore.edit { values ->
-                values[DatastoreKeys.userName] = name
-            }
+            dataStorePreferences.removePreference(DatastoreKeys.accessToken)
+            _isLoggedIn.value = false
         }
     }
-     */
-
-
-
 }

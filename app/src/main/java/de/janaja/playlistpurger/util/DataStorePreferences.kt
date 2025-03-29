@@ -9,7 +9,7 @@ import de.janaja.playlistpurger.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-
+// https://iamraghavawasthi.medium.com/securing-your-android-datastore-4c50f3e98d5c
 class DataStorePreferences(
     context: Context,
     private val securityUtil: SecurityUtil,

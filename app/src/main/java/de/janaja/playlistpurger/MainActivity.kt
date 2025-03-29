@@ -21,6 +21,7 @@ import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import de.janaja.playlistpurger.ui.AppStart
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.SplashScreen
 
@@ -62,7 +63,9 @@ class MainActivity : ComponentActivity() {
                         SplashScreen()
                     } else {
                         if (isLoggedIn) {
-                            PlaylistOverviewScreen()
+                            AppStart {
+                                authViewModel.logout()
+                            }
                         } else {
                             WelcomeScreen(
                                 onLogin = {
