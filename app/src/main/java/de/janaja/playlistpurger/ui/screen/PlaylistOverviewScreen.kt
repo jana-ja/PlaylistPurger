@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.janaja.playlistpurger.ui.component.PlaylistItem
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PlaylistOverviewScreen(
     onNavToTrackList: (String) -> Unit,
     modifier: Modifier = Modifier,
-    welcomeViewModel: PlaylistOverviewViewModel = viewModel()
+    welcomeViewModel: PlaylistOverviewViewModel = koinViewModel()
 ) {
     val playlists by welcomeViewModel.playlists.collectAsState()
 
