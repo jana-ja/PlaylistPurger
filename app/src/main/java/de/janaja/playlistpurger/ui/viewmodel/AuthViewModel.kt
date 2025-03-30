@@ -13,10 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
 class AuthViewModel(
-    val dataStoreRepo: DataStoreRepo,
-    val onStartLoginActivity: (AuthorizationRequest) -> Unit,
+    private val dataStoreRepo: DataStoreRepo,
+    private val onStartLoginActivity: (AuthorizationRequest) -> Unit,
 ) : ViewModel() {
 
     private val TAG = "AuthViewModel"
@@ -58,8 +57,6 @@ class AuthViewModel(
             }
         }
     }
-
-
 
     private fun checkToken() {
         // TODO implement

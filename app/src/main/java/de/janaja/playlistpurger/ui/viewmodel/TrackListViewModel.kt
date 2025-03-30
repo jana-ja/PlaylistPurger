@@ -11,6 +11,7 @@ import de.janaja.playlistpurger.data.repository.TrackListRepo
 import de.janaja.playlistpurger.ui.TrackListRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+
 /*
 viewmodel pro track?
     jeder trakc fragt einzeln ab wie gevoted wurde?
@@ -27,8 +28,10 @@ playlist tracks repository
     -> user votet -> wird an server gechickt, dann okay antwort abwarten und lokal updaten? neu von server abfragen vllt übertrieben?
  */
 
-class TrackListViewModel(val dataStoreRepo: DataStoreRepo, val trackListRepo: TrackListRepo, savedStateHandle: SavedStateHandle) :
-    ViewModel() {
+class TrackListViewModel(
+    private val dataStoreRepo: DataStoreRepo,
+    private val trackListRepo: TrackListRepo, savedStateHandle: SavedStateHandle
+) : ViewModel() {
     val TAG = "TrackListViewModel"
 
     private val args = savedStateHandle.toRoute<TrackListRoute>()

@@ -9,12 +9,14 @@ import de.janaja.playlistpurger.data.repository.PlaylistRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+class PlaylistOverviewViewModel(
+    private val dataStoreRepo: DataStoreRepo,
+    private val playListRepo: PlaylistRepo
+) : ViewModel() {
 
-class PlaylistOverviewViewModel(val dataStoreRepo: DataStoreRepo, val playListRepo: PlaylistRepo) : ViewModel() {
-    val TAG = "PlaylistOverviewViewModel"
+    private val TAG = "PlaylistOverviewViewModel"
 
     val playlists = MutableStateFlow<List<Playlist>>(listOf())
-
 
     init {
         loadAllPlaylists()
@@ -34,5 +36,4 @@ class PlaylistOverviewViewModel(val dataStoreRepo: DataStoreRepo, val playListRe
 
         }
     }
-
 }
