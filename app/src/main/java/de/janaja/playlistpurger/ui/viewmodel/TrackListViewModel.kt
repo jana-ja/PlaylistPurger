@@ -6,10 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.data.model.Track
+import de.janaja.playlistpurger.data.model.Vote
+import de.janaja.playlistpurger.data.model.VoteOption
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import de.janaja.playlistpurger.data.repository.TrackListRepo
+import de.janaja.playlistpurger.data.remote.VoteApi
 import de.janaja.playlistpurger.ui.TrackListRoute
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /*
@@ -30,7 +34,8 @@ playlist tracks repository
 
 class TrackListViewModel(
     private val dataStoreRepo: DataStoreRepo,
-    private val trackListRepo: TrackListRepo, savedStateHandle: SavedStateHandle
+    private val trackListRepo: TrackListRepo,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val TAG = "TrackListViewModel"
 
@@ -46,13 +51,27 @@ class TrackListViewModel(
     private fun loadTrackList() {
         viewModelScope.launch {
             try {
-                trackList.value = trackListRepo.getTracks(playlistId)
+                trackList.value = trackListRepo.getTracksWithVotes(playlistId)
 
                 // TODO response check und auf 401 reagieren
+//                val bla = trackList.value.map { it.id }
+//                Log.d(TAG, "loadTrackList: $bla")
                 Log.d(TAG, "loadAllPlaylists: success")
             } catch (e: Exception) {
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
             }
         }
     }
+
+    fun onChangeVote(track: Track, newVote: VoteOption) {
+        trackListRepo.updateVote(playlistId, track.id, newVote)
+        // TODO richtig machen:
+        trackList.value = trackList.value.map {
+            if (it.id == track.id)
+                it.copy(vote = newVote)
+            else
+                it
+        }
+    }
+
 }

@@ -8,6 +8,8 @@ import de.janaja.playlistpurger.data.repository.PlaylistRepoImpl
 import de.janaja.playlistpurger.data.repository.TrackListRepo
 import org.koin.dsl.module
 import de.janaja.playlistpurger.data.repository.TrackListRepoImpl
+import de.janaja.playlistpurger.data.remote.VoteApi
+import de.janaja.playlistpurger.data.remote.VoteApiDummyImpl
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
@@ -23,28 +25,30 @@ val appModule = module {
         DataStoreRepoImpl(androidContext())
     }
 
-    // AuthViewModel uses DataStoreRepo
-    viewModel {
-            (onStartLoginActivity: (AuthorizationRequest) -> Unit) -> // Define the callback as a parameter
-        AuthViewModel(get(), onStartLoginActivity)
+    // VoteRepo uses DataStoreRepo
+    single<VoteApi> {
+        VoteApiDummyImpl(get())
     }
-
-    // TrackListRepo uses DataStoreRepo
-//    singleOf(::TrackListRepoImpl)
-    single<TrackListRepo> {
-        TrackListRepoImpl(get())
-    }
-
-    // TrackListViewModel uses TrackListRepo and DataStoreRepo
-    viewModelOf(::TrackListViewModel)
 
     // PlayListRepo uses DataStoreRepo
     single<PlaylistRepo> {
         PlaylistRepoImpl(get())
     }
 
+    // TrackListRepo uses DataStoreRepo and VoteRepo
+//    singleOf(::TrackListRepoImpl)
+    single<TrackListRepo> {
+        TrackListRepoImpl(get(), get())
+    }
+
+    // AuthViewModel uses DataStoreRepo
+    viewModel { (onStartLoginActivity: (AuthorizationRequest) -> Unit) ->
+        AuthViewModel(get(), onStartLoginActivity)
+    }
+
     // PlayListViewModel uses PlayListRepo and DataStoreRepo
     viewModelOf(::PlaylistOverviewViewModel)
 
-
+    // TrackListViewModel uses VoteRepo and TrackListRepo and DataStoreRepo
+    viewModelOf(::TrackListViewModel)
 }

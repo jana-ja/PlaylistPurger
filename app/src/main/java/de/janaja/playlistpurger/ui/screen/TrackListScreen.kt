@@ -36,7 +36,9 @@ fun TrackListScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(trackList) { track ->
-                TrackItem(track)
+                TrackItem(track, onChangeVote = { newVote ->
+                    trackListViewModel.onChangeVote(track, newVote)
+                })
             }
         }
 

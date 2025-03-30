@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.data.remote
+package de.janaja.playlistpurger.data
 
 import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.model.User
