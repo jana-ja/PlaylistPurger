@@ -51,6 +51,17 @@ interface SpotifyAccountApiService {
         @Field("grant_type") grantType: String = "authorization_code",
 
     ): TokenRequestResponse
+
+    @FormUrlEncoded
+    @POST("api/token")
+    suspend fun refreshToken(
+        @Header("Authorization") client: String,
+        @Header("Content-Type") type: String = "application/x-www-form-urlencoded",
+        @Field("refresh_token") refreshToken: String,
+//        @Field("redirect_uri") redirectUri: String,
+        @Field("grant_type") grantType: String = "refresh_token",
+
+        ): TokenRequestResponse
 }
 
 object SpotifyAccountApi {

@@ -14,6 +14,7 @@ class DataStoreRepoImpl(context: Context): DataStoreRepo {
     )
 
     override val accessTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
+    override val refreshTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.refreshToken)
 
     override suspend fun updateAccessToken(token: String) {
         dataStorePreferences.putSecurePreference(

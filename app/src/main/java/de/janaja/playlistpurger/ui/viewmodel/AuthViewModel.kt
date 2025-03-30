@@ -9,6 +9,7 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
+import de.janaja.playlistpurger.data.local.DatastoreKeys.refreshToken
 import de.janaja.playlistpurger.data.remote.SpotifyAccountApi
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,8 +38,9 @@ class AuthViewModel(
     val isLoading = _isLoading.asStateFlow()
 
     // FLOW emittet nur wenn es consumer gibt!
-    private val tokenFlow = dataStoreRepo.accessTokenFlow
+    private val accessTokenFlow = dataStoreRepo.accessTokenFlow
     // hier könnte man direkt noch onEach oder map dran hängen
+    private val refreshTokenFlow = dataStoreRepo.refreshTokenFlow
 
     // TODO eig kein diekt zurgriff auf api
     private val api = SpotifyAccountApi.retrofitService
@@ -49,7 +51,7 @@ class AuthViewModel(
 
     private fun checkUserLoggedIn() {
         viewModelScope.launch {
-            tokenFlow.collect { value ->
+            accessTokenFlow.collect { value ->
                 Log.d(TAG, "token collect: $value")
                 Log.d(TAG, "try receive token from data store")
 
@@ -68,8 +70,46 @@ class AuthViewModel(
         }
     }
 
-    private fun checkToken() {
+    private suspend fun checkToken() {
         // TODO implement
+        if (false) {
+            refreshToken()
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private suspend fun refreshToken() {
+            refreshTokenFlow.collect { value ->
+                Log.d(TAG, "refresh token collect: $value")
+                Log.d(TAG, "try receive refresh token from data store")
+
+                if (value == null) {
+                    Log.d(TAG, "did not find refresh token in data store")
+                    _isLoggedIn.value = false
+                } else {
+                    Log.d(TAG, "found refresh token in data store")
+                    try {
+
+
+                        val tokenRequestResponse = api.refreshToken(
+
+                            client = "Basic " + Base64.encode("$CLIENT_ID:$clientSecret".encodeToByteArray()),
+                            refreshToken = value,
+                        )
+                        dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                        if (tokenRequestResponse.refreshToken != "") {
+                            dataStoreRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                        }
+                        _isLoggedIn.value = true
+                    } catch (e: Exception) {
+                        Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
+                    }
+
+                }
+                Log.d(TAG, "token: $value")
+                _isLoading.value = false
+            }
+
     }
 
     fun startLoginProcess() {
