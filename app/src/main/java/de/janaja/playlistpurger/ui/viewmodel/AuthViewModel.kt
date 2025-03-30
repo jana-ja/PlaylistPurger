@@ -1,33 +1,25 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
 import android.app.Activity.RESULT_OK
-import android.app.Application
 import android.util.Log
 import androidx.activity.result.ActivityResult
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
-import de.janaja.playlistpurger.DatastoreKeys
-import de.janaja.playlistpurger.util.DataStorePreferences
-import de.janaja.playlistpurger.util.SecurityUtil
+import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
 class AuthViewModel(
-    application: Application,
+    val dataStoreRepo: DataStoreRepo,
     val onStartLoginActivity: (AuthorizationRequest) -> Unit,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val TAG = "AuthViewModel"
-
-    private val dataStorePreferences = DataStorePreferences(
-        application,
-        SecurityUtil()
-    )
 
     private val CLIENT_ID = "1f7401f5d27847b99a6dfe6908c5ccac"
     private val REDIRECT_URI = "asdf://callback"
@@ -39,17 +31,14 @@ class AuthViewModel(
     val isLoading = _isLoading.asStateFlow()
 
     // FLOW emittet nur wenn es consumer gibt!
-    private val tokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
+    private val tokenFlow = dataStoreRepo.tokenFlow
     // hier könnte man direkt noch onEach oder map dran hängen
 
-//    val tokenStateFlow = tokenFlow
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(),
-//            initialValue = null
-//        )
-
     init {
+        checkUserLoggedIn()
+    }
+
+    private fun checkUserLoggedIn() {
         viewModelScope.launch {
             tokenFlow.collect { value ->
                 Log.d(TAG, "token collect: $value")
@@ -69,6 +58,8 @@ class AuthViewModel(
             }
         }
     }
+
+
 
     private fun checkToken() {
         // TODO implement
@@ -101,8 +92,7 @@ class AuthViewModel(
                 // Response was successful and contains auth token
                 AuthorizationResponse.Type.TOKEN -> {
                     viewModelScope.launch {
-                        dataStorePreferences.putSecurePreference(
-                            DatastoreKeys.accessToken,
+                        dataStoreRepo.updateToken(
                             response.accessToken
                         )
                         println("Success! ${AuthorizationResponse.Type.TOKEN}")
@@ -126,7 +116,7 @@ class AuthViewModel(
     fun logout() {
         // delete token
         viewModelScope.launch {
-            dataStorePreferences.removePreference(DatastoreKeys.accessToken)
+            dataStoreRepo.deleteToken()
             _isLoggedIn.value = false
         }
     }

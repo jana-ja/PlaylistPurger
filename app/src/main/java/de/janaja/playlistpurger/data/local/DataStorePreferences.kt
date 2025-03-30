@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.util
+package de.janaja.playlistpurger.data.local
 
 import android.content.Context
 import androidx.datastore.core.IOException
@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import de.janaja.playlistpurger.dataStore
+import de.janaja.playlistpurger.util.SecurityUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

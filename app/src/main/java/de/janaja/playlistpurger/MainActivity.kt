@@ -15,21 +15,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.preferencesDataStore
+import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationClient
 import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import de.janaja.playlistpurger.ui.AppStart
-import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.SplashScreen
+import org.koin.androidx.compose.koinViewModel
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "playlist_purger_datastore")
 
-object DatastoreKeys {
-    val accessToken by lazy { stringPreferencesKey("accessToken") }
-}
 
 class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
@@ -39,21 +36,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         val activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 authViewModel.handleLoginResult(result)
             }
 
-        authViewModel = AuthViewModel(
-            application,
-            onStartLoginActivity = { request ->
-                val intent = AuthorizationClient.createLoginActivityIntent(this, request)
-                activityResultLauncher.launch(intent)
-            }
-        )
         enableEdgeToEdge()
         setContent {
+            val authViewModel: AuthViewModel = koinViewModel(
+                parameters = {
+                    org.koin.core.parameter.parametersOf(
+                        { request: AuthorizationRequest ->
+                            val intent = AuthorizationClient.createLoginActivityIntent(this, request)
+                            activityResultLauncher.launch(intent)
+                        }
+                    )
+                }
+            )
+
             val isLoading by authViewModel.isLoading.collectAsState()
             val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
@@ -75,7 +75,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-
                 }
             }
         }
