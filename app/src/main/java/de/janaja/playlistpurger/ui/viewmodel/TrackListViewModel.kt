@@ -1,73 +1,55 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import de.janaja.playlistpurger.DatastoreKeys
 import de.janaja.playlistpurger.data.model.Track
-import de.janaja.playlistpurger.data.remote.SpotifyApi
+import de.janaja.playlistpurger.data.repository.DataStoreRepo
+import de.janaja.playlistpurger.data.repository.TrackListRepo
 import de.janaja.playlistpurger.ui.TrackListRoute
-import de.janaja.playlistpurger.util.DataStorePreferences
-import de.janaja.playlistpurger.util.SecurityUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+/*
+viewmodel pro track?
+    jeder trakc fragt einzeln ab wie gevoted wurde?
 
-class TrackListViewModel(application: Application, savedStateHandle: SavedStateHandle) :
-    AndroidViewModel(application) {
+viewmodel für tracklist
+    abfrage an server für playlist & user -> alle votes dafür bekommen
+    oder abfrage mit allen track ids & user (ne playlist info muss eh dabei sein, man kann in unterschiedlichen playlists für den gleichen song unterschiedlich voten)
+
+playlist tracks repository
+    -> holt die tracks der playlist von spotify api
+    -> holt für playlist und userid die votes vom server
+    -> ordnet zu, vllt domain model?
+
+    -> user votet -> wird an server gechickt, dann okay antwort abwarten und lokal updaten? neu von server abfragen vllt übertrieben?
+ */
+
+class TrackListViewModel(val dataStoreRepo: DataStoreRepo, val trackListRepo: TrackListRepo, savedStateHandle: SavedStateHandle) :
+    ViewModel() {
     val TAG = "TrackListViewModel"
 
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
 
-
-    val api = SpotifyApi.retrofitService
-
-    private val dataStorePreferences = DataStorePreferences(
-        application,
-        SecurityUtil()
-    )
-
-    private val tokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
-
     val trackList = MutableStateFlow<List<Track>>(listOf())
 
-    private lateinit var token: String
-
     init {
-        viewModelScope.launch {
-            // do I have a saved token?
-            tokenFlow.collect { value ->
-                if (value == null) {
-                    Log.d(TAG, ": did not find token")
-                    // TODO error hilfe stop, zurück zu login view?
-
-                } else {
-                    Log.d(TAG, ": found token")
-                    token = value
-                    loadTrackList()
-                }
-            }
-        }
+        loadTrackList()
     }
 
-    fun loadTrackList() {
+    private fun loadTrackList() {
         viewModelScope.launch {
-
             try {
-                val budf = api.getTracksForPlaylist("Bearer " + token, playlistId)
-                trackList.value = budf.items.map { it.track }
+                trackList.value = trackListRepo.getTracks(playlistId)
 
                 // TODO response check und auf 401 reagieren
                 Log.d(TAG, "loadAllPlaylists: success")
             } catch (e: Exception) {
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
-//                Log.e(TAG, "loadAllPlaylists: ${e.stackTrace.}")
             }
-
         }
     }
-
 }

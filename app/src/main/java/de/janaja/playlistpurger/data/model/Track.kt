@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.data.model
 
 import com.squareup.moshi.Json
-
+// TODO maybe domain model
 data class Track(
     val id: String,
     val name: String,
@@ -12,6 +12,8 @@ data class Track(
     // is local
     // added by
     // added at??
+
+    val vote: VoteOption? = null
 )
 /*
 {

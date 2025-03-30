@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.janaja.playlistpurger.ui.component.TrackItem
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrackListScreen(
     modifier: Modifier = Modifier,
-    trackListViewModel: TrackListViewModel = viewModel()
+    trackListViewModel: TrackListViewModel = koinViewModel()
 ) {
 
     val trackList by trackListViewModel.trackList.collectAsState()

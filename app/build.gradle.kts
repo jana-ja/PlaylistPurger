@@ -83,12 +83,12 @@ dependencies {
     // async image
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-//    // encrypted shared preferences
-//    implementation(libs.androidx.security.crypto.ktx){
-//        exclude(group= "com.google.protobuf", module= "protobuf-javalite")
-//
-//    }
     // data store
     implementation(libs.androidx.datastore.preferences)
+    // koin
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
 }
