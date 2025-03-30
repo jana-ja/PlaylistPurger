@@ -43,7 +43,8 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val authViewModel: AuthViewModel = koinViewModel(
+
+            authViewModel = koinViewModel(
                 parameters = {
                     org.koin.core.parameter.parametersOf(
                         { request: AuthorizationRequest ->
