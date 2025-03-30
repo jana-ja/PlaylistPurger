@@ -8,15 +8,22 @@ import androidx.lifecycle.viewModelScope
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import de.janaja.playlistpurger.BuildConfig
+import de.janaja.playlistpurger.data.remote.SpotifyAccountApi
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+
 
 class AuthViewModel(
     private val dataStoreRepo: DataStoreRepo,
     private val onStartLoginActivity: (AuthorizationRequest) -> Unit,
 ) : ViewModel() {
+
+    private val clientSecret = BuildConfig.CLIENT_SECRET
 
     private val TAG = "AuthViewModel"
 
@@ -30,8 +37,11 @@ class AuthViewModel(
     val isLoading = _isLoading.asStateFlow()
 
     // FLOW emittet nur wenn es consumer gibt!
-    private val tokenFlow = dataStoreRepo.tokenFlow
+    private val tokenFlow = dataStoreRepo.accessTokenFlow
     // hier könnte man direkt noch onEach oder map dran hängen
+
+    // TODO eig kein diekt zurgriff auf api
+    private val api = SpotifyAccountApi.retrofitService
 
     init {
         checkUserLoggedIn()
@@ -65,7 +75,7 @@ class AuthViewModel(
     fun startLoginProcess() {
         val builder = AuthorizationRequest.Builder(
             CLIENT_ID,
-            AuthorizationResponse.Type.TOKEN,
+            AuthorizationResponse.Type.CODE,
             REDIRECT_URI
         )
         builder.setScopes(arrayOf("playlist-read-private"))
@@ -87,13 +97,12 @@ class AuthViewModel(
 //                    result
             when (response.type) {
                 // Response was successful and contains auth token
-                AuthorizationResponse.Type.TOKEN -> {
-                    viewModelScope.launch {
-                        dataStoreRepo.updateToken(
-                            response.accessToken
-                        )
-                        println("Success! ${AuthorizationResponse.Type.TOKEN}")
-                    }
+                AuthorizationResponse.Type.CODE -> {
+                    // get accessToken and refreshToken from api with code
+                    println("Got Token! ${AuthorizationResponse.Type.TOKEN}")
+                    getTokenForCode(response.code)
+
+
                 }
                 // Auth flow returned an error
                 AuthorizationResponse.Type.ERROR -> {
@@ -113,8 +122,28 @@ class AuthViewModel(
     fun logout() {
         // delete token
         viewModelScope.launch {
-            dataStoreRepo.deleteToken()
+            dataStoreRepo.deleteAllToken()
             _isLoggedIn.value = false
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun getTokenForCode(code: String) {
+        viewModelScope.launch {
+            try {
+
+                val tokenRequestResponse = api.getToken(
+                    client = "Basic " + Base64.encode("$CLIENT_ID:$clientSecret".encodeToByteArray()),
+                    code = code,
+                    redirectUri = REDIRECT_URI,
+                )
+
+                dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                dataStoreRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+            } catch (e: Exception) {
+                Log.d(TAG, "getTokenForCode: Error ${e.localizedMessage}")
+            }
+
         }
     }
 }

@@ -14,7 +14,7 @@ class TrackListRepoImpl(
 
     private val api = SpotifyApi.retrofitService
 
-    private val tokenFlow = dataStoreRepo.tokenFlow
+    private val tokenFlow = dataStoreRepo.accessTokenFlow
     private val currentUserId = "janajansen-de" // TODO get real current user id from somewhere
 
 

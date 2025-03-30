@@ -1,3 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+val clientSecret = localProperties.getProperty("CLIENT_SECRET") ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,7 +35,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
+        }
         release {
+            buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -42,6 +56,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
 //        configurations {

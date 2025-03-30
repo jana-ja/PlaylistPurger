@@ -11,7 +11,7 @@ class PlaylistRepoImpl(
 
     private val api = SpotifyApi.retrofitService
 
-    private val tokenFlow = dataStoreRepo.tokenFlow
+    private val tokenFlow = dataStoreRepo.accessTokenFlow
 
     override suspend fun getPlaylists(): List<Playlist> {
         val token = tokenFlow.first() ?: throw Exception("No Token")

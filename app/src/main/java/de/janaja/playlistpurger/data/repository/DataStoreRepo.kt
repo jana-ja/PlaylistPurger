@@ -3,8 +3,9 @@ package de.janaja.playlistpurger.data.repository
 import kotlinx.coroutines.flow.Flow
 
 interface DataStoreRepo {
-    val tokenFlow: Flow<String?>
+    val accessTokenFlow: Flow<String?>
 //    val userIdFlow: Flow<String?>
-    suspend fun updateToken(token: String)
-    suspend fun deleteToken()
+    suspend fun updateAccessToken(token: String)
+    suspend fun updateRefreshToken(token: String)
+    suspend fun deleteAllToken()
 }

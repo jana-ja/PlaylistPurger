@@ -13,17 +13,24 @@ class DataStoreRepoImpl(context: Context): DataStoreRepo {
         SecurityUtil()
     )
 
-    override val tokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
+    override val accessTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
 
-    override suspend fun updateToken(token: String) {
+    override suspend fun updateAccessToken(token: String) {
         dataStorePreferences.putSecurePreference(
             DatastoreKeys.accessToken,
             token
         )
-        println("Success! ${AuthorizationResponse.Type.TOKEN}")
     }
 
-    override suspend fun deleteToken() {
+    override suspend fun updateRefreshToken(token: String) {
+        dataStorePreferences.putSecurePreference(
+            DatastoreKeys.refreshToken,
+            token
+        )
+    }
+
+    override suspend fun deleteAllToken() {
         dataStorePreferences.removePreference(DatastoreKeys.accessToken)
+        dataStorePreferences.removePreference(DatastoreKeys.refreshToken)
     }
 }

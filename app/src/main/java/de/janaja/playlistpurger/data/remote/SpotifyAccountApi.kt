@@ -18,7 +18,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-private const val BASE_URL = "https://api.spotify.com/v1/"
+private const val BASE_URL = "https://accounts.spotify.com/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -39,24 +39,20 @@ private val retrofit = Retrofit.Builder()
     .client(okHttpClient)
     .build()
 
-interface SpotifyApiService {
+interface SpotifyAccountApiService {
 
+    @FormUrlEncoded
+    @POST("api/token")
+    suspend fun getToken(
+        @Header("Authorization") client: String,
+        @Header("Content-Type") type: String = "application/x-www-form-urlencoded",
+        @Field("code") code: String,
+        @Field("redirect_uri") redirectUri: String,
+        @Field("grant_type") grantType: String = "authorization_code",
 
-    @GET("me/playlists")
-    suspend fun getCatImagesWithHeader(
-        @Header("Authorization") token: String,
-//        @Query("limit") limit: Int = 5
-    ): PlaylistResponse
-
-    // https://api.spotify.com/v1/playlists/7CLB5HWtSm5gMvUtYKutkQ/tracks
-    @GET("playlists/{playlist_id}/tracks")
-    suspend fun getTracksForPlaylist(
-        @Header("Authorization") token: String,
-        @Path("playlist_id") playlistId: String,
-    ): TracksResponse
-
+    ): TokenRequestResponse
 }
 
-object SpotifyApi {
-    val retrofitService: SpotifyApiService by lazy { retrofit.create(SpotifyApiService::class.java) }
+object SpotifyAccountApi {
+    val retrofitService: SpotifyAccountApiService by lazy { retrofit.create(SpotifyAccountApiService::class.java) }
 }
