@@ -5,12 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
-import de.janaja.playlistpurger.data.repository.PlayListRepo
+import de.janaja.playlistpurger.data.repository.PlaylistRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
-class PlaylistOverviewViewModel(val dataStoreRepo: DataStoreRepo, val playListRepo: PlayListRepo) : ViewModel() {
+class PlaylistOverviewViewModel(val dataStoreRepo: DataStoreRepo, val playListRepo: PlaylistRepo) : ViewModel() {
     val TAG = "PlaylistOverviewViewModel"
 
     val playlists = MutableStateFlow<List<Playlist>>(listOf())

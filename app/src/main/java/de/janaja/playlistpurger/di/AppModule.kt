@@ -2,8 +2,8 @@ package de.janaja.playlistpurger.di
 
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import de.janaja.playlistpurger.data.repository.DataStoreRepoImpl
-import de.janaja.playlistpurger.data.repository.PlayListRepo
-import de.janaja.playlistpurger.data.repository.PlayListRepoImpl
+import de.janaja.playlistpurger.data.repository.PlaylistRepo
+import de.janaja.playlistpurger.data.repository.PlaylistRepoImpl
 import de.janaja.playlistpurger.data.repository.TrackListRepo
 import org.koin.dsl.module
 import de.janaja.playlistpurger.data.repository.TrackListRepoImpl
@@ -30,8 +30,8 @@ val appModule = module {
     viewModelOf(::TrackListViewModel)
 
     // PlayListRepo uses DataStoreRepo
-    single<PlayListRepo> {
-        PlayListRepoImpl(get())
+    single<PlaylistRepo> {
+        PlaylistRepoImpl(get())
     }
 
     // PlayListViewModel uses PlayListRepo and DataStoreRepo

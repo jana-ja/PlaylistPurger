@@ -4,10 +4,10 @@ import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.remote.SpotifyApi
 import kotlinx.coroutines.flow.first
 
-class PlayListRepoImpl(
+class PlaylistRepoImpl(
     dataStoreRepo: DataStoreRepo
-): PlayListRepo {
-    val TAG = "PlayListRepoImpl"
+): PlaylistRepo {
+    val TAG = "PlaylistRepoImpl"
 
     private val api = SpotifyApi.retrofitService
 

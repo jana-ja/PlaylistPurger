@@ -4,5 +4,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataStoreRepo {
     val tokenFlow: Flow<String?>
-
 }
