@@ -3,6 +3,7 @@ package de.janaja.playlistpurger.data.remote
 import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.model.User
 import de.janaja.playlistpurger.data.model.PlaylistTracks
+import de.janaja.playlistpurger.data.model.Track
 
 object PreviewData {
     val playlist = Playlist(
@@ -18,5 +19,10 @@ object PreviewData {
             displayName = "Name"
         ),
         type = "type",
+    )
+    val track = Track(
+        id = "heufh",
+        name = "Track track",
+        durationMillis = 2000000
     )
 }

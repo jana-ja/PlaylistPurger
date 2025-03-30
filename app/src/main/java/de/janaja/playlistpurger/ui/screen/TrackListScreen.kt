@@ -1,5 +1,6 @@
 package de.janaja.playlistpurger.ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.janaja.playlistpurger.ui.component.TrackItem
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 
 @Composable
@@ -29,9 +31,11 @@ fun TrackListScreen(
             .padding(16.dp)
     ) {
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(trackList) { track ->
-                Text(track.name)
+                TrackItem(track)
             }
         }
 
