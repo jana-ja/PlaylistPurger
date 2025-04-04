@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.data.model
 
-data class PlaylistImage(
+data class SpotifyImage(
     val url: String,
     val height: Int?,
     val width: Int?,

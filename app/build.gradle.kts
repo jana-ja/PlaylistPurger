@@ -29,7 +29,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // TODO kümmern
         manifestPlaceholders["redirectSchemeName"] = "asdf"
         manifestPlaceholders["redirectHostName"] = "callback"
     }

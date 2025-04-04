@@ -6,7 +6,7 @@ data class Playlist(
     val description: String,
     val collaborative: Boolean,
     val public: Boolean,
-    val images: List<PlaylistImage>,
+    val images: List<SpotifyImage>,
     // owner TODO
     val tracks: PlaylistTracks,
     val owner: User,

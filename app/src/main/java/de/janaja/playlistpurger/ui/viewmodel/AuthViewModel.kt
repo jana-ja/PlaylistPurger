@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID
+import com.spotify.sdk.android.auth.AccountsQueryParameters.REDIRECT_URI
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -49,6 +51,21 @@ class AuthViewModel(
         checkUserLoggedIn()
     }
 
+    /*
+    save validUntil time for access token
+    init: check validUntil time ONCE
+        -> null: loggedin false
+        -> not valid: refresh
+        -> valid: loggedin true (access token sollte dann da sein, wird nicht explizit geprüft?
+    flow accesstoken:
+        null -> loggedout
+        value -> loggedin
+
+    oder:
+
+    init: check
+     */
+    // umbenennen listener/observer
     private fun checkUserLoggedIn() {
         viewModelScope.launch {
             accessTokenFlow.collect { value ->
