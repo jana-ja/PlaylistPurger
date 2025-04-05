@@ -36,21 +36,21 @@ fun SwipeCard(
     val offset by remember(swipeCardState) {
         derivedStateOf { swipeCardState.offset }
     }
-    val currentDir by remember(swipeCardState) {
-        derivedStateOf { swipeCardState.currentSwipeDirection }
-    }
+//    val currentDir by remember(swipeCardState) {
+//        derivedStateOf { swipeCardState.currentSwipeDirection }
+//    }
     val finalSwipeDirection by remember(swipeCardState) {
         derivedStateOf { swipeCardState.finalSwipeDirection }
     }
 
-    var buttonClickSwipe by remember { mutableStateOf<SwipeDirection?>(null) }
+//    var buttonClickSwipe by remember { mutableStateOf<SwipeDirection?>(null) }
 
-    LaunchedEffect(buttonClickSwipe) {
-        buttonClickSwipe?.let {
-            swipeCardState.swipe(it)
-            buttonClickSwipe = null
-        }
-    }
+//    LaunchedEffect(buttonClickSwipe) {
+//        buttonClickSwipe?.let {
+//            swipeCardState.swipe(it)
+//            buttonClickSwipe = null
+//        }
+//    }
 
     LaunchedEffect(finalSwipeDirection) {
         Log.d("SwipeCard", "SwipeCard: $finalSwipeDirection")
@@ -104,34 +104,6 @@ fun SwipeCard(
             content()
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            VoteOption.entries.reversed().forEach { vote ->
-                VoteButton(
-                    selected = (when (currentDir) {
-                        SwipeDirection.Up -> vote == VoteOption.DONT_CARE
-                        SwipeDirection.Left -> vote == VoteOption.REMOVE
-                        SwipeDirection.Right -> vote == VoteOption.KEEP
-                        else -> false
-
-                    }),
-                    onClick = {
-                        buttonClickSwipe = when (vote) {
-                            VoteOption.KEEP -> SwipeDirection.Right
-                            VoteOption.DONT_CARE -> SwipeDirection.Up
-                            VoteOption.REMOVE -> SwipeDirection.Left
-                        }
-                    },
-                    iconResId = vote.imgResId,
-                    selectionColor = vote.color,
-                    contentDescription = vote.contentDescription,
-                )
-            }
-        }
     }
 }
 

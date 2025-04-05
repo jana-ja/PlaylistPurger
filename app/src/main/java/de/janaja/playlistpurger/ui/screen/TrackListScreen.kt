@@ -1,8 +1,10 @@
 package de.janaja.playlistpurger.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,10 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
+import de.janaja.playlistpurger.data.model.VoteOption
 import de.janaja.playlistpurger.ui.component.SwipeCard
 import de.janaja.playlistpurger.ui.component.SwipeCardState
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.component.TrackCard
+import de.janaja.playlistpurger.ui.component.VoteButton
 import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 import kotlinx.coroutines.launch
@@ -44,14 +48,6 @@ fun TrackListScreen(
     var topSwipeCardState: SwipeCardState? = null
     val scope = rememberCoroutineScope()
 
-    var swipeStates = swipeableTracks
-        .map {
-            Log.d(TAG, "TrackListScreen: mappi in screen")
-            it to rememberSwipeableCardState()
-        }
-        .onEach { he ->
-            Log.d(TAG, "unvotedTracks: updatet ${he.first.name}")
-        }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -80,20 +76,51 @@ fun TrackListScreen(
                             }
                         },
                     ) {
-                        TrackCard(it,
-                            modifier = Modifier.size(400.dp))
+                        TrackCard(
+                            it,
+                            modifier = Modifier.size(400.dp)
+                        )
                     }
                 }
             }
+        }
 
-            Button(onClick = {
-                scope.launch {
+        topSwipeCardState?.let {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                VoteOption.entries.reversed().forEach { vote ->
+                    VoteButton(
+                        selected = (when (it.currentSwipeDirection) {
+                            SwipeDirection.Up -> vote == VoteOption.DONT_CARE
+                            SwipeDirection.Left -> vote == VoteOption.REMOVE
+                            SwipeDirection.Right -> vote == VoteOption.KEEP
+                            else -> false
 
-                    topSwipeCardState?.swipe(SwipeDirection.Up)
+                        }),
+                        onClick = {
+                            scope.launch {
+                                it.swipe(
+                                    when (vote) {
+                                        VoteOption.KEEP -> SwipeDirection.Right
+                                        VoteOption.DONT_CARE -> SwipeDirection.Up
+                                        VoteOption.REMOVE -> SwipeDirection.Left
+                                    }
+                                )
+                            }
+                        },
+                        iconResId = vote.imgResId,
+                        selectionColor = vote.color,
+                        contentDescription = vote.contentDescription,
+                    )
                 }
-            }) { Text("swipe up") }
+            }
         }
     }
+
 
 //        LazyColumn(
 //            verticalArrangement = Arrangement.spacedBy(8.dp)
