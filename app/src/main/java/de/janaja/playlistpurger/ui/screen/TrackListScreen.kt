@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.data.model.VoteOption
+import de.janaja.playlistpurger.ui.component.IconSwitch
 import de.janaja.playlistpurger.ui.component.SwipeCard
 import de.janaja.playlistpurger.ui.component.SwipeCardState
 import de.janaja.playlistpurger.ui.component.TrackCard
@@ -58,8 +60,13 @@ fun TrackListScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Switch(checked = swipeModeOn,
-            onCheckedChange = { trackListViewModel.switchSwipeMode(it) })
+        Row {
+            Spacer(Modifier.weight(1f))
+            IconSwitch(
+                checked = swipeModeOn,
+                onCheckedChange = { trackListViewModel.switchSwipeMode(it) }
+            )
+        }
         if (swipeModeOn) {
             Box(
                 modifier = Modifier
