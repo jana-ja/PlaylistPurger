@@ -18,12 +18,12 @@ enum class VoteOption(val value: Int, val imgResId: Int, val contentDescription:
     }
 
     companion object {
-        fun fromSwipeDirection(dir: SwipeDirection): VoteOption {
+        fun fromSwipeDirection(dir: SwipeDirection): VoteOption? {
             return when (dir) {
                 SwipeDirection.Left -> REMOVE
                 SwipeDirection.Right -> KEEP
                 SwipeDirection.Up -> DONT_CARE
-                SwipeDirection.Down -> DONT_CARE // TODO
+                SwipeDirection.Down -> null
             }
         }
     }

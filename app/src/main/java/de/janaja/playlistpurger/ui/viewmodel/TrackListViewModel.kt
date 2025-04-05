@@ -95,7 +95,10 @@ class TrackListViewModel(
     }
 
     fun onSwipe(dir: SwipeDirection, track: Track) {
-        onChangeVote(track, VoteOption.fromSwipeDirection(dir))
+        // TODO darf nicht passieren dass das null ist, dann wäre gültiger down swipe passiert, aber swipe card sollte das blocken
+        VoteOption.fromSwipeDirection(dir)?.let {
+            onChangeVote(track, it)
+        }
     }
 
     fun switchSwipeMode(isOn: Boolean) {
