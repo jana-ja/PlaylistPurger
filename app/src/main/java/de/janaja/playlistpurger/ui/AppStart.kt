@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.TrackListScreen
@@ -36,9 +38,13 @@ object PlaylistOverviewRoute
 
 @Serializable
 data class TrackListRoute(
-    val playlistId: String
+    val playlistId: String,
+    val playlistName: String
 )
 
+data class TopBarUiState(
+    val title: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,11 +52,12 @@ fun AppStart(
     onLogOut: () -> Unit
 ) {
     val navController = rememberNavController()
+    var topBarUiState by remember { mutableStateOf(TopBarUiState("Playlist Purger")) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Playlist Purger") },
+                title = { Text(topBarUiState.title) },
                 actions = {
                     IconButton(onClick = onLogOut) {
                         Icon(
@@ -68,9 +75,10 @@ fun AppStart(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<PlaylistOverviewRoute> {
+                topBarUiState = TopBarUiState("All Playlists")
                 PlaylistOverviewScreen(
-                    onNavToTrackList = { playlistId ->
-                        navController.navigate(TrackListRoute(playlistId))
+                    onNavToTrackList = { playlistId, playlistName ->
+                        navController.navigate(TrackListRoute(playlistId, playlistName))
                     }
                 )
             }
@@ -79,7 +87,9 @@ fun AppStart(
 
             }
 
-            composable<TrackListRoute> {
+            composable<TrackListRoute> { iwas ->
+                val name = iwas.toRoute<TrackListRoute>().playlistName
+                topBarUiState = TopBarUiState(name)
                 TrackListScreen()
             }
 

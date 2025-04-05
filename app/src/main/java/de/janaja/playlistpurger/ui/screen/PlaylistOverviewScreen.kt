@@ -22,7 +22,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PlaylistOverviewScreen(
-    onNavToTrackList: (String) -> Unit,
+    onNavToTrackList: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     welcomeViewModel: PlaylistOverviewViewModel = koinViewModel()
 ) {
@@ -41,7 +41,7 @@ fun PlaylistOverviewScreen(
             items(playlists) {
                 PlaylistItem(it,
                     Modifier.clickable {
-                        onNavToTrackList(it.id)
+                        onNavToTrackList(it.id, it.name)
                     }
                 )
             }
@@ -53,5 +53,5 @@ fun PlaylistOverviewScreen(
 @Composable
 private fun PlaylistOverviewScreenPreview() {
     // Use Theme here
-    PlaylistOverviewScreen({})
+    PlaylistOverviewScreen({a,b ->})
 }
