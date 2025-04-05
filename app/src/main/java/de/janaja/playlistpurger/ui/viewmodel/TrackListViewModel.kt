@@ -29,7 +29,7 @@ class TrackListViewModel(
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
 
-    private val _swipeModeOn = MutableStateFlow(false)
+    private val _swipeModeOn = MutableStateFlow(true)
     val swipeModeOn = _swipeModeOn.asStateFlow()
 
     val trackList = trackListRepo.allTracks

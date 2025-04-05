@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,15 +59,19 @@ fun TrackListScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Switch(checked = swipeModeOn,
-            onCheckedChange = {trackListViewModel.switchSwipeMode(it)})
+            onCheckedChange = { trackListViewModel.switchSwipeMode(it) })
         if (swipeModeOn) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Column {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     Text("Alle Songs wurden gevotet")
-                    Button(onClick = {
+                    FilledTonalButton(onClick = {
                         trackListViewModel.switchSwipeMode(false)
                     }) { Text("Zur Listenansicht") }
                 }
