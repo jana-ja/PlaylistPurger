@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.data.model.VoteOption
 import de.janaja.playlistpurger.ui.component.SwipeCard
 import de.janaja.playlistpurger.ui.component.SwipeCardState
-import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.component.TrackCard
+import de.janaja.playlistpurger.ui.component.TrackItem
 import de.janaja.playlistpurger.ui.component.VoteButton
 import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
@@ -35,10 +39,14 @@ fun TrackListScreen(
 ) {
     val TAG = "TrackListScreen"
 
+    val swipeModeOn by trackListViewModel.swipeModeOn.collectAsState()
+
+    val trackList by trackListViewModel.trackList.collectAsState()
+
+    // swipe
     val swipeableTracks by trackListViewModel.swipeTracks.collectAsState(
         emptyList()
     )
-
     var topSwipeCardState: SwipeCardState? = null
     val scope = rememberCoroutineScope()
 
@@ -47,71 +55,80 @@ fun TrackListScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Keine SOngs Ürbig wechsel zu liste")
+        Switch(checked = swipeModeOn,
+            onCheckedChange = {trackListViewModel.switchSwipeMode(it)})
+        if (swipeModeOn) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Column {
 
-            swipeableTracks.reversed().forEachIndexed { index, track ->
-                key(track.id) {
-                    val br = rememberSwipeCardState()
-                    if (index == swipeableTracks.lastIndex) {
-                        topSwipeCardState = br
+                    Text("Alle Songs wurden gevotet")
+                    Button(onClick = {
+
+                    }) { Text("Zur Listenansicht") }
+                }
+
+
+                swipeableTracks.reversed().forEachIndexed { index, track ->
+                    key(track.id) {
+                        val br = rememberSwipeCardState()
+                        if (index == swipeableTracks.lastIndex) {
+                            topSwipeCardState = br
+                        }
+                        SwipeCard(
+                            swipeCardState = br,
+                            onSwiped = { dir ->
+                                trackListViewModel.onSwipe(dir, track)
+
+                            },
+                        ) {
+                            TrackCard(
+                                track,
+                                modifier = Modifier.size(400.dp)
+                            )
+                        }
                     }
-                    SwipeCard(
-                        swipeCardState = br,
-                        onSwiped = { dir ->
-                            trackListViewModel.onSwipe(dir, track)
+                }
+            }
 
-                        },
-                    ) {
-                        TrackCard(
-                            track,
-                            modifier = Modifier.size(400.dp)
+            topSwipeCardState?.let {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    VoteOption.entries.reversed().forEach { vote ->
+                        VoteButton(
+                            selected = (vote == it.currentSwipeDirection?.let { it1 ->
+                                VoteOption.fromSwipeDirection(it1)
+                            }),
+                            onClick = {
+                                scope.launch {
+                                    it.swipe(vote.getSwipeDirection())
+                                }
+                            },
+                            iconResId = vote.imgResId,
+                            selectionColor = vote.color,
+                            contentDescription = vote.contentDescription,
                         )
                     }
                 }
             }
-        }
-
-        topSwipeCardState?.let {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                VoteOption.entries.reversed().forEach { vote ->
-                    VoteButton(
-                        selected = (vote == it.currentSwipeDirection?.let { it1 ->
-                            VoteOption.fromSwipeDirection(it1)
-                        }),
-                        onClick = {
-                            scope.launch {
-                                it.swipe(vote.getSwipeDirection())
-                            }
-                        },
-                        iconResId = vote.imgResId,
-                        selectionColor = vote.color,
-                        contentDescription = vote.contentDescription,
-                    )
+                items(trackList) { track ->
+                    TrackItem(track, onChangeVote = { newVote ->
+                        trackListViewModel.onChangeVote(track, newVote)
+                    })
                 }
             }
         }
     }
-
-
-//        LazyColumn(
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            items(trackList) { track ->
-//                TrackItem(track, onChangeVote = { newVote ->
-//                    trackListViewModel.onChangeVote(track, newVote)
-//                })
-//            }
-//        }
-
 }
 
 

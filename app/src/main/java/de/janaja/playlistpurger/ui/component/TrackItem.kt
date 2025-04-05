@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,8 +36,11 @@ fun TrackItem(
 
             Column(Modifier.weight(1f)) {
 
-                Text(track.name)
-                Text("${track.durationMillis / 1000}s")
+                Text(track.name, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    track.artists.joinToString(", ") { it.name },
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             // Radio Group hatte sehr interessantes

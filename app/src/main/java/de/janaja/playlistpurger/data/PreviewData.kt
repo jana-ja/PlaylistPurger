@@ -25,6 +25,7 @@ object PreviewData {
         id = "heufh",
         name = "Track track",
         durationMillis = 2000000,
-        album = Album(listOf(), "")
+        album = Album(listOf(), ""),
+        artists = listOf()
     )
 }

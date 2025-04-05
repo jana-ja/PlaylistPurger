@@ -19,22 +19,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/*
-viewmodel pro track?
-    jeder trakc fragt einzeln ab wie gevoted wurde?
-
-viewmodel für tracklist
-    abfrage an server für playlist & user -> alle votes dafür bekommen
-    oder abfrage mit allen track ids & user (ne playlist info muss eh dabei sein, man kann in unterschiedlichen playlists für den gleichen song unterschiedlich voten)
-
-playlist tracks repository
-    -> holt die tracks der playlist von spotify api
-    -> holt für playlist und userid die votes vom server
-    -> ordnet zu, vllt domain model?
-
-    -> user votet -> wird an server gechickt, dann okay antwort abwarten und lokal updaten? neu von server abfragen vllt übertrieben?
- */
-
 class TrackListViewModel(
     private val dataStoreRepo: DataStoreRepo,
     private val trackListRepo: TrackListRepo,
@@ -44,6 +28,10 @@ class TrackListViewModel(
 
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
+
+    private val _swipeModeOn = MutableStateFlow(false)
+    val swipeModeOn = _swipeModeOn.asStateFlow()
+
     val trackList = trackListRepo.allTracks
         .onEach {
             Log.d(TAG, "allTracks: updatet")
@@ -54,10 +42,9 @@ class TrackListViewModel(
             initialValue = emptyList()
         )
 
+    // swipe
     val unvotedTracks = trackList.map { list ->
         list.filter { it.vote == null }
-    }.onEach {
-        Log.d(TAG, "unvotedTracks: updatet ${it.map { it.name }}")
     }
 
     val swipeTracks =
@@ -65,13 +52,15 @@ class TrackListViewModel(
         listOfNotNull(list.getOrNull(0), list.getOrNull(1))
     }
 
-
-    private val _swipeMode = MutableStateFlow(false)
-    val swipeMode = _swipeMode.asStateFlow()
-
-
     init {
         loadTrackList()
+    }
+
+    fun switchSwipeMode(isOn: Boolean) {
+        _swipeModeOn.value = isOn
+        if (isOn) {
+
+        }
     }
 
     private fun loadTrackList() {
@@ -89,23 +78,16 @@ class TrackListViewModel(
         }
     }
 
-    private fun onChangeVote(track: Track, newVote: VoteOption) {
+    fun onChangeVote(track: Track, newVote: VoteOption) {
         Log.d(TAG, "onChangeVote: $track")
         trackListRepo.updateVote(playlistId, track.id, newVote)
     }
 
+    // swipe mode
     fun onSwipe(dir: SwipeDirection, track: Track) {
         // TODO darf nicht passieren dass das null ist, dann wäre gültiger down swipe passiert, aber swipe card sollte das blocken
         VoteOption.fromSwipeDirection(dir)?.let {
             onChangeVote(track, it)
         }
     }
-
-    fun switchSwipeMode(isOn: Boolean) {
-        _swipeMode.value = isOn
-        if (isOn) {
-
-        }
-    }
-
 }

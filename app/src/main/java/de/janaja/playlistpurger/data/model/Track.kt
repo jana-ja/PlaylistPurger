@@ -8,6 +8,7 @@ data class Track(
     @Json(name = "duration_ms")
     val durationMillis: Int,
     val album: Album,
+    val artists: List<Artist>,
     // album
     // href
     // is local
