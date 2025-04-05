@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.alexstyl.swipeablecard.rememberSwipeableCardState
+import de.janaja.playlistpurger.data.model.Album
 import de.janaja.playlistpurger.data.model.Track
 import de.janaja.playlistpurger.data.model.VoteOption
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
@@ -46,7 +48,6 @@ class TrackListViewModel(
 
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
-
     val trackList = trackListRepo.allTracks
         .onEach {
             Log.d(TAG, "allTracks: updatet")
@@ -57,18 +58,35 @@ class TrackListViewModel(
             initialValue = emptyList()
         )
 
-    val unvotedTracks: Flow<List<Track>> = trackList.map { list ->
+    val unvotedTracks = trackList.map { list ->
         list.filter { it.vote == null }
     }.onEach {
-        Log.d(TAG, "unvotedTracks: updatet $it")
+        Log.d(TAG, "unvotedTracks: updatet ${it.map { it.name }}")
     }
 
+    val testTracks = (1..10).map {
+        Track(
+            id = "$it",
+            name = "$it",
+            durationMillis = 0,
+            album = Album(
+                images = listOf(),
+                name = ""
+            )
+        )
+    }
+
+    val currentidx = 2
     val swipeTracks =
-//        MutableStateFlow<List<Track>>(listOf())
+//        MutableStateFlow<List<Track>>(testTracks.subList(0,2))
     unvotedTracks.map { list ->
         listOf(list.getOrNull(0), list.getOrNull(1))
             .filterNotNull()
     }
+        .onEach {
+            Log.d(TAG, "swipeTracks: updatet ${it.map { it.name }}")
+
+        }
 
 //    val currentSwipeTrack = trackListRepo.unvotedTracks.map {
 //        it.firstOrNull()
@@ -107,14 +125,15 @@ class TrackListViewModel(
                 // TODO response check und auf 401 reagieren
 //                val bla = trackList.value.map { it.id }
 //                Log.d(TAG, "loadTrackList: $bla")
-                Log.d(TAG, "loadAllPlaylists: success")
+//                Log.d(TAG, "loadAllPlaylists: success")
             } catch (e: Exception) {
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
             }
         }
     }
 
-    fun onChangeVote(track: Track, newVote: VoteOption) {
+    private fun onChangeVote(track: Track, newVote: VoteOption) {
+        Log.d(TAG, "onChangeVote: $track")
         trackListRepo.updateVote(playlistId, track.id, newVote)
         // TODO richtig machen:
 //        trackList.value = trackList.value.map {
@@ -142,6 +161,9 @@ class TrackListViewModel(
 //        val newList = listOf(swipeTracks.value.get(1), trackList.value.get(2))
 //
 //        swipeTracks.value = newList
+
+//        swipeTracks.value = swipeTracks.value.re
+
 
 
     }

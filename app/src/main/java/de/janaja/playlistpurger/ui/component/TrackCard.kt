@@ -42,5 +42,5 @@ fun TrackCard(
 @Composable
 private fun TrackCardPreview() {
     // Use Theme here
-    TrackCard(PreviewData.track)
+    TrackCard(PreviewData.previewTrack)
 }

@@ -76,5 +76,5 @@ fun PlaylistItem(
 @Composable
 private fun PlaylistItemPreview() {
     // Use Theme here
-    PlaylistItem(PreviewData.playlist)
+    PlaylistItem(PreviewData.previewPlaylist)
 }

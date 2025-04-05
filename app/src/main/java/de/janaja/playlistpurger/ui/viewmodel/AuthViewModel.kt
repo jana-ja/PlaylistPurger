@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID
 import com.spotify.sdk.android.auth.AccountsQueryParameters.REDIRECT_URI
 import com.spotify.sdk.android.auth.AuthorizationClient
@@ -49,6 +50,10 @@ class AuthViewModel(
 
     init {
         checkUserLoggedIn()
+        viewModelScope.launch {
+
+//            refreshToken()
+        }
     }
 
     /*
@@ -90,7 +95,7 @@ class AuthViewModel(
     private suspend fun checkToken() {
         // TODO implement
         if (false) {
-            refreshToken()
+//            refreshToken()
         }
     }
 

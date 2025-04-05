@@ -57,12 +57,6 @@ android {
         compose = true
         buildConfig = true
     }
-
-//        configurations {
-//            implementation.exclude(module:'proto-google-common-protos')
-//            implementation.exclude module:'protobuf-java'
-//        }
-
 }
 
 dependencies {
@@ -104,5 +98,7 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    // swipeable card
+    implementation(libs.swipeablecard)
 
 }

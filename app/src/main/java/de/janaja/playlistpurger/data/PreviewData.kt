@@ -7,7 +7,7 @@ import de.janaja.playlistpurger.data.model.PlaylistTracks
 import de.janaja.playlistpurger.data.model.Track
 
 object PreviewData {
-    val playlist = Playlist(
+    val previewPlaylist = Playlist(
         id = "ijgüo",
         name = "Playlist Test",
         description = "Description of Playlist",
@@ -21,7 +21,7 @@ object PreviewData {
         ),
         type = "type",
     )
-    val track = Track(
+    val previewTrack = Track(
         id = "heufh",
         name = "Track track",
         durationMillis = 2000000,

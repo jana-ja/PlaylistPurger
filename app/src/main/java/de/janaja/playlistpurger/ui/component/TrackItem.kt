@@ -67,5 +67,5 @@ fun TrackItem(
 @Composable
 private fun TrackItemPreview() {
     // Use Theme here
-    TrackItem(PreviewData.track, {})
+    TrackItem(PreviewData.previewTrack, {})
 }
