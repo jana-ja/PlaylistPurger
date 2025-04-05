@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.ui.component
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.VectorConverter
@@ -14,6 +13,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlin.math.abs
 
 @Composable
 fun rememberSwipeCardState(): SwipeCardState {
@@ -38,12 +38,7 @@ class SwipeCardState(
 ) {
     val offset = Animatable(offset(0f, 0f), Offset.VectorConverter)
 
-    /**
-     * The [SwipeDirection] the card was swiped at.
-     *
-     * Null value means the card has not been swiped fully yet.
-     */
-    var swipedDirection: SwipeDirection? by mutableStateOf(null)
+    var finalSwipeDirection: SwipeDirection? by mutableStateOf(null)
         private set
 
     var currentSwipeDirection: SwipeDirection? by mutableStateOf(null)
@@ -62,15 +57,53 @@ class SwipeCardState(
             SwipeDirection.Up -> offset.animateTo(offset(y = -endY), animationSpec)
             SwipeDirection.Down -> offset.animateTo(offset(y = endY), animationSpec)
         }
-        this.swipedDirection = direction
+        this.finalSwipeDirection = direction
     }
 
     private fun offset(x: Float = offset.value.x, y: Float = offset.value.y): Offset {
         return Offset(x, y)
     }
 
-    internal suspend fun drag(direction: SwipeDirection?, x: Float, y: Float) {
-        this.currentSwipeDirection = direction
-        offset.animateTo(offset(x, y))
+    internal suspend fun drag(newOffset: Offset) {
+        this.currentSwipeDirection = getDirection(newOffset)
+        offset.animateTo(newOffset)
+    }
+
+    internal suspend fun dragEnd(newOffset: Offset) {
+        val dir = this.getDirection(
+            newOffset
+        )
+        if (dir == null) {
+            this.reset()
+        } else {
+            this.swipe(dir)
+        }
+    }
+
+    private fun getDirection(offset: Offset): SwipeDirection? {
+        val horizontalTravel = abs(offset.x)
+        val verticalTravel = abs(offset.y)
+        if (hasNotTravelledEnough(offset)) {
+            return null
+        }
+        return if (horizontalTravel > verticalTravel) {
+            if (offset.x > 0)
+                SwipeDirection.Right
+            else
+                SwipeDirection.Left
+        } else {
+            if (offset.y < 0)
+                SwipeDirection.Up
+            else
+                SwipeDirection.Down
+        }
+    }
+
+    private fun hasNotTravelledEnough(
+        offset: Offset,
+    ): Boolean {
+        return abs(offset.x) < maxWidth / 4 &&
+//            abs(offset.y) < maxHeight / 4 // TODO das macht keinen sinn karte ist viel weniger hoch als bildschirm,
+                abs(offset.y) < maxWidth / 4 // TODO richtig lösen
     }
 }

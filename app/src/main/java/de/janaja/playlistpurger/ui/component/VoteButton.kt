@@ -1,5 +1,6 @@
 package de.janaja.playlistpurger.ui.component
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,8 +20,6 @@ fun VoteButton(
     contentDescription: String,
     modifier: Modifier = Modifier
 ) {
-
-
     if (selected) {
         FilledTonalIconButton(
             onClick = onClick,
@@ -29,7 +28,6 @@ fun VoteButton(
         ) {
             Icon(
                 painter = painterResource(iconResId), contentDescription = contentDescription,
-
                 )
         }
     } else {
@@ -39,7 +37,6 @@ fun VoteButton(
         ) {
             Icon(
                 painter = painterResource(iconResId), contentDescription = contentDescription,
-                modifier = modifier
             )
         }
     }

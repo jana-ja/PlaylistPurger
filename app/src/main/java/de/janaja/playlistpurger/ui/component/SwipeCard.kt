@@ -3,9 +3,12 @@ package de.janaja.playlistpurger.ui.component
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -18,12 +21,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.data.model.VoteOption
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonNull.content
-import kotlin.math.abs
 
 @Composable
 fun SwipeCard(
@@ -31,19 +32,31 @@ fun SwipeCard(
     swipeCardState: SwipeCardState = rememberSwipeCardState(),
     content: @Composable () -> Unit
 ) {
-
-
-    val offset2 by remember(swipeCardState) {
+    val offset by remember(swipeCardState) {
         derivedStateOf { swipeCardState.offset }
     }
     val currentDir by remember(swipeCardState) {
         derivedStateOf { swipeCardState.currentSwipeDirection }
     }
+    val finalSwipeDirection by remember(swipeCardState) {
+        derivedStateOf { swipeCardState.finalSwipeDirection }
+    }
 
+    var buttonClickSwipe by remember { mutableStateOf<SwipeDirection?>(null) }
 
+    LaunchedEffect(buttonClickSwipe) {
+        buttonClickSwipe?.let {
+            swipeCardState.swipe(it)
+            buttonClickSwipe = null
+        }
+    }
+
+    LaunchedEffect(finalSwipeDirection) {
+        Log.d("SwipeCard", "SwipeCard: $finalSwipeDirection")
+        finalSwipeDirection?.let(onSwiped)
+    }
 
     Column {
-
         Box(modifier = Modifier
             .pointerInput(Unit) {
                 coroutineScope {
@@ -63,13 +76,8 @@ fun SwipeCard(
                                     )
                                 )
                                 if (change.positionChange() != Offset.Zero) change.consume()
-                                val dir = getDirection(
-                                    newValue,
-                                    swipeCardState.maxWidth,
-                                    swipeCardState.maxHeight
-                                )
-                                Log.d("GRRR", "SwipeCard: $dir")
-                                swipeCardState.drag(dir, newValue.x, newValue.y)
+
+                                swipeCardState.drag(newValue)
                             }
                         },
                         onDragEnd = {
@@ -81,32 +89,26 @@ fun SwipeCard(
                                         maxWidth = swipeCardState.maxWidth
                                     )
 
-                                val dir = getDirection(
-                                    coercedOffset,
-                                    swipeCardState.maxWidth,
-                                    swipeCardState.maxHeight
-                                )
-                                if (dir == null) {
-                                    swipeCardState.reset()
-                                } else {
-                                    swipeCardState.swipe(dir)
-                                    onSwiped(dir)
-                                }
+                                swipeCardState.dragEnd(coercedOffset)
                             }
                         }
                     )
                 }
             }
             .graphicsLayer(
-                translationX = offset2.value.x,
-                translationY = offset2.value.y,
-//                alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f).value,
-                rotationZ = animateFloatAsState(offset2.value.x / 50).value
+                translationX = offset.value.x,
+                translationY = offset.value.y,
+                rotationZ = animateFloatAsState(offset.value.x / 50).value
             )) {
             content()
         }
 
-        Row() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
             VoteOption.entries.reversed().forEach { vote ->
                 VoteButton(
                     selected = (when (currentDir) {
@@ -117,45 +119,17 @@ fun SwipeCard(
 
                     }),
                     onClick = {
-//                        coroutineScope {
-//                            when (vote) {
-//                                VoteOption.KEEP -> {
-//                                    swipeCardState.swipe(Direction.Right)
-////                                dismissRight = true
-//                                }
-//
-//                                VoteOption.DONT_CARE -> {}
-//                                VoteOption.REMOVE -> {
-//                                    dismissLeft = true
-//                                }
-//                            }
-//                        }
+                        buttonClickSwipe = when (vote) {
+                            VoteOption.KEEP -> SwipeDirection.Right
+                            VoteOption.DONT_CARE -> SwipeDirection.Up
+                            VoteOption.REMOVE -> SwipeDirection.Left
+                        }
                     },
                     iconResId = vote.imgResId,
-                    contentDescription = vote.contentDescription
+                    contentDescription = vote.contentDescription,
                 )
             }
         }
-
-    }
-}
-
-private fun getDirection(offset: Offset, maxWidth: Float, maxHeight: Float): SwipeDirection? {
-    val horizontalTravel = abs(offset.x)
-    val verticalTravel = abs(offset.y)
-    if (hasNotTravelledEnough(maxWidth, maxHeight, offset)) {
-        return null
-    }
-    return if (horizontalTravel > verticalTravel) {
-        if (offset.x > 0)
-            SwipeDirection.Right
-        else
-            SwipeDirection.Left
-    } else {
-        if (offset.y < 0)
-            SwipeDirection.Up
-        else
-            SwipeDirection.Down
     }
 }
 
@@ -192,12 +166,3 @@ private fun Offset.coerceIn(
     )
 }
 
-private fun hasNotTravelledEnough(
-    maxWidth: Float,
-    maxHeight: Float, //: SwipeCardState,
-    offset: Offset,
-): Boolean {
-    return abs(offset.x) < maxWidth / 4 &&
-//            abs(offset.y) < maxHeight / 4 // TODO das macht keinen sinn karte ist viel weniger hoch als bildschirm,
-            abs(offset.y) < maxWidth / 4 // TODO richtig lösen
-}
