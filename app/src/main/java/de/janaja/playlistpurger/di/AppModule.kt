@@ -11,6 +11,7 @@ import de.janaja.playlistpurger.data.repository.TrackListRepoImpl
 import de.janaja.playlistpurger.data.remote.VoteApi
 import de.janaja.playlistpurger.data.remote.VoteApiDummyImpl
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
+import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import org.koin.android.ext.koin.androidContext
@@ -51,4 +52,7 @@ val appModule = module {
 
     // TrackListViewModel uses VoteRepo and TrackListRepo and DataStoreRepo
     viewModelOf(::TrackListViewModel)
+
+    // VoteResultViewModel uses TrackListRepo
+    viewModelOf(::VoteResultViewModel)
 }

@@ -1,14 +1,12 @@
 package de.janaja.playlistpurger.data.repository
 
-import android.util.Log
 import de.janaja.playlistpurger.data.model.Track
+import de.janaja.playlistpurger.data.model.Vote
 import de.janaja.playlistpurger.data.model.VoteOption
 import de.janaja.playlistpurger.data.remote.SpotifyApi
 import de.janaja.playlistpurger.data.remote.VoteApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
 class TrackListRepoImpl(
@@ -27,13 +25,13 @@ class TrackListRepoImpl(
 
     override val allTracks = MutableStateFlow<List<Track>>(listOf())
 
-    override val unvotedTracks: Flow<List<Track>> = allTracks.map { list ->
-        list.filter { it.vote == null }
-    }.onEach {
-        Log.d(TAG, "unvotedTracks: updatet $it")
-    }
+//    override val unvotedTracks: Flow<List<Track>> = allTracks.map { list ->
+//        list.filter { it.vote == null }
+//    }.onEach {
+//        Log.d(TAG, "unvotedTracks: updatet $it")
+//    }
 
-    override suspend fun loadTracksWithVotes(playlistId: String) {
+    override suspend fun loadTracksWithOwnVotes(playlistId: String) {
         val token = tokenFlow.first() ?: throw Exception("No Token")
         val tracksResponse = api.getTracksForPlaylist("Bearer $token", playlistId)
 
@@ -45,6 +43,18 @@ class TrackListRepoImpl(
             tracksFromSpotify.map { track -> track.copy(vote = votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
 
         allTracks.value = mergedTracks
+
+    }
+
+    override suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<Track, List<Vote>>> {
+        if (allTracks.value.isEmpty()) {
+            loadTracksWithOwnVotes(playlistId)
+        }
+
+        // get all votes
+        val allVotesByTrackId = voteApi.getAllVotesForPlaylist(playlistId).groupBy { it.trackId }
+
+        return allTracks.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
 
     }
 

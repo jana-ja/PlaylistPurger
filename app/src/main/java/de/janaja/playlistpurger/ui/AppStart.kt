@@ -28,6 +28,7 @@ import androidx.navigation.toRoute
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.TrackListScreen
+import de.janaja.playlistpurger.ui.screen.VoteResultScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,6 +39,12 @@ object PlaylistOverviewRoute
 
 @Serializable
 data class TrackListRoute(
+    val playlistId: String,
+    val playlistName: String
+)
+
+@Serializable
+data class VoteResultRoute(
     val playlistId: String,
     val playlistName: String
 )
@@ -79,6 +86,9 @@ fun AppStart(
                 PlaylistOverviewScreen(
                     onNavToTrackList = { playlistId, playlistName ->
                         navController.navigate(TrackListRoute(playlistId, playlistName))
+                    },
+                    onNavToResult = { playlistId, playlistName ->
+                        navController.navigate(VoteResultRoute(playlistId, playlistName))
                     }
                 )
             }
@@ -91,6 +101,12 @@ fun AppStart(
                 val name = iwas.toRoute<TrackListRoute>().playlistName
                 topBarUiState = TopBarUiState(name)
                 TrackListScreen()
+            }
+
+            composable<VoteResultRoute> { iwas ->
+                val name = iwas.toRoute<VoteResultRoute>().playlistName
+                topBarUiState = TopBarUiState(name)
+                VoteResultScreen()
             }
 
         }

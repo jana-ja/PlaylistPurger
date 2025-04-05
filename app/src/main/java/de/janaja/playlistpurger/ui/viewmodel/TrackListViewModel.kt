@@ -66,7 +66,7 @@ class TrackListViewModel(
     private fun loadTrackList() {
         viewModelScope.launch {
             try {
-                trackListRepo.loadTracksWithVotes(playlistId)
+                trackListRepo.loadTracksWithOwnVotes(playlistId)
 
                 // TODO response check und auf 401 reagieren
 //                val bla = trackList.value.map { it.id }

@@ -7,5 +7,6 @@ import de.janaja.playlistpurger.data.model.VoteOption
 interface VoteApi {
 
     fun getVotesForPlaylist(playlistId: String, userId: String): List<Vote>
+    fun getAllVotesForPlaylist(playlistId: String): List<Vote>
     fun upsertVote(playlistId: String, trackId: String, userId: String, newVote: VoteOption)
 }
