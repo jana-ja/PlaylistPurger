@@ -17,6 +17,7 @@ import de.janaja.playlistpurger.data.remote.SpotifyAccountApi
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -49,10 +50,10 @@ class AuthViewModel(
     private val api = SpotifyAccountApi.retrofitService
 
     init {
-        checkUserLoggedIn()
         viewModelScope.launch {
-
-//            refreshToken()
+            // TODO make better
+            refreshToken()
+        checkUserLoggedIn()
         }
     }
 
@@ -101,7 +102,9 @@ class AuthViewModel(
 
     @OptIn(ExperimentalEncodingApi::class)
     private suspend fun refreshToken() {
-            refreshTokenFlow.collect { value ->
+            val value = refreshTokenFlow.first()
+
+//            { value ->
                 Log.d(TAG, "refresh token collect: $value")
                 Log.d(TAG, "try receive refresh token from data store")
 
@@ -130,7 +133,7 @@ class AuthViewModel(
                 }
                 Log.d(TAG, "token: $value")
                 _isLoading.value = false
-            }
+//            }
 
     }
 
