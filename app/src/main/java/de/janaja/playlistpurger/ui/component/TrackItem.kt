@@ -61,6 +61,7 @@ fun TrackItem(
                         onClick = { onChangeVote(vote) },
                         iconResId = vote.imgResId,
                         selectionColor = vote.color,
+                        selectionScaling = 1.1f,
                         contentDescription = vote.contentDescription
                     )
                 }

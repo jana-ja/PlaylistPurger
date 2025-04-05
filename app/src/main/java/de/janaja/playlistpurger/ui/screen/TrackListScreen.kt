@@ -53,7 +53,8 @@ fun TrackListScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Switch(checked = swipeModeOn,
             onCheckedChange = {trackListViewModel.switchSwipeMode(it)})
@@ -63,13 +64,11 @@ fun TrackListScreen(
                     .fillMaxWidth()
             ) {
                 Column {
-
                     Text("Alle Songs wurden gevotet")
                     Button(onClick = {
-
+                        trackListViewModel.switchSwipeMode(false)
                     }) { Text("Zur Listenansicht") }
                 }
-
 
                 swipeableTracks.reversed().forEachIndexed { index, track ->
                     key(track.id) {
@@ -86,7 +85,7 @@ fun TrackListScreen(
                         ) {
                             TrackCard(
                                 track,
-                                modifier = Modifier.size(400.dp)
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -112,6 +111,7 @@ fun TrackListScreen(
                             },
                             iconResId = vote.imgResId,
                             selectionColor = vote.color,
+                            selectionScaling = 1.5f,
                             contentDescription = vote.contentDescription,
                         )
                     }

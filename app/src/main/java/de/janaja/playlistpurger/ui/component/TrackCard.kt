@@ -2,10 +2,11 @@ package de.janaja.playlistpurger.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,19 +26,21 @@ fun TrackCard(
 ) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
-
                 model = track.album.images.firstOrNull()?.url,
                 contentDescription = "Cover of Track",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                    .fillMaxWidth()
                     .aspectRatio(1f)
             )
+
+            Spacer(Modifier.height(8.dp))
+
+            // TODO handle long track names
             Text(
                 track.name,
                 style = MaterialTheme.typography.titleLarge
