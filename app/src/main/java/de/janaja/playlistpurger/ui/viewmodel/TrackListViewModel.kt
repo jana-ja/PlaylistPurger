@@ -157,6 +157,12 @@ class TrackListViewModel(
 
     }
 
+    fun swipeUp(track: Track) {
+        onChangeVote(track, VoteOption.DONT_CARE)
+//        Log.d(TAG, "swipeRight: ")
+        nextSwipeTrack()
+    }
+
     private fun nextSwipeTrack() {
 //        val newList = listOf(swipeTracks.value.get(1), trackList.value.get(2))
 //

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,7 +22,9 @@ import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
 import de.janaja.playlistpurger.data.PreviewData.previewTrack
 import de.janaja.playlistpurger.ui.component.SwipeCard
+import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.component.TrackCard
+import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,16 +70,16 @@ fun TrackListScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+//                .height(400.dp)
         ) {
             Text("Keine SOngs Ürbig wechsel zu liste")
 
-            swipeStates.reversed().forEach { (track, state) ->
-//                if (state.swipedDirection == null) {
-//                key(track.id) {
+            // Mit diesem code wird der TrackListScreen permanent recomposed onDrag, wenn ich bei der eigenen SwipeCard das genauso einrichte (rememberState wird im Aufruf erzeugt) dann ist das nicht so, vllt weil es hier ein Modifier ist?
+            swipableTracks.reversed().forEach { track ->
+                key(track.id) {
                 TrackCard(track,
                     modifier = Modifier.swipableCard(
-                        state = state,
+                        state = rememberSwipeableCardState(),
                         onSwiped = { direction ->
                             when (direction) {
                                 Direction.Left -> {
@@ -95,28 +98,37 @@ fun TrackListScreen(
                         }
                     )
                 )
-//                }
-//                }
-            }
-        }
-            Box {
-            swipableTracks.reversed().forEach {
-                key(it.id) {
-                    SwipeCard(
-                        id = it.name,
-                        onSwipeRight = {
-                            Log.d(TAG, "onSwipeRight next: ")
-                            trackListViewModel.swipeRight(it)
-                        },
-                        onSwipeLeft = {
-                            Log.d(TAG, "onSwipeLeft next: ")
-                            trackListViewModel.swipeLeft(it)
-                        }
-                    ) {
-                        TrackCard(it)
-                    }
                 }
+
             }
+//        }
+//            Box {
+//            swipableTracks.reversed().forEach {
+//                key(it.id) {
+//                    SwipeCard(
+//                        swipeCardState = rememberSwipeCardState(),
+//                        onSwiped = { dir ->
+//                            when (dir) {
+//                                SwipeDirection.Left -> trackListViewModel.swipeLeft(it)
+//                                SwipeDirection.Right -> trackListViewModel.swipeRight(it)
+//                                SwipeDirection.Up -> trackListViewModel.swipeUp(it)
+//                                SwipeDirection.Down -> {}
+//                            }
+//                        },
+////                        onSwipeRight = {
+////                            Log.d(TAG, "onSwipeRight next: ")
+////                            trackListViewModel.swipeRight(it)
+////                        },
+////                        onSwipeLeft = {
+////                            Log.d(TAG, "onSwipeLeft next: ")
+////                            trackListViewModel.swipeLeft(it)
+////                        },
+//                    ) {
+//                        TrackCard(it,
+//                            modifier = Modifier.size(400.dp))
+//                    }
+//                }
+//            }
 
 
 //            nextTrack?.let {

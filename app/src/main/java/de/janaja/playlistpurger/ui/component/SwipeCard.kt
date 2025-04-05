@@ -1,14 +1,14 @@
 package de.janaja.playlistpurger.ui.component
 
 import android.util.Log
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,102 +19,185 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import de.janaja.playlistpurger.data.model.Track
+import de.janaja.playlistpurger.data.model.VoteOption
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonNull.content
-import kotlin.math.roundToInt
+import kotlin.math.abs
 
 @Composable
 fun SwipeCard(
-    id: String,
-    onSwipeLeft: () -> Unit = {},
-    onSwipeRight: () -> Unit = {},
-    swipeThreshold: Float = 400f,
-    sensitivityFactor: Float = 3f,
+    onSwiped: (SwipeDirection) -> Unit,
+    swipeCardState: SwipeCardState = rememberSwipeCardState(),
     content: @Composable () -> Unit
 ) {
 
-    var offset by remember { mutableStateOf(0f) }
-    val offseti by animateFloatAsState(offset)// remember { Animatable(0f) }
-    var dismissRight by remember { mutableStateOf(false) }
-    var dismissLeft by remember { mutableStateOf(false) }
-    val density = LocalDensity.current.density
-    var reset by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        Log.d("SwipeCard", "SwipeCard: init: $id")
+    val offset2 by remember(swipeCardState) {
+        derivedStateOf { swipeCardState.offset }
     }
-//    Log.d("SwipeCard", "SwipeCard: recompose")
-
-    LaunchedEffect(dismissRight) {
-        if (dismissRight) {
-            offset = 1500f
-            delay(300)
-            onSwipeRight.invoke()
-            dismissRight = false
-        }
+    val currentDir by remember(swipeCardState) {
+        derivedStateOf { swipeCardState.currentSwipeDirection }
     }
 
-    LaunchedEffect(dismissLeft) {
-        if (dismissLeft) {
-            offset = -1500f
-//            withAnimation {
-//            offset.animateTo(-1000f)
-//            }
-            delay(300)
-            onSwipeLeft.invoke()
-            dismissLeft = false
-        }
-    }
 
-    LaunchedEffect(reset) {
-        if (reset) {
-            offset = 0f
-            reset = false
-        }
-    }
-    Box(modifier = Modifier
-        .offset { IntOffset(offseti.roundToInt(), 0) }
-        .pointerInput(Unit) {
-            detectHorizontalDragGestures(
-                onHorizontalDrag = { change, dragAmount ->
-//                    val new = offset.value + (dragAmount / density) * sensitivityFactor
-//                    offset.animateTo(new)
-                    offset += (dragAmount / density) * sensitivityFactor
-                    if (change.positionChange() != Offset.Zero) change.consume()
-                },
-                onDragEnd = {
-                    Log.d("TrackList", "onDragEnd: $offset")
-                    when {
-                        offset > swipeThreshold -> {
-                            dismissRight = true
-                            Log.d("TrackList", "SwipeCard: dismiss right")
+
+    Column {
+
+        Box(modifier = Modifier
+            .pointerInput(Unit) {
+                coroutineScope {
+                    detectDragGestures(
+                        onDrag = { change, dragAmount ->
+                            launch {
+                                val original = swipeCardState.offset.targetValue
+                                val summed = original + dragAmount
+                                val newValue = Offset(
+                                    x = summed.x.coerceIn(
+                                        -swipeCardState.maxWidth,
+                                        swipeCardState.maxWidth
+                                    ),
+                                    y = summed.y.coerceIn(
+                                        -swipeCardState.maxHeight,
+                                        swipeCardState.maxHeight
+                                    )
+                                )
+                                if (change.positionChange() != Offset.Zero) change.consume()
+                                val dir = getDirection(
+                                    newValue,
+                                    swipeCardState.maxWidth,
+                                    swipeCardState.maxHeight
+                                )
+                                Log.d("GRRR", "SwipeCard: $dir")
+                                swipeCardState.drag(dir, newValue.x, newValue.y)
+                            }
+                        },
+                        onDragEnd = {
+                            launch {
+                                val coercedOffset = swipeCardState.offset.targetValue
+                                    .coerceIn(
+                                        listOf(SwipeDirection.Down),
+                                        maxHeight = swipeCardState.maxHeight,
+                                        maxWidth = swipeCardState.maxWidth
+                                    )
+
+                                val dir = getDirection(
+                                    coercedOffset,
+                                    swipeCardState.maxWidth,
+                                    swipeCardState.maxHeight
+                                )
+                                if (dir == null) {
+                                    swipeCardState.reset()
+                                } else {
+                                    swipeCardState.swipe(dir)
+                                    onSwiped(dir)
+                                }
+                            }
                         }
-                        offset < -swipeThreshold -> {
-                            dismissLeft = true
-                            Log.d("TrackList", "SwipeCard: dismiss left")
-                        }
-                        else -> {
-                            reset = true
-                        }
-                    }
+                    )
                 }
-            )
+            }
+            .graphicsLayer(
+                translationX = offset2.value.x,
+                translationY = offset2.value.y,
+//                alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f).value,
+                rotationZ = animateFloatAsState(offset2.value.x / 50).value
+            )) {
+            content()
         }
-        .graphicsLayer(
-            alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f).value,
-            rotationZ = animateFloatAsState(offset / 50).value
-        )) {
-        content()
+
+        Row() {
+            VoteOption.entries.reversed().forEach { vote ->
+                VoteButton(
+                    selected = (when (currentDir) {
+                        SwipeDirection.Up -> vote == VoteOption.DONT_CARE
+                        SwipeDirection.Left -> vote == VoteOption.REMOVE
+                        SwipeDirection.Right -> vote == VoteOption.KEEP
+                        else -> false
+
+                    }),
+                    onClick = {
+//                        coroutineScope {
+//                            when (vote) {
+//                                VoteOption.KEEP -> {
+//                                    swipeCardState.swipe(Direction.Right)
+////                                dismissRight = true
+//                                }
+//
+//                                VoteOption.DONT_CARE -> {}
+//                                VoteOption.REMOVE -> {
+//                                    dismissLeft = true
+//                                }
+//                            }
+//                        }
+                    },
+                    iconResId = vote.imgResId,
+                    contentDescription = vote.contentDescription
+                )
+            }
+        }
+
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun SwipeUiPreview() {
-//    // Use Theme here
-//    SwipeCard()
-//}
+private fun getDirection(offset: Offset, maxWidth: Float, maxHeight: Float): SwipeDirection? {
+    val horizontalTravel = abs(offset.x)
+    val verticalTravel = abs(offset.y)
+    if (hasNotTravelledEnough(maxWidth, maxHeight, offset)) {
+        return null
+    }
+    return if (horizontalTravel > verticalTravel) {
+        if (offset.x > 0)
+            SwipeDirection.Right
+        else
+            SwipeDirection.Left
+    } else {
+        if (offset.y < 0)
+            SwipeDirection.Up
+        else
+            SwipeDirection.Down
+    }
+}
+
+private fun Offset.coerceIn(
+    blockedDirections: List<SwipeDirection>,
+    maxHeight: Float,
+    maxWidth: Float,
+): Offset {
+    return copy(
+        x = x.coerceIn(
+            if (blockedDirections.contains(SwipeDirection.Left)) {
+                0f
+            } else {
+                -maxWidth
+            },
+            if (blockedDirections.contains(SwipeDirection.Right)) {
+                0f
+            } else {
+                maxWidth
+            }
+        ),
+        y = y.coerceIn(
+            if (blockedDirections.contains(SwipeDirection.Up)) {
+                0f
+            } else {
+                -maxHeight
+            },
+            if (blockedDirections.contains(SwipeDirection.Down)) {
+                0f
+            } else {
+                maxHeight
+            }
+        )
+    )
+}
+
+private fun hasNotTravelledEnough(
+    maxWidth: Float,
+    maxHeight: Float, //: SwipeCardState,
+    offset: Offset,
+): Boolean {
+    return abs(offset.x) < maxWidth / 4 &&
+//            abs(offset.y) < maxHeight / 4 // TODO das macht keinen sinn karte ist viel weniger hoch als bildschirm,
+            abs(offset.y) < maxWidth / 4 // TODO richtig lösen
+}
