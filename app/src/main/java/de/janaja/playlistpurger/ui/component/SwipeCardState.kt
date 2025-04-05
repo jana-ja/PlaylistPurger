@@ -49,6 +49,7 @@ class SwipeCardState(
     }
 
     suspend fun swipe(direction: SwipeDirection, animationSpec: AnimationSpec<Offset> = tween(400)) {
+        this.currentSwipeDirection = direction // for onClick button animation
         val endX = maxWidth * 1.5f
         val endY = maxHeight
         when (direction) {
