@@ -1,27 +1,22 @@
 package de.janaja.playlistpurger.ui.component
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,40 +36,47 @@ fun IconSwitch(
     val checkedBackground = MaterialTheme.colorScheme.primary
 
     val uncheckedColor = MaterialTheme.colorScheme.onSurface
-    val uncheckedBackground = MaterialTheme.colorScheme.surface
+    val uncheckedBackground = MaterialTheme.colorScheme.surfaceContainer
 
-    val size = 30.dp
+    val size = 24.dp
+
+    val selectedModifier = Modifier
+        .clip(shape)
+        .background(color = checkedBackground)
+        .padding(4.dp)
+        .padding(horizontal = 2.dp)
+        .size(size)
+    val unselectedModifier = Modifier
+        .padding(4.dp)
+        .size(size)
 
     Row(
         modifier
             .height(IntrinsicSize.Min)
-            .border(width = Dp.Hairline, color = Color.Black, shape = shape)
+            .border(width = Dp.Hairline, color = MaterialTheme.colorScheme.outline, shape = shape)
             .clip(shape)
+            .background(color = uncheckedBackground)
     ) {
 
         // unchecked
         Icon(
             Icons.Default.Menu,
             contentDescription = "",
-            modifier = Modifier
+            modifier = (if (checked) unselectedModifier else selectedModifier)
                 .clickable { onCheckedChange(false) }
-                .background(color = if (checked) uncheckedBackground else checkedBackground)
-                .padding(4.dp)
-                .size(size),
+            ,
             tint = if (checked) uncheckedColor else checkedColor
         )
 
 
-        VerticalDivider()
+//        VerticalDivider()
         // checked
         Icon(
             painterResource(R.drawable.round_rectangle_24),
             "",
-            modifier = Modifier
+            modifier = (if (checked) selectedModifier else unselectedModifier)
                 .clickable { onCheckedChange(true) }
-                .background(color = if (checked) checkedBackground else uncheckedBackground)
-                .padding(4.dp)
-                .size(size),
+            ,
             tint = if (checked) checkedColor else uncheckedColor
         )
     }
@@ -85,12 +87,12 @@ fun IconSwitch(
 @Composable
 private fun IconSwitchOnPreview() {
     // Use Theme here
-    IconSwitch(true, {})
+    IconSwitch(true, {}, Modifier.padding(16.dp))
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun IconSwitchOffPreview() {
     // Use Theme here
-    IconSwitch(false, {})
+    IconSwitch(false, {}, Modifier.padding(16.dp))
 }
