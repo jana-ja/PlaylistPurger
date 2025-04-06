@@ -44,32 +44,36 @@ fun PlaylistItem(
     ElevatedCard(
         modifier = modifier
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+//            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Row(
+            Column (
                 modifier = Modifier
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
+                    .weight(1f)
                     .height(IntrinsicSize.Min),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+//                horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Image
                 val imageUrl = playlist.images.firstOrNull()?.url
                 AsyncImage(
                     model = imageUrl,
                     "Playlist Image",
-                    modifier = Modifier.size(70.dp)
+                    modifier = Modifier.size(120.dp),
+                    error = painterResource(R.drawable.round_rectangle_24)
+
                 )
 
                 // Name and owner
                 Column(Modifier.weight(1f)) {
                     Text(playlist.name,
                         style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.height(4.dp))
                     Text(playlist.owner.displayName,
                         style = MaterialTheme.typography.bodyMedium)
                 }
@@ -87,10 +91,9 @@ fun PlaylistItem(
 //            )
             }
 
-            Row(
-                Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+            Column (
+                Modifier,
+//                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 BigCardButton(
                     onClick = {
