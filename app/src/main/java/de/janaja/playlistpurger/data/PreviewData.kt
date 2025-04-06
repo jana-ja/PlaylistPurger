@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.data
 
 import de.janaja.playlistpurger.data.model.Album
+import de.janaja.playlistpurger.data.model.Artist
 import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.model.User
 import de.janaja.playlistpurger.data.model.PlaylistTracks
@@ -23,9 +24,9 @@ object PreviewData {
     )
     val previewTrack = Track(
         id = "heufh",
-        name = "Track track",
+        name = "Track Name",
         durationMillis = 2000000,
         album = Album(listOf(), ""),
-        artists = listOf()
+        artists = listOf(Artist("", "Artist Name"))
     )
 }

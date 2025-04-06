@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +29,9 @@ fun TrackItem(
 ) {
     val radioOptions = VoteOption.entries
 
-    Card(modifier = modifier) {
+    ElevatedCard(modifier = modifier) {
+//    OutlinedCard(modifier = modifier) {
+//    Card(modifier = modifier) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -74,5 +78,15 @@ fun TrackItem(
 @Composable
 private fun TrackItemPreview() {
     // Use Theme here
-    TrackItem(PreviewData.previewTrack, {})
+    Column(
+        Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        TrackItem(PreviewData.previewTrack, {})
+        TrackItem(PreviewData.previewTrack, {})
+        TrackItem(PreviewData.previewTrack, {})
+        TrackItem(PreviewData.previewTrack, {})
+        TrackItem(PreviewData.previewTrack, {})
+    }
 }

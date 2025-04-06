@@ -42,10 +42,11 @@ fun PlaylistOverviewScreen(
             items(playlists) {
                 PlaylistItem(
                     it,
+                    onNavToVote = onNavToTrackList,
                     onNavToResult = onNavToResult,
-                    Modifier.clickable {
-                        onNavToTrackList(it.id, it.name)
-                    }
+//                    Modifier.clickable {
+//                        onNavToTrackList(it.id, it.name)
+//                    }
                 )
             }
         }
