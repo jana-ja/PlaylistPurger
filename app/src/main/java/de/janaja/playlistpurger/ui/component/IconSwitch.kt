@@ -36,7 +36,7 @@ fun IconSwitch(
     val checkedBackground = MaterialTheme.colorScheme.primary
 
     val uncheckedColor = MaterialTheme.colorScheme.onSurface
-    val uncheckedBackground = MaterialTheme.colorScheme.surfaceContainer
+    val uncheckedBackground = MaterialTheme.colorScheme.surfaceDim
 
     val size = 24.dp
 
@@ -53,7 +53,7 @@ fun IconSwitch(
     Row(
         modifier
             .height(IntrinsicSize.Min)
-            .border(width = Dp.Hairline, color = MaterialTheme.colorScheme.outline, shape = shape)
+//            .border(width = Dp.Hairline, color = MaterialTheme.colorScheme.outline, shape = shape)
             .clip(shape)
             .background(color = uncheckedBackground)
     ) {
