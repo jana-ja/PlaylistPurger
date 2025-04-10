@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Edit
@@ -26,12 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.data.model.Playlist
 import de.janaja.playlistpurger.data.PreviewData
+import de.janaja.playlistpurger.data.model.User
 
 @Composable
 fun PlaylistItem(
@@ -44,40 +49,28 @@ fun PlaylistItem(
     ElevatedCard(
         modifier = modifier
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(IntrinsicSize.Min)
                 .padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column (
-                modifier = Modifier
-//                    .fillMaxWidth()
-                    .weight(1f)
-                    .height(IntrinsicSize.Min),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                verticalAlignment = Alignment.CenterVertically
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Image
-                val imageUrl = playlist.images.firstOrNull()?.url
-                AsyncImage(
-                    model = imageUrl,
-                    "Playlist Image",
-                    modifier = Modifier.size(120.dp),
-                    error = painterResource(R.drawable.round_rectangle_24)
 
-                )
+            // Image
+            val imageUrl = playlist.images.firstOrNull()?.url
+            AsyncImage(
+                model = imageUrl,
+                "Playlist Image",
+                modifier = Modifier.fillMaxWidth(0.38f).aspectRatio(1f),
+                error = painterResource(R.drawable.img)
 
-                // Name and owner
-                Column(Modifier.weight(1f)) {
-                    Text(playlist.name,
-                        style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.height(4.dp))
-                    Text(playlist.owner.displayName,
-                        style = MaterialTheme.typography.bodyMedium)
-                }
+            )
 
+
+            ;{
 //            // private or not
 //            Icon(
 //                painterResource(if (playlist.public) R.drawable.outline_lock_open_24 else R.drawable.outline_lock_24),
@@ -89,28 +82,62 @@ fun PlaylistItem(
 //                painterResource(if (playlist.collaborative) R.drawable.baseline_groups_24 else R.drawable.baseline_person_24),
 //                if (playlist.collaborative) "collaborative playlist" else "single playlist"
 //            )
-            }
+        }
 
-            Column (
-                Modifier,
-//                horizontalArrangement = Arrangement.SpaceAround
+// Name and owner
+            Column(
+                Modifier.fillMaxHeight().weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                BigCardButton(
-                    onClick = {
-                        onNavToResult(playlist.id, playlist.name)
-                    },
-                    icon = R.drawable.baseline_poll_24,
-                    text = "Result"
-                )
-                BigCardButton(
-                    onClick = {
-                        onNavToVote(playlist.id, playlist.name)
-                    },
-                    icon = R.drawable.baseline_compare_arrows_24,
-                    text = "Vote"
-                )
-            }
+                Column(
+                    Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
 
+                    Text(
+                        playlist.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        playlist.owner.displayName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+
+                    )
+                }
+
+//                Spacer(Modifier.weight(1f))
+
+
+
+                Row(
+                    Modifier.align(Alignment.CenterHorizontally),
+//                horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    BigCardButton(
+                        onClick = {
+                            onNavToResult(playlist.id, playlist.name)
+                        },
+                        icon = R.drawable.baseline_poll_24,
+                        text = "Result"
+                    )
+
+                    Spacer(Modifier.width(16.dp))
+
+                    BigCardButton(
+                        onClick = {
+                            onNavToVote(playlist.id, playlist.name)
+                        },
+                        icon = R.drawable.baseline_compare_arrows_24,
+                        text = "Vote"
+                    )
+                }
+            }
         }
 
 
@@ -128,8 +155,7 @@ private fun BigCardButton(
 ) {
     ElevatedCard(
         modifier
-            .padding(8.dp)
-            .size(70.dp)
+            .size(60.dp)
             .clickable {
                 onClick()
 
@@ -146,8 +172,10 @@ private fun BigCardButton(
                 null
             )
             Spacer(Modifier.height(4.dp))
-            Text(text,
-                style = MaterialTheme.typography.labelMedium)
+            Text(
+                text,
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }
@@ -157,4 +185,23 @@ private fun BigCardButton(
 private fun PlaylistItemPreview() {
     // Use Theme here
     PlaylistItem(PreviewData.previewPlaylist, { _, _ -> }, { _, _ -> })
+}
+@Preview(showBackground = true)
+@Composable
+private fun PlaylistItemPreview2() {
+    // Use Theme here
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist"), { _, _ -> }, { _, _ -> })
+}
+@Preview(showBackground = true)
+@Composable
+private fun PlaylistItemPreview3() {
+    // Use Theme here
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
+}
+
+@Preview(showBackground = true, widthDp = 500, heightDp = 200)
+@Composable
+private fun PlaylistItemPreview4() {
+    // Use Theme here
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }
