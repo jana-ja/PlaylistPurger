@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +25,7 @@ fun TrackCard(
     track: Track,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier) {
+    ElevatedCard(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

@@ -58,7 +58,8 @@ fun TrackItem(
 
 
             // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
-            Row(modifier.selectableGroup()) {
+            Row(modifier.selectableGroup(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 radioOptions.forEach { vote ->
                     VoteButton(
                         selected = (vote == track.vote),
