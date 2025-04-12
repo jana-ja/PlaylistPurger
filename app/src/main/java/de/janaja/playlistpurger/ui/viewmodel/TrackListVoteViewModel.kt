@@ -9,22 +9,25 @@ import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.domain.model.Track
+import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.ui.TrackListRoute
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TrackListViewModel(
+class TrackListVoteViewModel(
     private val tokenRepo: TokenRepo,
+    private val settingsRepo: SettingsRepo,
     private val trackListRepo: TrackListRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    val TAG = "TrackListViewModel"
+    private val TAG = "TrackListViewModel"
 
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
@@ -34,7 +37,7 @@ class TrackListViewModel(
 
     val trackList = trackListRepo.allTracks
         .onEach {
-            Log.d(TAG, "allTracks: updatet")
+            Log.d(TAG, "allTracks: updated")
         }
         .stateIn(
             scope = viewModelScope,
@@ -43,7 +46,7 @@ class TrackListViewModel(
         )
 
     // swipe
-    val unvotedTracks = trackList.map { list ->
+    private val unvotedTracks = trackList.map { list ->
         list.filter { it.vote == null }
     }
 
@@ -54,6 +57,12 @@ class TrackListViewModel(
 
     init {
         loadTrackList()
+
+        viewModelScope.launch {
+            settingsRepo.showSwipeFirstFlow.first()?.let {
+                _swipeModeOn.value = it
+            }
+        }
     }
 
     fun switchSwipeMode(isOn: Boolean) {

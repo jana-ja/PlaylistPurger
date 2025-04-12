@@ -29,22 +29,22 @@ import de.janaja.playlistpurger.ui.component.TrackCard
 import de.janaja.playlistpurger.ui.component.TrackItem
 import de.janaja.playlistpurger.ui.component.VoteButton
 import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
-import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
+import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrackListVoteScreen(
     modifier: Modifier = Modifier,
-    trackListViewModel: TrackListViewModel = koinViewModel()
+    trackListVoteViewModel: TrackListVoteViewModel = koinViewModel()
 ) {
 
-    val swipeModeOn by trackListViewModel.swipeModeOn.collectAsState()
+    val swipeModeOn by trackListVoteViewModel.swipeModeOn.collectAsState()
 
-    val trackList by trackListViewModel.trackList.collectAsState()
+    val trackList by trackListVoteViewModel.trackList.collectAsState()
 
     // swipe
-    val swipeableTracks by trackListViewModel.swipeTracks.collectAsState(
+    val swipeableTracks by trackListVoteViewModel.swipeTracks.collectAsState(
         emptyList()
     )
     var topSwipeCardState: SwipeCardState? = null
@@ -60,7 +60,7 @@ fun TrackListVoteScreen(
             Spacer(Modifier.weight(1f))
             IconSwitch(
                 checked = swipeModeOn,
-                onCheckedChange = { trackListViewModel.switchSwipeMode(it) }
+                onCheckedChange = { trackListVoteViewModel.switchSwipeMode(it) }
             )
         }
         if (swipeModeOn) {
@@ -75,7 +75,7 @@ fun TrackListVoteScreen(
                 ) {
                     Text("Alle Songs wurden gevotet")
                     FilledTonalButton(onClick = {
-                        trackListViewModel.switchSwipeMode(false)
+                        trackListVoteViewModel.switchSwipeMode(false)
                     }) { Text("Zur Listenansicht") }
                 }
 
@@ -88,7 +88,7 @@ fun TrackListVoteScreen(
                         SwipeCard(
                             swipeCardState = br,
                             onSwiped = { dir ->
-                                trackListViewModel.onSwipe(dir, track)
+                                trackListVoteViewModel.onSwipe(dir, track)
 
                             },
                         ) {
@@ -132,7 +132,7 @@ fun TrackListVoteScreen(
             ) {
                 items(trackList) { track ->
                     TrackItem(track, onChangeVote = { newVote ->
-                        trackListViewModel.onChangeVote(track, newVote)
+                        trackListVoteViewModel.onChangeVote(track, newVote)
                     })
                 }
             }

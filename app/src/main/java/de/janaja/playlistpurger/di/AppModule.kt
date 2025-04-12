@@ -12,7 +12,7 @@ import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApiDummyImpl
 import de.janaja.playlistpurger.data.repository.DataStoreSettingsRepo
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
-import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
+import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
@@ -59,7 +59,7 @@ val appModule = module {
     viewModelOf(::PlaylistOverviewViewModel)
 
     // TrackListViewModel uses VoteRepo and TrackListRepo and DataStoreRepo
-    viewModelOf(::TrackListViewModel)
+    viewModelOf(::TrackListVoteViewModel)
 
     // VoteResultViewModel uses TrackListRepo
     viewModelOf(::VoteResultViewModel)
