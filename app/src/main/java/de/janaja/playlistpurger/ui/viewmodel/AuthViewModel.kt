@@ -5,14 +5,10 @@ import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID
-import com.spotify.sdk.android.auth.AccountsQueryParameters.REDIRECT_URI
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
-import de.janaja.playlistpurger.data.local.DatastoreKeys.refreshToken
 import de.janaja.playlistpurger.data.remote.SpotifyAccountApi
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,11 +25,12 @@ class AuthViewModel(
 ) : ViewModel() {
 
     private val clientSecret = BuildConfig.CLIENT_SECRET
+    private val clientId = BuildConfig.CLIENT_ID
+    private val redirectUri = "asdf://callback"
 
     private val TAG = "AuthViewModel"
 
-    private val CLIENT_ID = "1f7401f5d27847b99a6dfe6908c5ccac"
-    private val REDIRECT_URI = "asdf://callback"
+
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn = _isLoggedIn.asStateFlow()
@@ -118,7 +115,7 @@ class AuthViewModel(
 
                         val tokenRequestResponse = api.refreshToken(
 
-                            client = "Basic " + Base64.encode("$CLIENT_ID:$clientSecret".encodeToByteArray()),
+                            client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                             refreshToken = value,
                         )
                         dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
@@ -139,9 +136,9 @@ class AuthViewModel(
 
     fun startLoginProcess() {
         val builder = AuthorizationRequest.Builder(
-            CLIENT_ID,
+            clientId,
             AuthorizationResponse.Type.CODE,
-            REDIRECT_URI
+            redirectUri
         )
         builder.setScopes(arrayOf("playlist-read-private"))
         builder.setShowDialog(true)
@@ -198,9 +195,9 @@ class AuthViewModel(
             try {
 
                 val tokenRequestResponse = api.getToken(
-                    client = "Basic " + Base64.encode("$CLIENT_ID:$clientSecret".encodeToByteArray()),
+                    client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                     code = code,
-                    redirectUri = REDIRECT_URI,
+                    redirectUri = redirectUri,
                 )
 
                 dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
