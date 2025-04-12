@@ -62,30 +62,16 @@ fun PlaylistItem(
 
             )
 
-
-            ;{
-//            // private or not
-//            Icon(
-//                painterResource(if (playlist.public) R.drawable.outline_lock_open_24 else R.drawable.outline_lock_24),
-//                if (playlist.public) "public playlist" else "private playlist"
-//            )
-//
-//            // collabortaive or not
-//            Icon(
-//                painterResource(if (playlist.collaborative) R.drawable.baseline_groups_24 else R.drawable.baseline_person_24),
-//                if (playlist.collaborative) "collaborative playlist" else "single playlist"
-//            )
-        }
-
-// Name and owner
             Column(
                 Modifier.fillMaxHeight().weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Name and owner
                 Column(
                     Modifier.weight(1f).fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
                     Text(
@@ -104,13 +90,8 @@ fun PlaylistItem(
                     )
                 }
 
-//                Spacer(Modifier.weight(1f))
-
-
-
                 Row(
                     Modifier.align(Alignment.CenterHorizontally),
-//                horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     BigCardButton(
                         onClick = {
@@ -131,44 +112,6 @@ fun PlaylistItem(
                     )
                 }
             }
-        }
-
-
-    }
-
-}
-
-@Composable
-private fun BigCardButton(
-    onClick: () -> Unit,
-    @DrawableRes
-    icon: Int,
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    ElevatedCard(
-        modifier
-            .size(60.dp)
-            .clickable {
-                onClick()
-
-            }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Icon(
-                painterResource(icon),
-                null
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text,
-                style = MaterialTheme.typography.labelMedium
-            )
         }
     }
 }
