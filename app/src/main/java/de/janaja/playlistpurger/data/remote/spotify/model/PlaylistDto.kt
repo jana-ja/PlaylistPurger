@@ -1,15 +1,15 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
-data class Playlist(
+data class PlaylistDto(
     val id: String,
     val name: String,
     val description: String,
     val collaborative: Boolean,
     val public: Boolean,
-    val images: List<SpotifyImage>,
+    val images: List<ImageDto>,
     // owner TODO
-    val tracks: PlaylistTracks,
-    val owner: User,
+    val tracks: PlaylistTracksDto,
+    val owner: UserDto,
     val type: String,
 )
 

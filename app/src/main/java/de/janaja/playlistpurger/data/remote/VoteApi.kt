@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.data.remote
 
-import de.janaja.playlistpurger.data.model.Vote
-import de.janaja.playlistpurger.data.model.VoteOption
+import de.janaja.playlistpurger.domain.model.Vote
+import de.janaja.playlistpurger.domain.model.VoteOption
 
 // TODO change to api interface?
 interface VoteApi {

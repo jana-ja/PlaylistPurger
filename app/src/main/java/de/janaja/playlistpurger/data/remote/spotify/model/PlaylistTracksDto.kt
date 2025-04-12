@@ -1,6 +1,6 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
-data class PlaylistTracks(
+data class PlaylistTracksDto(
     val href: String,
     val total: Int,
 )

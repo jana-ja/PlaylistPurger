@@ -1,9 +1,9 @@
 package de.janaja.playlistpurger.data.repository
 
-import de.janaja.playlistpurger.data.model.Playlist
+import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistDto
 
 interface PlaylistRepo {
 
-    suspend fun getPlaylists(): List<Playlist>
+    suspend fun getPlaylists(): List<PlaylistDto>
 
 }

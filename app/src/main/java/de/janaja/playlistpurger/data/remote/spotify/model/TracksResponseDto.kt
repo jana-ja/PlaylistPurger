@@ -1,8 +1,8 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
-data class TracksResponse(
+data class TracksResponseDto(
     val total: Int,
-    val items: List<TrackWrapper>
+    val items: List<TrackWrapperDto>
 )
 /*
 {

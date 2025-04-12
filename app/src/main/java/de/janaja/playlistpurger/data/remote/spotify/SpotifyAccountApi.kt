@@ -1,22 +1,16 @@
-package de.janaja.playlistpurger.data.remote
+package de.janaja.playlistpurger.data.remote.spotify
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import de.janaja.playlistpurger.data.model.PlaylistResponse
-import de.janaja.playlistpurger.data.model.TokenRequestResponse
-import de.janaja.playlistpurger.data.model.TracksResponse
+import de.janaja.playlistpurger.data.remote.spotify.model.TokenRequestResponseDto
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 private const val BASE_URL = "https://accounts.spotify.com/"
 
@@ -50,7 +44,7 @@ interface SpotifyAccountApiService {
         @Field("redirect_uri") redirectUri: String,
         @Field("grant_type") grantType: String = "authorization_code",
 
-    ): TokenRequestResponse
+    ): TokenRequestResponseDto
 
     @FormUrlEncoded
     @POST("api/token")
@@ -61,7 +55,7 @@ interface SpotifyAccountApiService {
 //        @Field("redirect_uri") redirectUri: String,
         @Field("grant_type") grantType: String = "refresh_token",
 
-        ): TokenRequestResponse
+        ): TokenRequestResponseDto
 }
 
 object SpotifyAccountApi {

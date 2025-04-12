@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,11 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.data.PreviewData
-import de.janaja.playlistpurger.data.model.Track
+import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
 
 @Composable
 fun TrackCard(
-    track: Track,
+    track: TrackDto,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(modifier = modifier) {

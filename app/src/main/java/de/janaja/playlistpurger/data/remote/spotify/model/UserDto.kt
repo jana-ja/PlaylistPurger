@@ -1,8 +1,8 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
 
-data class User(
+data class UserDto(
     val id: String,
     @Json(name = "display_name")
     val displayName: String = "Unknown User", // in playlist tracks: added by hat dieses field nicht

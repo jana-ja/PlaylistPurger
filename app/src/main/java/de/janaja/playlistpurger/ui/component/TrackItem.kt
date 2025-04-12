@@ -5,25 +5,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.data.model.Track
-import de.janaja.playlistpurger.data.model.VoteOption
+import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.data.PreviewData
 
 
 @Composable
 fun TrackItem(
-    track: Track,
+    track: TrackDto,
     onChangeVote: (VoteOption) -> Unit,
     modifier: Modifier = Modifier
 ) {

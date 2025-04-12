@@ -1,11 +1,11 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
 
-data class TrackWrapper(
-    val track: Track,
+data class TrackWrapperDto(
+    val track: TrackDto,
     @Json(name = "added_by")
-    val addedBy: User, // hat hier keinen display name
+    val addedBy: UserDto, // hat hier keinen display name
 )
 /*
 {

@@ -15,14 +15,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.data.PreviewData
-import de.janaja.playlistpurger.data.model.Track
-import de.janaja.playlistpurger.data.model.Vote
-import de.janaja.playlistpurger.data.model.VoteOption
+import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.domain.model.Vote
+import de.janaja.playlistpurger.domain.model.VoteOption
 
 
 @Composable
 fun TrackItemVotes(
-    track: Track,
+    track: TrackDto,
     voteList: List<Vote>,
     modifier: Modifier = Modifier
 ) {

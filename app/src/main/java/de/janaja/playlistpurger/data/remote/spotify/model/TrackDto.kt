@@ -1,14 +1,16 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
+import de.janaja.playlistpurger.domain.model.VoteOption
+
 // TODO maybe domain model
-data class Track(
+data class TrackDto(
     val id: String,
     val name: String,
     @Json(name = "duration_ms")
     val durationMillis: Int,
-    val album: Album,
-    val artists: List<Artist>,
+    val album: AlbumDto,
+    val artists: List<ArtistDto>,
     // album
     // href
     // is local

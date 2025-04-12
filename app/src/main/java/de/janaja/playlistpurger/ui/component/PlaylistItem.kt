@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.ui.component
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,10 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,20 +22,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.R
-import de.janaja.playlistpurger.data.model.Playlist
+import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistDto
 import de.janaja.playlistpurger.data.PreviewData
-import de.janaja.playlistpurger.data.model.User
+import de.janaja.playlistpurger.data.remote.spotify.model.UserDto
 
 @Composable
 fun PlaylistItem(
-    playlist: Playlist,
+    playlist: PlaylistDto,
     onNavToVote: (String, String) -> Unit,
     onNavToResult: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -196,12 +190,12 @@ private fun PlaylistItemPreview2() {
 @Composable
 private fun PlaylistItemPreview3() {
     // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = UserDto(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }
 
 @Preview(showBackground = true, widthDp = 500, heightDp = 200)
 @Composable
 private fun PlaylistItemPreview4() {
     // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = UserDto(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }

@@ -1,6 +1,6 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
-data class Artist (
+data class ArtistDto (
     val id: String,
     val name: String
 )

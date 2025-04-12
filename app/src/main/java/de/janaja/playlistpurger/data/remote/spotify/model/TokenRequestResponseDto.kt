@@ -1,8 +1,8 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
 
-data class TokenRequestResponse(
+data class TokenRequestResponseDto(
     @Json(name = "access_token")
     val accessToken: String,
     @Json(name = "token_type")

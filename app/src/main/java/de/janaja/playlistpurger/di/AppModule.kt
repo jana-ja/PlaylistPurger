@@ -4,10 +4,10 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import de.janaja.playlistpurger.data.repository.DataStoreRepo
 import de.janaja.playlistpurger.data.repository.DataStoreRepoImpl
 import de.janaja.playlistpurger.data.repository.PlaylistRepo
-import de.janaja.playlistpurger.data.repository.PlaylistRepoImpl
+import de.janaja.playlistpurger.data.repository.SpotifyPlaylistRepo
 import de.janaja.playlistpurger.data.repository.TrackListRepo
 import org.koin.dsl.module
-import de.janaja.playlistpurger.data.repository.TrackListRepoImpl
+import de.janaja.playlistpurger.data.repository.SpotifyTrackListRepo
 import de.janaja.playlistpurger.data.remote.VoteApi
 import de.janaja.playlistpurger.data.remote.VoteApiDummyImpl
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
@@ -33,13 +33,13 @@ val appModule = module {
 
     // PlayListRepo uses DataStoreRepo
     single<PlaylistRepo> {
-        PlaylistRepoImpl(get())
+        SpotifyPlaylistRepo(get())
     }
 
     // TrackListRepo uses DataStoreRepo and VoteRepo
 //    singleOf(::TrackListRepoImpl)
     single<TrackListRepo> {
-        TrackListRepoImpl(get(), get())
+        SpotifyTrackListRepo(get(), get())
     }
 
     // AuthViewModel uses DataStoreRepo

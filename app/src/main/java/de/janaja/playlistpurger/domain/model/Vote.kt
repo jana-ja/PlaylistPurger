@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.domain.model
 
 data class Vote(
     val playlistId: String,

@@ -1,21 +1,15 @@
-package de.janaja.playlistpurger.data.remote
+package de.janaja.playlistpurger.data.remote.spotify
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import de.janaja.playlistpurger.data.model.PlaylistResponse
-import de.janaja.playlistpurger.data.model.TokenRequestResponse
-import de.janaja.playlistpurger.data.model.TracksResponse
+import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistResponseDto
+import de.janaja.playlistpurger.data.remote.spotify.model.TracksResponseDto
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.POST
 import retrofit2.http.Path
 
 private const val BASE_URL = "https://api.spotify.com/v1/"
@@ -46,14 +40,14 @@ interface SpotifyApiService {
     suspend fun getCatImagesWithHeader(
         @Header("Authorization") token: String,
 //        @Query("limit") limit: Int = 5
-    ): PlaylistResponse
+    ): PlaylistResponseDto
 
     // https://api.spotify.com/v1/playlists/7CLB5HWtSm5gMvUtYKutkQ/tracks
     @GET("playlists/{playlist_id}/tracks")
     suspend fun getTracksForPlaylist(
         @Header("Authorization") token: String,
         @Path("playlist_id") playlistId: String,
-    ): TracksResponse
+    ): TracksResponseDto
 
 }
 

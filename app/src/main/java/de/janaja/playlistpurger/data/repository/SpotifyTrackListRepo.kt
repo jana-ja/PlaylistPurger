@@ -1,15 +1,15 @@
 package de.janaja.playlistpurger.data.repository
 
-import de.janaja.playlistpurger.data.model.Track
-import de.janaja.playlistpurger.data.model.Vote
-import de.janaja.playlistpurger.data.model.VoteOption
-import de.janaja.playlistpurger.data.remote.SpotifyApi
+import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.domain.model.Vote
+import de.janaja.playlistpurger.domain.model.VoteOption
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
 import de.janaja.playlistpurger.data.remote.VoteApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 
-class TrackListRepoImpl(
+class SpotifyTrackListRepo(
     dataStoreRepo: DataStoreRepo,
     val voteApi: VoteApi
 ) : TrackListRepo {
@@ -23,7 +23,7 @@ class TrackListRepoImpl(
         }
     private val currentUserId = "janajansen-de" // TODO get real current user id from somewhere
 
-    override val allTracks = MutableStateFlow<List<Track>>(listOf())
+    override val allTracks = MutableStateFlow<List<TrackDto>>(listOf())
 
 //    override val unvotedTracks: Flow<List<Track>> = allTracks.map { list ->
 //        list.filter { it.vote == null }
@@ -46,7 +46,7 @@ class TrackListRepoImpl(
 
     }
 
-    override suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<Track, List<Vote>>> {
+    override suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<TrackDto, List<Vote>>> {
         if (allTracks.value.isEmpty()) {
             loadTracksWithOwnVotes(playlistId)
         }

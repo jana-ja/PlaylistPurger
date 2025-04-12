@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.domain.model
 
 import androidx.compose.ui.graphics.Color
 import de.janaja.playlistpurger.R

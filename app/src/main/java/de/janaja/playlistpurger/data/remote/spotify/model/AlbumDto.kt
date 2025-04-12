@@ -1,7 +1,7 @@
-package de.janaja.playlistpurger.data.model
+package de.janaja.playlistpurger.data.remote.spotify.model
 
-data class Album(
-    val images: List<SpotifyImage>,
+data class AlbumDto(
+    val images: List<ImageDto>,
     val name: String
 )
 
