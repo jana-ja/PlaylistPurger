@@ -21,6 +21,7 @@ import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import androidx.datastore.preferences.core.Preferences
+import de.janaja.playlistpurger.data.repository.LoginState
 import de.janaja.playlistpurger.ui.AppStart
 import de.janaja.playlistpurger.ui.screen.SplashScreen
 import org.koin.androidx.compose.koinViewModel
@@ -48,27 +49,30 @@ class MainActivity : ComponentActivity() {
                 parameters = {
                     org.koin.core.parameter.parametersOf(
                         { request: AuthorizationRequest ->
-                            val intent = AuthorizationClient.createLoginActivityIntent(this, request)
+                            val intent =
+                                AuthorizationClient.createLoginActivityIntent(this, request)
                             activityResultLauncher.launch(intent)
                         }
                     )
                 }
             )
 
-            val isLoading by authViewModel.isLoading.collectAsState()
-            val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+            val loginState by authViewModel.loginState.collectAsState()
+//            val isLoading by authViewModel.isLoading.collectAsState()
+//            val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
             PlaylistPurgerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (isLoading) {
-                        SplashScreen()
-                    } else {
-                        if (isLoggedIn) {
+                    when (loginState) {
+                        LoginState.Loading -> {
+                            SplashScreen()
+                        }
+
+                        is LoginState.LoggedIn -> {
                             AppStart()
-//                            {
-//                                authViewModel.logout()
-//                            }
-                        } else {
+                        }
+
+                        LoginState.LoggedOut -> {
                             WelcomeScreen(
                                 onLogin = {
                                     authViewModel.startLoginProcess()

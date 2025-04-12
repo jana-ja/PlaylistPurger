@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
 import android.app.Activity.RESULT_OK
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,50 +8,44 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
-import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApi
-import de.janaja.playlistpurger.domain.repository.TokenRepo
+import de.janaja.playlistpurger.data.repository.LoginState
+import de.janaja.playlistpurger.domain.repository.AuthRepo
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class AuthViewModel(
-    private val tokenRepo: TokenRepo,
+    private val authRepo: AuthRepo,
     private val onStartLoginActivity: (AuthorizationRequest) -> Unit,
 ) : ViewModel() {
 
-    private val clientSecret = BuildConfig.CLIENT_SECRET
     private val clientId = BuildConfig.CLIENT_ID
     private val redirectUri = "asdf://callback"
 
     private val TAG = "AuthViewModel"
 
 
-    private val _isLoggedIn = MutableStateFlow(false)
-    val isLoggedIn = _isLoggedIn.asStateFlow()
+    val loginState = authRepo.loginState
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = LoginState.Loading
+        )
+//    val isLoggedIn = authRepo.isLoggedIn
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(),
+//            initialValue = false
+//        )
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    // ui states
+//    private val _isLoading = MutableStateFlow(false)
+//    val isLoading = _isLoading.asStateFlow()
 
-    // FLOW emittet nur wenn es consumer gibt!
-    private val accessTokenFlow = tokenRepo.accessTokenFlow
 
-    // hier könnte man direkt noch onEach oder map dran hängen
-    private val refreshTokenFlow = tokenRepo.refreshTokenFlow
-
-    // TODO eig kein diekt zurgriff auf api
-    private val api = SpotifyAccountApi.retrofitService
-
-    init {
-        viewModelScope.launch {
-            // TODO make better
-            refreshToken()
-            checkUserLoggedIn()
-        }
-    }
 
     /*
     save validUntil time for access token
@@ -68,69 +61,7 @@ class AuthViewModel(
 
     init: check
      */
-    // umbenennen listener/observer
-    private fun checkUserLoggedIn() {
-        viewModelScope.launch {
-            accessTokenFlow.collect { value ->
-                Log.d(TAG, "token collect: $value")
-                Log.d(TAG, "try receive token from data store")
 
-                if (value == null) {
-                    Log.d(TAG, "did not find token in data store")
-                    _isLoggedIn.value = false
-                } else {
-                    Log.d(TAG, "found token in data store")
-                    checkToken()
-                    // TODO erst check
-                    _isLoggedIn.value = true
-                }
-                Log.d(TAG, "token: $value")
-                _isLoading.value = false
-            }
-        }
-    }
-
-    private suspend fun checkToken() {
-        // TODO implement
-        if (false) {
-//            refreshToken()
-        }
-    }
-
-    @OptIn(ExperimentalEncodingApi::class)
-    private suspend fun refreshToken() {
-        val value = refreshTokenFlow.first()
-
-        Log.d(TAG, "refresh token collect: $value")
-        Log.d(TAG, "try receive refresh token from data store")
-
-        if (value == null) {
-            Log.d(TAG, "did not find refresh token in data store")
-            _isLoggedIn.value = false
-        } else {
-            Log.d(TAG, "found refresh token in data store")
-            try {
-
-
-                val tokenRequestResponse = api.refreshToken(
-
-                    client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
-                    refreshToken = value,
-                )
-                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                if (tokenRequestResponse.refreshToken != "") {
-                    tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
-                }
-                _isLoggedIn.value = true
-            } catch (e: Exception) {
-                Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
-            }
-
-        }
-        Log.d(TAG, "token: $value")
-        _isLoading.value = false
-
-    }
 
     fun startLoginProcess() {
         val builder = AuthorizationRequest.Builder(
@@ -160,7 +91,10 @@ class AuthViewModel(
                 AuthorizationResponse.Type.CODE -> {
                     // get accessToken and refreshToken from api with code
                     println("Got Token! ${AuthorizationResponse.Type.TOKEN}")
-                    getTokenForCode(response.code)
+
+                    viewModelScope.launch {
+                        authRepo.loginWithCode(response.code)
+                    }
 
 
                 }
@@ -179,31 +113,4 @@ class AuthViewModel(
         }
     }
 
-    fun logout() {
-        // delete token
-        viewModelScope.launch {
-            tokenRepo.deleteAllToken()
-            _isLoggedIn.value = false
-        }
-    }
-
-    @OptIn(ExperimentalEncodingApi::class)
-    private fun getTokenForCode(code: String) {
-        viewModelScope.launch {
-            try {
-
-                val tokenRequestResponse = api.getToken(
-                    client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
-                    code = code,
-                    redirectUri = redirectUri,
-                )
-
-                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
-            } catch (e: Exception) {
-                Log.d(TAG, "getTokenForCode: Error ${e.localizedMessage}")
-            }
-
-        }
-    }
 }

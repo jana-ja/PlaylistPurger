@@ -2,6 +2,7 @@ package de.janaja.playlistpurger.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
+// TODO maybe remove from domain
 interface TokenRepo {
     val accessTokenFlow: Flow<String?>
     val refreshTokenFlow: Flow<String?>

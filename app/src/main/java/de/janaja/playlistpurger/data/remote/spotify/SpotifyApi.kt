@@ -4,8 +4,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistResponseDto
 import de.janaja.playlistpurger.data.remote.spotify.model.TracksResponseDto
+import de.janaja.playlistpurger.data.remote.spotify.model.UserDto
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
@@ -48,6 +50,11 @@ interface SpotifyApiService {
         @Header("Authorization") token: String,
         @Path("playlist_id") playlistId: String,
     ): TracksResponseDto
+
+    @GET("me")
+    suspend fun getCurrentUser(
+        @Header("Authorization") token: String,
+    ): Response<UserDto>
 
 }
 

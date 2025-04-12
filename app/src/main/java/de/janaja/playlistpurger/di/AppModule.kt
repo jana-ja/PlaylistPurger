@@ -11,6 +11,8 @@ import de.janaja.playlistpurger.data.repository.SpotifyTrackListRepo
 import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApiDummyImpl
 import de.janaja.playlistpurger.data.repository.DataStoreSettingsRepo
+import de.janaja.playlistpurger.data.repository.SpotifyAuthRepo
+import de.janaja.playlistpurger.domain.repository.AuthRepo
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
@@ -32,6 +34,10 @@ val appModule = module {
     // SettingsRepo
     single<SettingsRepo> {
         DataStoreSettingsRepo(androidContext())
+    }
+
+    single<AuthRepo> {
+        SpotifyAuthRepo(get())
     }
 
     // VoteRepo
