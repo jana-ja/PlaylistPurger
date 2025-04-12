@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun TrackListScreen(
+fun TrackListVoteScreen(
     modifier: Modifier = Modifier,
     trackListViewModel: TrackListViewModel = koinViewModel()
 ) {
@@ -145,5 +145,5 @@ fun TrackListScreen(
 @Composable
 private fun TrackListScreenPreview() {
     // Use Theme here
-    TrackListScreen()
+    TrackListVoteScreen()
 }

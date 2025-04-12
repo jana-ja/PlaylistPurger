@@ -15,16 +15,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.SettingsScreen
-import de.janaja.playlistpurger.ui.screen.TrackListScreen
+import de.janaja.playlistpurger.ui.screen.TrackListVoteScreen
 import de.janaja.playlistpurger.ui.screen.VoteResultScreen
 import kotlinx.serialization.Serializable
 
@@ -100,7 +98,7 @@ fun AppStart() {
             composable<TrackListRoute> { iwas ->
                 val name = iwas.toRoute<TrackListRoute>().playlistName
                 topBarUiState = TopBarUiState(name)
-                TrackListScreen()
+                TrackListVoteScreen()
             }
 
             composable<VoteResultRoute> { iwas ->
