@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.ui.TrackListRoute
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TrackListViewModel(
-    private val dataStoreRepo: DataStoreRepo,
+    private val tokenRepo: TokenRepo,
     private val trackListRepo: TrackListRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {

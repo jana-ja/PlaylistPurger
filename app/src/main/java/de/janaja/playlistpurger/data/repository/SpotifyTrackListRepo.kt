@@ -6,20 +6,20 @@ import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.domain.model.Track
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 
 class SpotifyTrackListRepo(
-    dataStoreRepo: DataStoreRepo,
+    tokenRepo: TokenRepo,
     val voteApi: VoteApi
 ) : TrackListRepo {
 
     private val api = SpotifyApi.retrofitService
 
-    private val tokenFlow = dataStoreRepo.accessTokenFlow
+    private val tokenFlow = tokenRepo.accessTokenFlow
         .onEach {
 
         }

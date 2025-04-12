@@ -1,8 +1,8 @@
 package de.janaja.playlistpurger.di
 
 import com.spotify.sdk.android.auth.AuthorizationRequest
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
-import de.janaja.playlistpurger.data.repository.DataStoreRepoImpl
+import de.janaja.playlistpurger.domain.repository.TokenRepo
+import de.janaja.playlistpurger.data.repository.DataStoreTokenRepo
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.data.repository.SpotifyPlaylistRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
@@ -22,8 +22,8 @@ import org.koin.core.module.dsl.viewModelOf
 val appModule = module {
 
     // DataStoreRepo
-    single<DataStoreRepo> {
-        DataStoreRepoImpl(androidContext())
+    single<TokenRepo> {
+        DataStoreTokenRepo(androidContext())
     }
 
     // VoteRepo

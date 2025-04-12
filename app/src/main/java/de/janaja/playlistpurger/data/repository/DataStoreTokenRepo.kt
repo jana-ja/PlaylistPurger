@@ -3,10 +3,10 @@ package de.janaja.playlistpurger.data.repository
 import android.content.Context
 import de.janaja.playlistpurger.data.local.DataStorePreferences
 import de.janaja.playlistpurger.data.local.DatastoreKeys
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.util.SecurityUtil
 
-class DataStoreRepoImpl(context: Context): DataStoreRepo {
+class DataStoreTokenRepo(context: Context): TokenRepo {
 
     private val dataStorePreferences = DataStorePreferences(
         context,

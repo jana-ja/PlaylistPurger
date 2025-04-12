@@ -2,7 +2,7 @@ package de.janaja.playlistpurger.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
-interface DataStoreRepo {
+interface TokenRepo {
     val accessTokenFlow: Flow<String?>
     val refreshTokenFlow: Flow<String?>
 //    val userIdFlow: Flow<String?>

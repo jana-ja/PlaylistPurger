@@ -3,14 +3,14 @@ package de.janaja.playlistpurger.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.domain.model.Playlist
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class PlaylistOverviewViewModel(
-    private val dataStoreRepo: DataStoreRepo,
+    private val tokenRepo: TokenRepo,
     private val playListRepo: PlaylistRepo
 ) : ViewModel() {
 

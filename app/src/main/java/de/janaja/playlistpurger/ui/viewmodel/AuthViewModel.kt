@@ -10,7 +10,7 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApi
-import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TokenRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -20,7 +20,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class AuthViewModel(
-    private val dataStoreRepo: DataStoreRepo,
+    private val tokenRepo: TokenRepo,
     private val onStartLoginActivity: (AuthorizationRequest) -> Unit,
 ) : ViewModel() {
 
@@ -38,10 +38,10 @@ class AuthViewModel(
     val isLoading = _isLoading.asStateFlow()
 
     // FLOW emittet nur wenn es consumer gibt!
-    private val accessTokenFlow = dataStoreRepo.accessTokenFlow
+    private val accessTokenFlow = tokenRepo.accessTokenFlow
 
     // hier könnte man direkt noch onEach oder map dran hängen
-    private val refreshTokenFlow = dataStoreRepo.refreshTokenFlow
+    private val refreshTokenFlow = tokenRepo.refreshTokenFlow
 
     // TODO eig kein diekt zurgriff auf api
     private val api = SpotifyAccountApi.retrofitService
@@ -117,9 +117,9 @@ class AuthViewModel(
                     client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                     refreshToken = value,
                 )
-                dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
                 if (tokenRequestResponse.refreshToken != "") {
-                    dataStoreRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                    tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
                 }
                 _isLoggedIn.value = true
             } catch (e: Exception) {
@@ -182,7 +182,7 @@ class AuthViewModel(
     fun logout() {
         // delete token
         viewModelScope.launch {
-            dataStoreRepo.deleteAllToken()
+            tokenRepo.deleteAllToken()
             _isLoggedIn.value = false
         }
     }
@@ -198,8 +198,8 @@ class AuthViewModel(
                     redirectUri = redirectUri,
                 )
 
-                dataStoreRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                dataStoreRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
             } catch (e: Exception) {
                 Log.d(TAG, "getTokenForCode: Error ${e.localizedMessage}")
             }
