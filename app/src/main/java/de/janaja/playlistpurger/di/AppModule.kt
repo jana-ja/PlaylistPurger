@@ -1,15 +1,15 @@
 package de.janaja.playlistpurger.di
 
 import com.spotify.sdk.android.auth.AuthorizationRequest
-import de.janaja.playlistpurger.data.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.DataStoreRepo
 import de.janaja.playlistpurger.data.repository.DataStoreRepoImpl
-import de.janaja.playlistpurger.data.repository.PlaylistRepo
+import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.data.repository.SpotifyPlaylistRepo
-import de.janaja.playlistpurger.data.repository.TrackListRepo
+import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import org.koin.dsl.module
 import de.janaja.playlistpurger.data.repository.SpotifyTrackListRepo
-import de.janaja.playlistpurger.data.remote.VoteApi
-import de.janaja.playlistpurger.data.remote.VoteApiDummyImpl
+import de.janaja.playlistpurger.data.remote.vote.VoteApi
+import de.janaja.playlistpurger.data.remote.vote.VoteApiDummyImpl
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
@@ -26,9 +26,9 @@ val appModule = module {
         DataStoreRepoImpl(androidContext())
     }
 
-    // VoteRepo uses DataStoreRepo
+    // VoteRepo
     single<VoteApi> {
-        VoteApiDummyImpl(get())
+        VoteApiDummyImpl()
     }
 
     // PlayListRepo uses DataStoreRepo

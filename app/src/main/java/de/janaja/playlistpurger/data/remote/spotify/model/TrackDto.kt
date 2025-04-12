@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
-import de.janaja.playlistpurger.domain.model.VoteOption
 
 // TODO maybe domain model
 data class TrackDto(
@@ -16,8 +15,6 @@ data class TrackDto(
     // is local
     // added by
     // added at??
-
-    val vote: VoteOption? = null
 )
 /*
 {

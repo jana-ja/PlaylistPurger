@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.data.remote
+package de.janaja.playlistpurger.data.remote.vote
 
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption

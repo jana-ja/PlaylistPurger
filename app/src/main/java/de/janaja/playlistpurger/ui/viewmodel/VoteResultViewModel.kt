@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
 import de.janaja.playlistpurger.domain.model.Vote
-import de.janaja.playlistpurger.data.repository.TrackListRepo
+import de.janaja.playlistpurger.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.ui.VoteResultRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class VoteResultViewModel (
     private val playlistId = args.playlistId
 
 
-    val blub = MutableStateFlow<List<Pair<TrackDto, List<Vote>>>>(emptyList())
+    val blub = MutableStateFlow<List<Pair<Track, List<Vote>>>>(emptyList())
 
     init {
         getAllVotes()

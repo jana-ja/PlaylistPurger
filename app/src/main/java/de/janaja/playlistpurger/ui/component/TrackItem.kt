@@ -13,14 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.data.PreviewData
+import de.janaja.playlistpurger.domain.PreviewData
+import de.janaja.playlistpurger.domain.model.Track
 
 
 @Composable
 fun TrackItem(
-    track: TrackDto,
+    track: Track,
     onChangeVote: (VoteOption) -> Unit,
     modifier: Modifier = Modifier
 ) {

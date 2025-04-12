@@ -38,7 +38,6 @@ fun TrackListScreen(
     modifier: Modifier = Modifier,
     trackListViewModel: TrackListViewModel = koinViewModel()
 ) {
-    val TAG = "TrackListScreen"
 
     val swipeModeOn by trackListViewModel.swipeModeOn.collectAsState()
 

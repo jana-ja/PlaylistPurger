@@ -1,9 +1,9 @@
 package de.janaja.playlistpurger.data.repository
 
 import android.content.Context
-import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.data.local.DataStorePreferences
 import de.janaja.playlistpurger.data.local.DatastoreKeys
+import de.janaja.playlistpurger.domain.repository.DataStoreRepo
 import de.janaja.playlistpurger.util.SecurityUtil
 
 class DataStoreRepoImpl(context: Context): DataStoreRepo {

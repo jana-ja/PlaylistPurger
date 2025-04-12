@@ -1,12 +1,9 @@
-package de.janaja.playlistpurger.data.remote
+package de.janaja.playlistpurger.data.remote.vote
 
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.data.repository.DataStoreRepo
 
-class VoteApiDummyImpl(
-    private val dataStoreRepo: DataStoreRepo
-) : VoteApi {
+class VoteApiDummyImpl: VoteApi {
     private val testPlaylistId = "26YTAFslmPya0jBIFSglKd"
     private val myUserId = "janajansen-de"
 
@@ -29,7 +26,7 @@ class VoteApiDummyImpl(
         Vote(
             playlistId = testPlaylistId,
             trackId = "5E3BK90EQQxmrDz3zLG2l9",
-            userId = user2Id,
+            userId = user3Id,
             voteOption = VoteOption.DONT_CARE
         ),
         Vote(

@@ -3,9 +3,9 @@ package de.janaja.playlistpurger.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistDto
-import de.janaja.playlistpurger.data.repository.DataStoreRepo
-import de.janaja.playlistpurger.data.repository.PlaylistRepo
+import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.PlaylistRepo
+import de.janaja.playlistpurger.domain.model.Playlist
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -16,7 +16,7 @@ class PlaylistOverviewViewModel(
 
     private val TAG = "PlaylistOverviewViewModel"
 
-    val playlists = MutableStateFlow<List<PlaylistDto>>(listOf())
+    val playlists = MutableStateFlow<List<Playlist>>(listOf())
 
     init {
         loadAllPlaylists()

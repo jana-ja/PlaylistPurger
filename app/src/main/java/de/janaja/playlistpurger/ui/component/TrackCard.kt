@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import de.janaja.playlistpurger.data.PreviewData
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.domain.PreviewData
+import de.janaja.playlistpurger.domain.model.Track
 
 @Composable
 fun TrackCard(
-    track: TrackDto,
+    track: Track,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(modifier = modifier) {
@@ -31,7 +31,7 @@ fun TrackCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
-                model = track.album.images.firstOrNull()?.url,
+                model = track.album.imageUrl,
                 contentDescription = "Cover of Track",
                 modifier = Modifier
                     .fillMaxWidth()

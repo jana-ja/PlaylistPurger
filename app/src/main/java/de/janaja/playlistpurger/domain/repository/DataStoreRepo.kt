@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.data.repository
+package de.janaja.playlistpurger.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 

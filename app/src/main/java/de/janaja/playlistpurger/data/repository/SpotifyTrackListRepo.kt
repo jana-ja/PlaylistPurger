@@ -1,10 +1,13 @@
 package de.janaja.playlistpurger.data.repository
 
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.data.mapper.toTrack
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
-import de.janaja.playlistpurger.data.remote.VoteApi
+import de.janaja.playlistpurger.data.remote.vote.VoteApi
+import de.janaja.playlistpurger.domain.model.Track
+import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
@@ -13,7 +16,6 @@ class SpotifyTrackListRepo(
     dataStoreRepo: DataStoreRepo,
     val voteApi: VoteApi
 ) : TrackListRepo {
-    val TAG = "TrackListRepo"
 
     private val api = SpotifyApi.retrofitService
 
@@ -23,7 +25,7 @@ class SpotifyTrackListRepo(
         }
     private val currentUserId = "janajansen-de" // TODO get real current user id from somewhere
 
-    override val allTracks = MutableStateFlow<List<TrackDto>>(listOf())
+    override val allTracks = MutableStateFlow<List<Track>>(listOf())
 
 //    override val unvotedTracks: Flow<List<Track>> = allTracks.map { list ->
 //        list.filter { it.vote == null }
@@ -40,13 +42,13 @@ class SpotifyTrackListRepo(
         val votesForPlaylist = voteApi.getVotesForPlaylist(playlistId, currentUserId)
 
         val mergedTracks =
-            tracksFromSpotify.map { track -> track.copy(vote = votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
+            tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
 
         allTracks.value = mergedTracks
 
     }
 
-    override suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<TrackDto, List<Vote>>> {
+    override suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<Track, List<Vote>>> {
         if (allTracks.value.isEmpty()) {
             loadTracksWithOwnVotes(playlistId)
         }

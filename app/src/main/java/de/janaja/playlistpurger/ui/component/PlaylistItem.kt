@@ -28,13 +28,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.R
-import de.janaja.playlistpurger.data.remote.spotify.model.PlaylistDto
-import de.janaja.playlistpurger.data.PreviewData
-import de.janaja.playlistpurger.data.remote.spotify.model.UserDto
+import de.janaja.playlistpurger.domain.PreviewData
+import de.janaja.playlistpurger.domain.model.Playlist
+import de.janaja.playlistpurger.domain.model.User
 
 @Composable
 fun PlaylistItem(
-    playlist: PlaylistDto,
+    playlist: Playlist,
     onNavToVote: (String, String) -> Unit,
     onNavToResult: (String, String) -> Unit,
     modifier: Modifier = Modifier
@@ -54,9 +54,8 @@ fun PlaylistItem(
         ) {
 
             // Image
-            val imageUrl = playlist.images.firstOrNull()?.url
             AsyncImage(
-                model = imageUrl,
+                model = playlist.imageUrl,
                 "Playlist Image",
                 modifier = Modifier.fillMaxWidth(0.38f).aspectRatio(1f),
                 error = painterResource(R.drawable.img)
@@ -97,7 +96,7 @@ fun PlaylistItem(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        playlist.owner.displayName,
+                        playlist.owner.name,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -190,12 +189,12 @@ private fun PlaylistItemPreview2() {
 @Composable
 private fun PlaylistItemPreview3() {
     // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = UserDto(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", name = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }
 
 @Preview(showBackground = true, widthDp = 500, heightDp = 200)
 @Composable
 private fun PlaylistItemPreview4() {
     // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = UserDto(id = "", displayName = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
+    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", name = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }

@@ -1,13 +1,13 @@
-package de.janaja.playlistpurger.data.repository
+package de.janaja.playlistpurger.domain.repository
 
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
+import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption
 import kotlinx.coroutines.flow.Flow
 
 interface TrackListRepo {
 
-    val allTracks: Flow<List<TrackDto>>
+    val allTracks: Flow<List<Track>>
 
     suspend fun loadTracksWithOwnVotes(playlistId: String)
 
@@ -15,5 +15,5 @@ interface TrackListRepo {
     // inject current user id into repo? and token datastore thing?
     fun updateVote(playlistId: String, trackId: String, newVote: VoteOption)
 
-    suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<TrackDto, List<Vote>>>
+    suspend fun loadTracksWithAllVotes(playlistId: String): List<Pair<Track, List<Vote>>>
 }

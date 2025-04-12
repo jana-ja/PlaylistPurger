@@ -5,10 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import de.janaja.playlistpurger.data.remote.spotify.model.TrackDto
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.data.repository.DataStoreRepo
-import de.janaja.playlistpurger.data.repository.TrackListRepo
+import de.janaja.playlistpurger.domain.repository.DataStoreRepo
+import de.janaja.playlistpurger.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.ui.TrackListRoute
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,9 +58,6 @@ class TrackListViewModel(
 
     fun switchSwipeMode(isOn: Boolean) {
         _swipeModeOn.value = isOn
-        if (isOn) {
-
-        }
     }
 
     private fun loadTrackList() {
@@ -78,13 +75,13 @@ class TrackListViewModel(
         }
     }
 
-    fun onChangeVote(track: TrackDto, newVote: VoteOption) {
+    fun onChangeVote(track: Track, newVote: VoteOption) {
         Log.d(TAG, "onChangeVote: $track")
         trackListRepo.updateVote(playlistId, track.id, newVote)
     }
 
     // swipe mode
-    fun onSwipe(dir: SwipeDirection, track: TrackDto) {
+    fun onSwipe(dir: SwipeDirection, track: Track) {
         // TODO darf nicht passieren dass das null ist, dann wäre gültiger down swipe passiert, aber swipe card sollte das blocken
         VoteOption.fromSwipeDirection(dir)?.let {
             onChangeVote(track, it)
