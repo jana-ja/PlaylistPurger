@@ -64,9 +64,10 @@ class MainActivity : ComponentActivity() {
                         SplashScreen()
                     } else {
                         if (isLoggedIn) {
-                            AppStart {
-                                authViewModel.logout()
-                            }
+                            AppStart()
+//                            {
+//                                authViewModel.logout()
+//                            }
                         } else {
                             WelcomeScreen(
                                 onLogin = {

@@ -1,3 +1,4 @@
+import com.android.tools.r8.internal.me
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -101,7 +102,7 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    // swipeable card
-    implementation(libs.swipeablecard)
+    // compose preference
+    implementation (libs.compose.preference)
 
 }

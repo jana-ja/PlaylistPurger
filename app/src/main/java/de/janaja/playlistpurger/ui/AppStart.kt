@@ -1,13 +1,11 @@
 package de.janaja.playlistpurger.ui
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -15,18 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
+import de.janaja.playlistpurger.ui.screen.SettingsScreen
 import de.janaja.playlistpurger.ui.screen.TrackListScreen
 import de.janaja.playlistpurger.ui.screen.VoteResultScreen
 import kotlinx.serialization.Serializable
@@ -36,6 +33,9 @@ object MenuRoute
 
 @Serializable
 object PlaylistOverviewRoute
+
+@Serializable
+object SettingsRoute
 
 @Serializable
 data class TrackListRoute(
@@ -55,9 +55,7 @@ data class TopBarUiState(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppStart(
-    onLogOut: () -> Unit
-) {
+fun AppStart() {
     val navController = rememberNavController()
     var topBarUiState by remember { mutableStateOf(TopBarUiState("Playlist Purger")) }
 
@@ -66,10 +64,12 @@ fun AppStart(
             TopAppBar(
                 title = { Text(topBarUiState.title) },
                 actions = {
-                    IconButton(onClick = onLogOut) {
+                    IconButton(onClick = {
+                        navController.navigate(SettingsRoute)
+                    }) {
                         Icon(
-                            painterResource(R.drawable.baseline_logout_24),
-                            "Logout"
+                            imageVector = Icons.Default.Settings,
+                            "Settings"
                         )
                     }
                 }
@@ -109,6 +109,11 @@ fun AppStart(
                 VoteResultScreen()
             }
 
+            composable<SettingsRoute> {
+                topBarUiState = TopBarUiState("Settings")
+                SettingsScreen()
+            }
+
         }
     }
 }
@@ -117,5 +122,5 @@ fun AppStart(
 @Composable
 private fun AppStartPreview() {
     // Use Theme here
-    AppStart({})
+    AppStart()
 }

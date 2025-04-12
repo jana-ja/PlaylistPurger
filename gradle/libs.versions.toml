@@ -19,13 +19,12 @@ retrofitVersion = "2.11.0"
 loggingInterceptor = "4.9.3"
 # async image
 coilCompose = "3.0.0-rc02"
-# encrypted shared preferences
-#securityCryptoKtx = "1.0.0-alpha06"
 # data store
 datastorePreferences = "1.1.1"
 # koin
 koinBom = "4.1.0-Beta4"
-swipeablecard = "0.1.0"
+# compose preference
+composePreference = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -64,7 +63,8 @@ koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
-swipeablecard = { module = "com.alexstyl.swipeablecard:swipeablecard", version.ref = "swipeablecard" }
+# compose preference
+compose-preference = { module = "me.zhanghai.compose.preference:library", version.ref = "composePreference" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

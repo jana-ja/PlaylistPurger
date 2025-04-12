@@ -10,10 +10,13 @@ import org.koin.dsl.module
 import de.janaja.playlistpurger.data.repository.SpotifyTrackListRepo
 import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApiDummyImpl
+import de.janaja.playlistpurger.data.repository.DataStoreSettingsRepo
+import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.ui.viewmodel.TrackListViewModel
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
+import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -21,9 +24,14 @@ import org.koin.core.module.dsl.viewModelOf
 
 val appModule = module {
 
-    // DataStoreRepo
+    // TokenRepo
     single<TokenRepo> {
         DataStoreTokenRepo(androidContext())
+    }
+
+    // SettingsRepo
+    single<SettingsRepo> {
+        DataStoreSettingsRepo(androidContext())
     }
 
     // VoteRepo
@@ -55,4 +63,7 @@ val appModule = module {
 
     // VoteResultViewModel uses TrackListRepo
     viewModelOf(::VoteResultViewModel)
+
+    // SettingsViewModel uses SettingsRepo
+    viewModelOf(::SettingsViewModel)
 }
