@@ -1,7 +1,9 @@
 package de.janaja.playlistpurger.di
 
 import com.spotify.sdk.android.auth.AuthorizationRequest
+import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyWebApiService
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.data.repository.DataStoreTokenRepo
@@ -22,6 +24,7 @@ import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 
@@ -29,9 +32,10 @@ import org.koin.core.module.dsl.viewModelOf
 val appModule = module {
 
     // Spotify WebApiService
-    single<SpotifyWebApiService> {
-        KtorSpotifyWebApiService()
-    }
+    singleOf<SpotifyWebApiService>(::KtorSpotifyWebApiService)
+
+    // Spotify AccountApiService
+    singleOf<SpotifyAccountApiService>(::KtorSpotifyAccountApiService)
 
     // TokenRepo
     single<TokenRepo> {
@@ -43,9 +47,9 @@ val appModule = module {
         DataStoreSettingsRepo(androidContext())
     }
 
-    // AuthRepo uses TokenRepo and WebApiService
+    // AuthRepo uses TokenRepo and WebApiService and AccountApiService
     single<AuthRepo> {
-        SpotifyAuthRepo(get(), get())
+        SpotifyAuthRepo(get(), get(), get())
     }
 
     // VoteRepo

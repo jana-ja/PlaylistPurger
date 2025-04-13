@@ -33,7 +33,7 @@ private val retrofit = Retrofit.Builder()
     .client(okHttpClient)
     .build()
 
-interface SpotifyAccountApiService {
+interface SpotifyAccountApiServiceRetrofit {
 
     @FormUrlEncoded
     @POST("api/token")
@@ -59,5 +59,5 @@ interface SpotifyAccountApiService {
 }
 
 object SpotifyAccountApi {
-    val retrofitService: SpotifyAccountApiService by lazy { retrofit.create(SpotifyAccountApiService::class.java) }
+    val retrofitService: SpotifyAccountApiServiceRetrofit by lazy { retrofit.create(SpotifyAccountApiServiceRetrofit::class.java) }
 }

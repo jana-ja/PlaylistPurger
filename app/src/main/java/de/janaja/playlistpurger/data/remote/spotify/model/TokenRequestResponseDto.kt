@@ -1,18 +1,18 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class TokenRequestResponseDto(
-    @Json(name = "access_token")
+    @SerialName("access_token")
     val accessToken: String,
-    @Json(name = "token_type")
+    @SerialName("token_type")
     val tokenType: String, // always "Bearer"
     val scope: String,
-    @Json(name = "expires_in")
+    @SerialName("expires_in")
     val expiresInSec: Int,
-    @Json(name = "refresh_token")
+    @SerialName("refresh_token")
     val refreshToken: String = ""
 )
 // swap code for token

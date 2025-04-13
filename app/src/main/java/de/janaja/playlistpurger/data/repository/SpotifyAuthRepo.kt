@@ -2,7 +2,7 @@ package de.janaja.playlistpurger.data.repository
 
 import android.util.Log
 import de.janaja.playlistpurger.BuildConfig
-import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApi
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.LoginState
@@ -15,15 +15,14 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SpotifyAuthRepo(
     private val tokenRepo: TokenRepo,
-    private val webApiService: SpotifyWebApiService
+    private val webApiService: SpotifyWebApiService,
+    private val accountApiService: SpotifyAccountApiService
 ) : AuthRepo {
     private val TAG = "AuthRepo"
 
     private val clientSecret = BuildConfig.CLIENT_SECRET
     private val clientId = BuildConfig.CLIENT_ID
     private val redirectUri = "asdf://callback"
-
-    private val api = SpotifyAccountApi.retrofitService
 
     private val accessTokenFlow = tokenRepo.accessTokenFlow
 
@@ -35,19 +34,25 @@ class SpotifyAuthRepo(
 
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun loginWithCode(code: String) {
-        try {
+        // TODO loginState -> loading
+        Log.d(TAG, "loginWithCode: try receive token for code: $code")
 
-            val tokenRequestResponse = api.getToken(
+            val result = this.accountApiService.getToken(
                 client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                 code = code,
                 redirectUri = redirectUri,
             )
+            result.onSuccess { tokenRequestResponse ->
+                Log.d(TAG, "loginWithCode: got token for toke")
+                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+            }.onFailure { e ->
+                // TODO exception handling
+                Log.d(TAG, "loginWithCode: Error ${e}")
 
-            tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-            tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
-        } catch (e: Exception) {
-            Log.d(TAG, "getTokenForCode: Error ${e.localizedMessage}")
-        }
+            }
+
+
     }
 
     private suspend fun checkToken(token: String?): LoginState {
@@ -99,24 +104,25 @@ class SpotifyAuthRepo(
             logout()
             return false
         } else {
-            try {
                 // TODO improve error handling
                 Log.d(TAG, "found saved refresh token -> get fresh access token with it")
-                val tokenRequestResponse = api.refreshToken(
+                val result = this.accountApiService.refreshToken(
                     client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                     refreshToken = value,
                 )
-                Log.d(TAG, "got fresh access token -> save it")
-                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                if (tokenRequestResponse.refreshToken != "") {
-                    tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                result.onSuccess { tokenRequestResponse ->
+                    Log.d(TAG, "got fresh access token -> save it")
+                    tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                    if (tokenRequestResponse.refreshToken != "") {
+                        tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                    }
+                    return true
+                }.onFailure { e ->
+                    Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
+                    return false
                 }
-                return true
-            } catch (e: Exception) {
-                Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
-                return false
-            }
-
+            // TODO
+            return false
         }
     }
 
