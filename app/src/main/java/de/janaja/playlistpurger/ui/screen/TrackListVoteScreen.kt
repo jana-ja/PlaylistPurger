@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,13 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.ui.DataState
+import de.janaja.playlistpurger.ui.component.DataStateView
 import de.janaja.playlistpurger.ui.component.IconSwitch
 import de.janaja.playlistpurger.ui.component.SwipeCard
 import de.janaja.playlistpurger.ui.component.SwipeCardState
 import de.janaja.playlistpurger.ui.component.TrackCard
 import de.janaja.playlistpurger.ui.component.TrackItem
-import de.janaja.playlistpurger.ui.component.TrackItemVotes
 import de.janaja.playlistpurger.ui.component.VoteButton
 import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
 import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
@@ -68,92 +66,83 @@ fun TrackListVoteScreen(
                 onCheckedChange = { trackListVoteViewModel.switchSwipeMode(it) }
             )
         }
-        when(val state = dataState) {
-            is DataState.Error -> {
-                Text(state.message.asString())
-            }
 
-            DataState.Loading -> {
-                CircularProgressIndicator()
-            }
-
-            is DataState.Ready -> {
-
-                if (swipeModeOn) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
+        DataStateView(dataState) { data ->
+            if (swipeModeOn) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Text("Alle Songs wurden gevotet")
-                            FilledTonalButton(onClick = {
-                                trackListVoteViewModel.switchSwipeMode(false)
-                            }) { Text("Zur Listenansicht") }
-                        }
-
-                        swipeableTracks.reversed().forEachIndexed { index, track ->
-                            key(track.id) {
-                                val br = rememberSwipeCardState()
-                                if (index == swipeableTracks.lastIndex) {
-                                    topSwipeCardState = br
-                                }
-                                SwipeCard(
-                                    swipeCardState = br,
-                                    onSwiped = { dir ->
-                                        trackListVoteViewModel.onSwipe(dir, track)
-
-                                    },
-                                ) {
-                                    TrackCard(
-                                        track,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
-                        }
+                        Text("Alle Songs wurden gevotet")
+                        FilledTonalButton(onClick = {
+                            trackListVoteViewModel.switchSwipeMode(false)
+                        }) { Text("Zur Listenansicht") }
                     }
 
-                    topSwipeCardState?.let {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            VoteOption.entries.reversed().forEach { vote ->
-                                VoteButton(
-                                    selected = (vote == it.currentSwipeDirection?.let { it1 ->
-                                        VoteOption.fromSwipeDirection(it1)
-                                    }),
-                                    onClick = {
-                                        scope.launch {
-                                            it.swipe(vote.getSwipeDirection())
-                                        }
-                                    },
-                                    iconResId = vote.imgResId,
-                                    selectionColor = vote.color,
-                                    selectionScaling = 1.5f,
-                                    contentDescription = vote.contentDescription,
+                    swipeableTracks.reversed().forEachIndexed { index, track ->
+                        key(track.id) {
+                            val br = rememberSwipeCardState()
+                            if (index == swipeableTracks.lastIndex) {
+                                topSwipeCardState = br
+                            }
+                            SwipeCard(
+                                swipeCardState = br,
+                                onSwiped = { dir ->
+                                    trackListVoteViewModel.onSwipe(dir, track)
+
+                                },
+                            ) {
+                                TrackCard(
+                                    track,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
                     }
-                } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                }
+
+                topSwipeCardState?.let {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        items(state.data) { track ->
-                            TrackItem(track, onChangeVote = { newVote ->
-                                trackListVoteViewModel.onChangeVote(track, newVote)
-                            })
+                        VoteOption.entries.reversed().forEach { vote ->
+                            VoteButton(
+                                selected = (vote == it.currentSwipeDirection?.let { it1 ->
+                                    VoteOption.fromSwipeDirection(it1)
+                                }),
+                                onClick = {
+                                    scope.launch {
+                                        it.swipe(vote.getSwipeDirection())
+                                    }
+                                },
+                                iconResId = vote.imgResId,
+                                selectionColor = vote.color,
+                                selectionScaling = 1.5f,
+                                contentDescription = vote.contentDescription,
+                            )
                         }
                     }
                 }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(data) { track ->
+                        TrackItem(track, onChangeVote = { newVote ->
+                            trackListVoteViewModel.onChangeVote(track, newVote)
+                        })
+                    }
+                }
             }
+
         }
     }
 }
