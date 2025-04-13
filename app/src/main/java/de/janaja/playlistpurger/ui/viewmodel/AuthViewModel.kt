@@ -9,14 +9,14 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.domain.model.LoginState
-import de.janaja.playlistpurger.domain.repository.AuthRepo
+import de.janaja.playlistpurger.domain.repository.AuthService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class AuthViewModel(
-    private val authRepo: AuthRepo,
+    private val authService: AuthService,
     private val onStartLoginActivity: (AuthorizationRequest) -> Unit,
 ) : ViewModel() {
 
@@ -26,7 +26,7 @@ class AuthViewModel(
     private val TAG = "AuthViewModel"
 
 
-    val loginState = authRepo.loginState
+    val loginState = authService.loginState
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -64,7 +64,7 @@ class AuthViewModel(
                     println("Got Token! ${AuthorizationResponse.Type.TOKEN}")
 
                     viewModelScope.launch {
-                        authRepo.loginWithCode(response.code)
+                        authService.loginWithCode(response.code)
                     }
 
 

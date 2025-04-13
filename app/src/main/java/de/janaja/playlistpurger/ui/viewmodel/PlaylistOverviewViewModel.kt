@@ -4,15 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.janaja.playlistpurger.domain.exception.DataException
-import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.domain.model.Playlist
-import de.janaja.playlistpurger.domain.repository.AuthRepo
+import de.janaja.playlistpurger.domain.repository.AuthService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class PlaylistOverviewViewModel(
-    private val authRepo: AuthRepo,
+    private val authService: AuthService,
     private val playListRepo: PlaylistRepo
 ) : ViewModel() {
 
@@ -42,7 +41,7 @@ class PlaylistOverviewViewModel(
                 // look for authorization error, refresh token, retry
                 when (e) {
                     DataException.Remote.InvalidAccessToken -> {
-                        authRepo.refreshToken()
+                        authService.refreshToken()
                         // TODO try again
                     }
                     is DataException -> {

@@ -3,7 +3,7 @@ package de.janaja.playlistpurger.domain.repository
 import de.janaja.playlistpurger.domain.model.LoginState
 import kotlinx.coroutines.flow.Flow
 
-interface AuthRepo {
+interface AuthService {
     val loginState: Flow<LoginState>
     suspend fun refreshToken(): Boolean
     suspend fun logout()

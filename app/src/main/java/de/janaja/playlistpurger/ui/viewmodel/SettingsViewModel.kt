@@ -2,7 +2,7 @@ package de.janaja.playlistpurger.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.janaja.playlistpurger.domain.repository.AuthRepo
+import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val settingsRepo: SettingsRepo,
-    private val authRepo: AuthRepo,
+    private val authService: AuthService,
     ): ViewModel() {
 
     val showSwipeFirst = settingsRepo.showSwipeFirstFlow
@@ -30,7 +30,7 @@ class SettingsViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            authRepo.logout()
+            authService.logout()
         }
     }
 

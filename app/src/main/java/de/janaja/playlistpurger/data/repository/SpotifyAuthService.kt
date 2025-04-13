@@ -6,18 +6,18 @@ import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.LoginState
-import de.janaja.playlistpurger.domain.repository.AuthRepo
+import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.TokenRepo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class SpotifyAuthRepo(
+class SpotifyAuthService(
     private val tokenRepo: TokenRepo,
     private val webApiService: SpotifyWebApiService,
     private val accountApiService: SpotifyAccountApiService
-) : AuthRepo {
+) : AuthService {
     private val TAG = "AuthRepo"
 
     private val clientSecret = BuildConfig.CLIENT_SECRET
