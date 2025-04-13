@@ -39,10 +39,10 @@ interface SpotifyApiService {
 
 
     @GET("me/playlists")
-    suspend fun getCatImagesWithHeader(
+    suspend fun getCurrentUsersPlaylists(
         @Header("Authorization") token: String,
 //        @Query("limit") limit: Int = 5
-    ): PlaylistResponseDto
+    ): Response<PlaylistResponseDto>
 
     // https://api.spotify.com/v1/playlists/7CLB5HWtSm5gMvUtYKutkQ/tracks
     @GET("playlists/{playlist_id}/tracks")
