@@ -5,20 +5,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import de.janaja.playlistpurger.domain.exception.DataException
-import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.domain.model.Track
+import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
+import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.ui.TrackListRoute
+import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.component.SwipeDirection
+import de.janaja.playlistpurger.ui.handleDataException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class TrackListVoteViewModel(
@@ -36,6 +35,9 @@ class TrackListVoteViewModel(
     val swipeModeOn = _swipeModeOn.asStateFlow()
 
     var trackList = MutableStateFlow<List<Track>>(emptyList())
+
+    private val _errorMessage = MutableStateFlow<UiText?>(null)
+    val errorMessage = _errorMessage.asStateFlow()
 
     // swipe
     private val unvotedTracks = trackList.map { list ->
@@ -73,19 +75,20 @@ class TrackListVoteViewModel(
                 }
             }.onFailure { e ->
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
-                when (e) {
-                    DataException.Remote.InvalidAccessToken -> {
-                        authService.refreshToken()
-                        // TODO try again
-                    }
-                    is DataException -> {
-                        // TODO exception handling, show error message etc
-                    }
-                    else -> {
-
-                    }
-
-                }
+                handleDataException(
+                    e = e,
+                    onRefresh = {
+                        viewModelScope.launch {
+                            authService.refreshToken()
+                        }
+                    },
+                    onLogout = {
+                        viewModelScope.launch {
+                            authService.logout()
+                        }
+                    },
+                    onUpdateErrorMessage = { _errorMessage.value = it }
+                )
             }
         }
     }
@@ -94,9 +97,22 @@ class TrackListVoteViewModel(
         viewModelScope.launch {
             Log.d(TAG, "onChangeVote: $track")
             val response = trackListRepo.updateVote(playlistId, track.id, newVote)
-            response.onFailure {
-                Log.e(TAG, "onChangeVote: ", it.cause)
-                // TODO exception handling
+            response.onFailure { e ->
+                Log.e(TAG, "onChangeVote: ", e.cause)
+                handleDataException(
+                    e = e,
+                    onRefresh = {
+                        viewModelScope.launch {
+                            authService.refreshToken()
+                        }
+                    },
+                    onLogout = {
+                        viewModelScope.launch {
+                            authService.logout()
+                        }
+                    },
+                    onUpdateErrorMessage = { _errorMessage.value = it }
+                )
             }
         }
     }

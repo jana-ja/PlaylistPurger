@@ -8,5 +8,5 @@ interface AuthService {
     val accessToken: Flow<String?>
     suspend fun refreshToken(): Boolean
     suspend fun logout()
-    suspend fun loginWithCode(code: String)
+    suspend fun loginWithCode(code: String): Result<Unit>
 }

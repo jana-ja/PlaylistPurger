@@ -34,24 +34,27 @@ class SpotifyAuthService(
 
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun loginWithCode(code: String) {
+    override suspend fun loginWithCode(code: String): Result<Unit> {
         // TODO loginState -> loading
         Log.d(TAG, "loginWithCode: try receive token for code: $code")
 
-            val result = this.accountApiService.getToken(
-                client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
-                code = code,
-                redirectUri = redirectUri,
-            )
-            result.onSuccess { tokenRequestResponse ->
+        val result = this.accountApiService.getToken(
+            client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
+            code = code,
+            redirectUri = redirectUri,
+        )
+        return result.fold(
+            onSuccess = { tokenRequestResponse ->
                 Log.d(TAG, "loginWithCode: got token for toke")
                 tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
                 tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
-            }.onFailure { e ->
-                // TODO exception handling
-                Log.d(TAG, "loginWithCode: Error ${e}")
-
+                Result.success(Unit)
+            },
+            onFailure = { e ->
+                Log.e(TAG, "loginWithCode: ", e.cause)
+                Result.failure(e)
             }
+        )
 
 
     }
@@ -76,6 +79,7 @@ class SpotifyAuthService(
                         Log.d(TAG, "token is not valid - try to refresh")
 
                         if (!refreshToken()) {
+                            // TODO show something to user, maybe go default exception handling function path
                             logout()
                         }
                     }
@@ -100,23 +104,24 @@ class SpotifyAuthService(
             logout()
             return false
         } else {
-                // TODO improve error handling
-                Log.d(TAG, "found saved refresh token -> get fresh access token with it")
-                val result = this.accountApiService.refreshToken(
-                    client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
-                    refreshToken = value,
-                )
-                result.onSuccess { tokenRequestResponse ->
-                    Log.d(TAG, "got fresh access token -> save it")
-                    tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                    if (tokenRequestResponse.refreshToken != "") {
-                        tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
-                    }
-                    return true
-                }.onFailure { e ->
-                    Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
-                    return false
+            // TODO improve error handling
+            Log.d(TAG, "found saved refresh token -> get fresh access token with it")
+            val result = this.accountApiService.refreshToken(
+                client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
+                refreshToken = value,
+            )
+
+            result.onSuccess { tokenRequestResponse ->
+                Log.d(TAG, "got fresh access token -> save it")
+                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                if (tokenRequestResponse.refreshToken != "") {
+                    tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
                 }
+                return true
+            }.onFailure { e ->
+                Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
+                return false
+            }
             // TODO
             return false
         }
@@ -126,4 +131,6 @@ class SpotifyAuthService(
     override suspend fun logout() {
         tokenRepo.deleteAllToken()
     }
+
+
 }

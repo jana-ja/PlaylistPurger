@@ -32,69 +32,70 @@ class SpotifyTrackListRepo(
 
     private val allTracks = MutableStateFlow<List<Track>>(listOf())
 
-    // TODO
     override suspend fun loadTracksWithOwnVotes(playlistId: String): Result<Flow<List<Track>>> {
         // TODO cache lists for ids in memory?
-        val token = tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-        val currentUserId = userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
+        val token =
+            tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
+        val currentUserId =
+            userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
         val tracksResult = webApiService.getTracksForPlaylist("Bearer $token", playlistId)
 
-        tracksResult.onSuccess { tracksResponse ->
-            // TODO parallel
-            val tracksFromSpotify = tracksResponse.items.map { it.track }
-            val votesResult = voteApi.getVotesForPlaylist(playlistId, currentUserId)
+        return tracksResult.fold(
+            onSuccess = { tracksResponse ->
+                // TODO parallel
+                val tracksFromSpotify = tracksResponse.items.map { it.track }
+                val votesResult = voteApi.getVotesForPlaylist(playlistId, currentUserId)
 
-            votesResult.onSuccess { votesForPlaylist ->
-                val mergedTracks =
-                    tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
+                votesResult.fold(
+                    onSuccess = { votesForPlaylist ->
+                        val mergedTracks =
+                            tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
 
-                allTracks.value = mergedTracks
+                        allTracks.value = mergedTracks
 
-                return Result.success(allTracks)
-            }.onFailure { e ->
-                // TODO
-                return Result.failure(e)
+                        Result.success(allTracks)
+                    },
+                    onFailure = { e ->
+                        Result.failure(e)
+                    }
+                )
+            },
+            onFailure = {
+                Result.failure(it)
             }
-
-
-        }.onFailure { e ->
-            // TODO
-            return Result.failure(e)
-        }
-        // TODO
-        return Result.failure(Exception("something"))
-
-
+        )
     }
 
     override suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>> {
 
 //        if (allTracks.value.isEmpty()) {
 //            // TODO error handling??
-            loadTracksWithOwnVotes(playlistId)
+        loadTracksWithOwnVotes(playlistId)
 //        }
 
         // get all votes
         val allVotesResult = voteApi.getAllVotesForPlaylist(playlistId)
-        allVotesResult.onSuccess { allVotes ->
-
-            val allVotesByTrackId = allVotes.groupBy { it.trackId }
-
-            return Result.success(
-                allTracks.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
-            )
-
-        }
-
-        // TODO
-        return Result.failure(Exception("something"))
-
-
+        return allVotesResult.fold(
+            onSuccess = { allVotes ->
+                val allVotesByTrackId = allVotes.groupBy { it.trackId }
+                Result.success(
+                    allTracks.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
+                )
+            },
+            onFailure = {
+                Result.failure(it)
+            }
+        )
     }
 
-    override suspend fun updateVote(playlistId: String, trackId: String, newVote: VoteOption): Result<Unit> {
-        val currentUserId = userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
+    override suspend fun updateVote(
+        playlistId: String,
+        trackId: String,
+        newVote: VoteOption
+    ): Result<Unit> {
+        val currentUserId =
+            userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
         voteApi.upsertVote(playlistId, trackId, currentUserId, newVote)
         // TODO auf antwort warten, dabei feedback für user anzeigen, dann lokal ändern?
@@ -107,8 +108,6 @@ class SpotifyTrackListRepo(
         }
         return Result.success(Unit)
     }
-
-
 
 
 }
