@@ -3,7 +3,8 @@ package de.janaja.playlistpurger.data.repository
 import android.util.Log
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApi
-import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
+import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthRepo
 import de.janaja.playlistpurger.domain.repository.TokenRepo
@@ -14,6 +15,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SpotifyAuthRepo(
     private val tokenRepo: TokenRepo,
+    private val webApiService: SpotifyWebApiService
 ) : AuthRepo {
     private val TAG = "AuthRepo"
 
@@ -22,7 +24,6 @@ class SpotifyAuthRepo(
     private val redirectUri = "asdf://callback"
 
     private val api = SpotifyAccountApi.retrofitService
-    private val webApi = SpotifyApi.retrofitService
 
     private val accessTokenFlow = tokenRepo.accessTokenFlow
 
@@ -57,27 +58,30 @@ class SpotifyAuthRepo(
             return LoginState.LoggedOut
         } else {
             Log.d(TAG, "found saved token -> check if valid by loading current user")
-            val response = webApi.getCurrentUser("Bearer $token")
+            val result = this.webApiService.getCurrentUser("Bearer $token")
 
-            if (response.isSuccessful) {
+            result.onSuccess { user ->
                 Log.d(TAG, "token is valid -> logged in")
-                val userId = response.body()!!.id
+                val userId = user.id
                 // TODO maybe whole user
                 return LoginState.LoggedIn(userId)
-            } else {
-                Log.d(TAG, "token is not valid")
-                when (response.code()) {
-                    401 -> {
-                        Log.d(TAG, "try to refresh token")
+            }.onFailure { e ->
+                Log.d(TAG, "loading current user failed: ", e.cause)
+//                Log.d(TAG, "token is not valid - try to refresh")
+                // TODO bekomme hier unknown error
+                when (e) {
+                    DataException.Remote.InvalidAccessToken -> {
+                        Log.d(TAG, "token is not valid - try to refresh")
 
                         if (!refreshToken()) {
-                            return LoginState.LoggedOut
+                            logout()
+//                            return LoginState.LoggedOut
                         }
                     }
                 }
                 // TODO improve error handling and think about loadingState flows in exception case (endless refresh/reload or loadingState?)
-                return LoginState.Loading
             }
+            return LoginState.Loading
         }
     }
 

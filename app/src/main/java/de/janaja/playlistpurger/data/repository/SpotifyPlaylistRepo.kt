@@ -1,34 +1,38 @@
 package de.janaja.playlistpurger.data.repository
 
 import de.janaja.playlistpurger.data.mapper.toPlaylist
-import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.Playlist
-import de.janaja.playlistpurger.domain.repository.AuthRepo
 import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class SpotifyPlaylistRepo(
-    tokenRepo: TokenRepo
+    tokenRepo: TokenRepo,
+    private val webApiService: SpotifyWebApiService
 ): PlaylistRepo {
-
-    private val api = SpotifyApi.retrofitService
 
     private val tokenFlow = tokenRepo.accessTokenFlow
 
     override suspend fun getPlaylists(): Result<List<Playlist>> {
         val token = tokenFlow.firstOrNull() ?: return Result.failure(DataException.Remote.MissingAccessToken)
 
-        val response = api.getCurrentUsersPlaylists("Bearer $token")
+        val result = webApiService.getCurrentUsersPlaylists("Bearer $token")
 
-        if (response.isSuccessful) {
-            return Result.success(response.body()!!.items.map { it.toPlaylist() })
+        result.onSuccess { playlistResponse ->
+            return Result.success(playlistResponse.items.map { it.toPlaylist() })
 
-        } else {
-            return Result.failure(Exception("something"))
+        }.onFailure {
+            return Result.failure(it)
         }
+//            .onFailure {
+//            return Result.failure(Exception("something"))
+//
+//        }
+        // TODO
+            return Result.failure(Exception("something"))
+
 
         /*
         return try {

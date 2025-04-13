@@ -1,12 +1,14 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-// TODO maybe domain model
+@Serializable
 data class TrackDto(
     val id: String,
     val name: String,
-    @Json(name = "duration_ms")
+    @SerialName("duration_ms")
     val durationMillis: Int,
     val album: AlbumDto,
     val artists: List<ArtistDto>,

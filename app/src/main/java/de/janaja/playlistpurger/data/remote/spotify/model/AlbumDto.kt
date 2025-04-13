@@ -1,5 +1,8 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AlbumDto(
     val id: String,
     val images: List<ImageDto>,

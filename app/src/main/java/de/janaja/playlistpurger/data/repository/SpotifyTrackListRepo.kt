@@ -1,9 +1,9 @@
 package de.janaja.playlistpurger.data.repository
 
 import de.janaja.playlistpurger.data.mapper.toTrack
+import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.repository.TokenRepo
@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.onEach
 
 class SpotifyTrackListRepo(
     tokenRepo: TokenRepo,
-    val voteApi: VoteApi
-) : TrackListRepo {
+    private val voteApi: VoteApi,
+    private val webApiService: SpotifyWebApiService
 
-    private val api = SpotifyApi.retrofitService
+) : TrackListRepo {
 
     private val tokenFlow = tokenRepo.accessTokenFlow
         .onEach {
@@ -35,16 +35,20 @@ class SpotifyTrackListRepo(
 
     override suspend fun loadTracksWithOwnVotes(playlistId: String) {
         val token = tokenFlow.first() ?: throw Exception("No Token")
-        val tracksResponse = api.getTracksForPlaylist("Bearer $token", playlistId)
+        val result = webApiService.getTracksForPlaylist("Bearer $token", playlistId)
 
-        // TODO parallel
-        val tracksFromSpotify = tracksResponse.items.map { it.track }
-        val votesForPlaylist = voteApi.getVotesForPlaylist(playlistId, currentUserId)
+        result.onSuccess { tracksResponse ->
+            // TODO parallel
+            val tracksFromSpotify = tracksResponse.items.map { it.track }
+            val votesForPlaylist = voteApi.getVotesForPlaylist(playlistId, currentUserId)
 
-        val mergedTracks =
-            tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
+            val mergedTracks =
+                tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
 
-        allTracks.value = mergedTracks
+            allTracks.value = mergedTracks
+        }.onFailure { e ->
+            // TODO
+        }
 
     }
 

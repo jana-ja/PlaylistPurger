@@ -104,5 +104,13 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     // compose preference
     implementation (libs.compose.preference)
+    // ktor
+    implementation(libs.ktor.client.android) // was macht core stattdessen?
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+//    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    // ktor logging
+    implementation(libs.ktor.client.logging)
 
 }

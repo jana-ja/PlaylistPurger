@@ -1,10 +1,13 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
 import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TrackWrapperDto(
     val track: TrackDto,
-    @Json(name = "added_by")
+    @SerialName("added_by")
     val addedBy: UserDto, // hat hier keinen display name
 )
 /*
