@@ -4,36 +4,14 @@ import android.util.Log
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApi
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyApi
+import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthRepo
 import de.janaja.playlistpurger.domain.repository.TokenRepo
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-/*
-vllt loginstate: LOGGED_IN(userId), LOGGED_OUT, LOADING
-A:
-  - ich habe ein token
-  - ich will prüfen ob es gültig ist
-  - ich sende request an api und sehe ob es gültig ist (könnte dabei zB auch userid holen)
-  - falls 401 refresh, sonst nicht (grundsätzliche kopplung)
 
-B:
-  - ich habe ein token
-  - ich will prüfen ob es gültig ist
-  - ich schaue die abgespeicherte zeit an und rechne ob es noch gültig ist
-  - refresh falls nur noch <10min oder so gültig, sonst nicht
-
- */
-
-sealed class LoginState() {
-    data class LoggedIn(val userId: String): LoginState()
-    data object LoggedOut: LoginState()
-    data object Loading: LoginState()
-}
 class SpotifyAuthRepo(
     private val tokenRepo: TokenRepo,
 ) : AuthRepo {
@@ -46,22 +24,12 @@ class SpotifyAuthRepo(
     private val api = SpotifyAccountApi.retrofitService
     private val webApi = SpotifyApi.retrofitService
 
-    // FLOW emittet nur wenn es consumer gibt!
     private val accessTokenFlow = tokenRepo.accessTokenFlow
-        .onEach { checkToken(it) }
-    // TODO connect loginState to this flow, viewmodel collects loginstate so flow can emit and flow
 
-
-    // hier könnte man direkt noch onEach oder map dran hängen
     private val refreshTokenFlow = tokenRepo.refreshTokenFlow
 
-    private val _loginState = MutableStateFlow<LoginState>(LoginState.Loading)
-    override val loginState = _loginState.asStateFlow()
-
-//    private val _isLoggedIn = MutableStateFlow(false)
-//    override val isLoggedIn: Flow<Boolean> = _isLoggedIn.asStateFlow()
-
-
+    override val loginState = accessTokenFlow
+        .map { checkToken(it) }
 
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -79,92 +47,77 @@ class SpotifyAuthRepo(
         } catch (e: Exception) {
             Log.d(TAG, "getTokenForCode: Error ${e.localizedMessage}")
         }
-
     }
 
-//    private suspend fun checkUserLoggedIn() {
-//        accessTokenFlow.collect { value ->
-//            Log.d(TAG, "token collect: $value")
-//
-//            if (value == null) {
-//                Log.d(TAG, "did not find token in data store")
-//                _loginState.value = LoginState.LoggedOut
-////                _isLoggedIn.value = false
-//            } else {
-//                Log.d(TAG, "found token in data store")
-//                checkToken(it)
-//                // TODO erst check
-//                _isLoggedIn.value = true
-//            }
-//            Log.d(TAG, "token: $value")
-//        }
-//    }
-
-    private suspend fun checkToken(token: String?) {
+    private suspend fun checkToken(token: String?): LoginState {
         Log.d(TAG, "received token: $token")
 
         if (token == null) {
             Log.d(TAG, "no saved token -> logged out")
-            _loginState.value = LoginState.LoggedOut
-//                _isLoggedIn.value = false
+            return LoginState.LoggedOut
         } else {
-            Log.d(TAG, "found saved token -> check if valid")
+            Log.d(TAG, "found saved token -> check if valid by loading current user")
+            val response = webApi.getCurrentUser("Bearer $token")
 
-            val response = webApi.getCurrentUser(token)
             if (response.isSuccessful) {
                 Log.d(TAG, "token is valid -> logged in")
                 val userId = response.body()!!.id
                 // TODO maybe whole user
-                _loginState.value = LoginState.LoggedIn(userId)
+                return LoginState.LoggedIn(userId)
             } else {
+                Log.d(TAG, "token is not valid")
                 when (response.code()) {
-                    401 -> refreshToken()
+                    401 -> {
+                        Log.d(TAG, "try to refresh token")
+
+                        if (!refreshToken()) {
+                            return LoginState.LoggedOut
+                        }
+                    }
                 }
+                // TODO improve error handling and think about loadingState flows in exception case (endless refresh/reload or loadingState?)
+                return LoginState.Loading
             }
         }
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun refreshToken() {
-        // unsuccessful -> set loginState to logged out
-        // successful -> update access token will trigger check token and set the loginState
+    override suspend fun refreshToken(): Boolean {
+        // unsuccessful -> call logout - this will delete token and trigger checkToken to set the loginState
+        // successful -> update access token - this will trigger checkToken to set the loginState
 
         val value = refreshTokenFlow.first()
 
-        Log.d(TAG, "refresh token collect: $value")
-        Log.d(TAG, "try receive refresh token from data store")
+        Log.d(TAG, "refresh token collected: $value")
 
         if (value == null) {
-            Log.d(TAG, "did not find refresh token in data store")
+            Log.d(TAG, "no saved refresh token -> logout to delete all tokens")
             logout()
-//            _isLoggedIn.value = false
+            return false
         } else {
-            Log.d(TAG, "found refresh token in data store")
             try {
-
-
+                // TODO improve error handling
+                Log.d(TAG, "found saved refresh token -> get fresh access token with it")
                 val tokenRequestResponse = api.refreshToken(
-
                     client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                     refreshToken = value,
                 )
+                Log.d(TAG, "got fresh access token -> save it")
                 tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
                 if (tokenRequestResponse.refreshToken != "") {
                     tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
                 }
+                return true
             } catch (e: Exception) {
                 Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
+                return false
             }
 
         }
-        Log.d(TAG, "token: $value")
-
     }
 
 
     override suspend fun logout() {
         tokenRepo.deleteAllToken()
-        _loginState.value = LoginState.LoggedOut
-//        _isLoggedIn.value = false
     }
 }

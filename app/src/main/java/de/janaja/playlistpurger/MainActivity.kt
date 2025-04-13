@@ -21,7 +21,7 @@ import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import androidx.datastore.preferences.core.Preferences
-import de.janaja.playlistpurger.data.repository.LoginState
+import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.ui.AppStart
 import de.janaja.playlistpurger.ui.screen.SplashScreen
 import org.koin.androidx.compose.koinViewModel

@@ -8,11 +8,9 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
-import de.janaja.playlistpurger.data.repository.LoginState
+import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthRepo
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -34,33 +32,6 @@ class AuthViewModel(
             started = SharingStarted.WhileSubscribed(),
             initialValue = LoginState.Loading
         )
-//    val isLoggedIn = authRepo.isLoggedIn
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(),
-//            initialValue = false
-//        )
-
-    // ui states
-//    private val _isLoading = MutableStateFlow(false)
-//    val isLoading = _isLoading.asStateFlow()
-
-
-
-    /*
-    save validUntil time for access token
-    init: check validUntil time ONCE
-        -> null: loggedin false
-        -> not valid: refresh
-        -> valid: loggedin true (access token sollte dann da sein, wird nicht explizit geprüft?
-    flow accesstoken:
-        null -> loggedout
-        value -> loggedin
-
-    oder:
-
-    init: check
-     */
 
 
     fun startLoginProcess() {
