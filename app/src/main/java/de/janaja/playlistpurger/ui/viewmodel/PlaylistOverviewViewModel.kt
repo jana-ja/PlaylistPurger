@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.domain.model.Playlist
+import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.repository.AuthService
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.handleDataException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +21,9 @@ class PlaylistOverviewViewModel(
 
     private val TAG = "PlaylistOverviewViewModel"
 
-    val playlists = MutableStateFlow<List<Playlist>>(listOf())
-
-    private val _errorMessage = MutableStateFlow<UiText?>(null)
-    val errorMessage = _errorMessage.asStateFlow()
+    private val _dataState =
+        MutableStateFlow<DataState<List<Playlist>>>(DataState.Loading)
+    val dataState = _dataState.asStateFlow()
 
     init {
         loadAllPlaylists()
@@ -40,8 +41,7 @@ class PlaylistOverviewViewModel(
 
             result.onSuccess { allPlaylists ->
                 Log.d(TAG, "loadAllPlaylists: success")
-                playlists.value = allPlaylists
-                _errorMessage.value = null
+                _dataState.value = DataState.Ready(allPlaylists)
 
             }.onFailure { e ->
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
@@ -58,7 +58,9 @@ class PlaylistOverviewViewModel(
                             authService.logout()
                         }
                     },
-                    onUpdateErrorMessage = { _errorMessage.value = it }
+                    onUpdateErrorMessage = {
+                        _dataState.value = DataState.Error(it)
+                    }
                 )
             }
 

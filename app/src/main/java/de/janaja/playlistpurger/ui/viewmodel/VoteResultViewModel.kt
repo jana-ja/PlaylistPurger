@@ -8,14 +8,14 @@ import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.repository.AuthService
-import de.janaja.playlistpurger.ui.UiText
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.VoteResultRoute
 import de.janaja.playlistpurger.ui.handleDataException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class VoteResultViewModel (
+class VoteResultViewModel(
     savedStateHandle: SavedStateHandle,
     private val authService: AuthService,
     private val trackListRepo: TrackListRepo,
@@ -23,10 +23,9 @@ class VoteResultViewModel (
     private val args = savedStateHandle.toRoute<VoteResultRoute>()
     private val playlistId = args.playlistId
 
-    val tracksWithAllVotes = MutableStateFlow<List<Pair<Track, List<Vote>>>>(emptyList())
-
-    private val _errorMessage = MutableStateFlow<UiText?>(null)
-    val errorMessage = _errorMessage.asStateFlow()
+    private val _dataState =
+        MutableStateFlow<DataState<List<Pair<Track, List<Vote>>>>>(DataState.Loading)
+    val dataState = _dataState.asStateFlow()
 
     init {
         getAllVotes()
@@ -36,7 +35,7 @@ class VoteResultViewModel (
         viewModelScope.launch {
             val result = trackListRepo.loadTracksWithAllVotes(playlistId)
             result.onSuccess {
-                tracksWithAllVotes.value = it
+                _dataState.value = DataState.Ready(it)
             }.onFailure { e ->
                 handleDataException(
                     e = e,
@@ -50,7 +49,9 @@ class VoteResultViewModel (
                             authService.logout()
                         }
                     },
-                    onUpdateErrorMessage = { _errorMessage.value = it }
+                    onUpdateErrorMessage = {
+                        _dataState.value = DataState.Error(it)
+                    }
                 )
             }
         }

@@ -6,13 +6,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.component.PlaylistItem
+import de.janaja.playlistpurger.ui.component.TrackItemVotes
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -21,31 +26,38 @@ fun PlaylistOverviewScreen(
     onNavToTrackList: (String, String) -> Unit,
     onNavToResult: (String, String) -> Unit,
     modifier: Modifier = Modifier,
-    welcomeViewModel: PlaylistOverviewViewModel = koinViewModel()
+    viewModel: PlaylistOverviewViewModel = koinViewModel()
 ) {
-    val playlists by welcomeViewModel.playlists.collectAsState()
+    val dataState by viewModel.dataState.collectAsState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(playlists) {
-                PlaylistItem(
-                    it,
-                    onNavToVote = onNavToTrackList,
-                    onNavToResult = onNavToResult,
-//                    Modifier.clickable {
-//                        onNavToTrackList(it.id, it.name)
-//                    }
-                )
+        when(val state = dataState) {
+            is DataState.Error -> {
+                Text(state.message.asString())
+            }
+            DataState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is DataState.Ready -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(state.data) {
+                        PlaylistItem(
+                            it,
+                            onNavToVote = onNavToTrackList,
+                            onNavToResult = onNavToResult
+                        )
+                    }
+                }
             }
         }
+
     }
 }
 

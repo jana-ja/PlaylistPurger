@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.component.TrackItemVotes
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -22,24 +26,33 @@ fun VoteResultScreen(
     voteResultViewModel: VoteResultViewModel = koinViewModel()
 ) {
 
-    val tracksWithAllVotes by voteResultViewModel.tracksWithAllVotes.collectAsState()
+    val dataState by voteResultViewModel.dataState.collectAsState()
     // song mit den vote dingern mit anzahl der votes, wenn alle abgestimmt haben ist grün hinterlegt oder so
 
     Column(modifier = modifier
         .fillMaxSize()
-        .padding(horizontal = 16.dp)
+        .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(tracksWithAllVotes) { (track, voteList) ->
-                TrackItemVotes(track, voteList)
+        when(val state = dataState) {
+            is DataState.Error -> {
+                Text(state.message.asString())
+            }
+            DataState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is DataState.Ready -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.data) { (track, voteList) ->
+                        TrackItemVotes(track, voteList)
+                    }
+                }
             }
         }
-
     }
-
 }
 
 @Preview(showBackground = true)

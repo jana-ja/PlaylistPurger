@@ -10,8 +10,8 @@ import de.janaja.playlistpurger.domain.model.VoteOption
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.TrackListRoute
-import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.handleDataException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,14 +34,17 @@ class TrackListVoteViewModel(
     private val _swipeModeOn = MutableStateFlow(true)
     val swipeModeOn = _swipeModeOn.asStateFlow()
 
-    var trackList = MutableStateFlow<List<Track>>(emptyList())
-
-    private val _errorMessage = MutableStateFlow<UiText?>(null)
-    val errorMessage = _errorMessage.asStateFlow()
+    private val _dataState =
+        MutableStateFlow<DataState<List<Track>>>(DataState.Loading)
+    val dataState = _dataState.asStateFlow()
 
     // swipe
-    private val unvotedTracks = trackList.map { list ->
-        list.filter { it.vote == null }
+    private val unvotedTracks = _dataState.map {
+        if(it is DataState.Ready) {
+            it.data.filter { it.vote == null }
+        } else {
+            emptyList()
+        }
     }
 
     val swipeTracks =
@@ -71,7 +74,7 @@ class TrackListVoteViewModel(
             result.onSuccess { trackListFlow ->
                 trackListFlow.collect {
                     // TODO besser machen
-                    trackList.value = it
+                    _dataState.value = DataState.Ready(it)
                 }
             }.onFailure { e ->
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
@@ -87,7 +90,8 @@ class TrackListVoteViewModel(
                             authService.logout()
                         }
                     },
-                    onUpdateErrorMessage = { _errorMessage.value = it }
+                    onUpdateErrorMessage = {
+                        _dataState.value = DataState.Error(it) }
                 )
             }
         }
@@ -111,7 +115,10 @@ class TrackListVoteViewModel(
                             authService.logout()
                         }
                     },
-                    onUpdateErrorMessage = { _errorMessage.value = it }
+                    onUpdateErrorMessage = {
+                        // TODO just show toast instead?
+                        _dataState.value = DataState.Error(it)
+                    }
                 )
             }
         }

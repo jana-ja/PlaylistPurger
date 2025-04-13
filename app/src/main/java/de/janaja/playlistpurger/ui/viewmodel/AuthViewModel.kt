@@ -11,6 +11,7 @@ import com.spotify.sdk.android.auth.AuthorizationResponse
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthService
+import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.handleDataException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,7 @@ class AuthViewModel(
             initialValue = LoginState.Loading
         )
 
+    // TODO how to show?
     private val _errorMessage = MutableStateFlow<UiText?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
