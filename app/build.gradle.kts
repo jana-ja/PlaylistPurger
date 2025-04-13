@@ -87,11 +87,6 @@ dependencies {
     // navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization)
-    // api
-    implementation(libs.moshi)
-    implementation(libs.retrofit)
-    implementation(libs.converterMoshi)
-    implementation(libs.logging.interceptor)
     // async image
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

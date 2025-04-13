@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.data.remote.spotify.model
 
-import com.squareup.moshi.Json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
