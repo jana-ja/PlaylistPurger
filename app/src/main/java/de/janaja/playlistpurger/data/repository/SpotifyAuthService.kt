@@ -2,6 +2,7 @@ package de.janaja.playlistpurger.data.repository
 
 import android.util.Log
 import de.janaja.playlistpurger.BuildConfig
+import de.janaja.playlistpurger.data.mapper.toUser
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.exception.DataException
@@ -24,11 +25,11 @@ class SpotifyAuthService(
     private val clientId = BuildConfig.CLIENT_ID
     private val redirectUri = "asdf://callback"
 
-    private val accessTokenFlow = tokenRepo.accessTokenFlow
+    override val accessToken = tokenRepo.accessTokenFlow
 
     private val refreshTokenFlow = tokenRepo.refreshTokenFlow
 
-    override val loginState = accessTokenFlow
+    override val loginState = accessToken
         .map { checkToken(it) }
 
 
@@ -67,20 +68,15 @@ class SpotifyAuthService(
 
             result.onSuccess { user ->
                 Log.d(TAG, "token is valid -> logged in")
-                val userId = user.id
-                // TODO maybe whole user
-                return LoginState.LoggedIn(userId)
+                return LoginState.LoggedIn(user.toUser())
             }.onFailure { e ->
                 Log.d(TAG, "loading current user failed: ", e.cause)
-//                Log.d(TAG, "token is not valid - try to refresh")
-                // TODO bekomme hier unknown error
                 when (e) {
                     DataException.Remote.InvalidAccessToken -> {
                         Log.d(TAG, "token is not valid - try to refresh")
 
                         if (!refreshToken()) {
                             logout()
-//                            return LoginState.LoggedOut
                         }
                     }
                 }

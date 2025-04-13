@@ -4,19 +4,20 @@ import de.janaja.playlistpurger.data.mapper.toPlaylist
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
 import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.Playlist
+import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import kotlinx.coroutines.flow.firstOrNull
 
 class SpotifyPlaylistRepo(
-    tokenRepo: TokenRepo,
+    authService: AuthService,
     private val webApiService: SpotifyWebApiService
 ): PlaylistRepo {
 
-    private val tokenFlow = tokenRepo.accessTokenFlow
+    private val tokenFlow = authService.accessToken
 
     override suspend fun getPlaylists(): Result<List<Playlist>> {
-        val token = tokenFlow.firstOrNull() ?: return Result.failure(DataException.Remote.MissingAccessToken)
+        val token = tokenFlow.firstOrNull() ?: return Result.failure(DataException.Auth.MissingAccessToken)
 
         val result = webApiService.getCurrentUsersPlaylists("Bearer $token")
 
@@ -26,30 +27,9 @@ class SpotifyPlaylistRepo(
         }.onFailure {
             return Result.failure(it)
         }
-//            .onFailure {
-//            return Result.failure(Exception("something"))
-//
-//        }
         // TODO
             return Result.failure(Exception("something"))
 
-
-        /*
-        return try {
-                // ... API call ...
-                if (/* success */) {
-                    Result.success(playlist)
-                } else {
-                    Result.failure(PlaylistException.Remote.Server)
-                }
-            } catch (e: IOException) {
-                Result.failure(PlaylistException.Remote.NoInternet)
-            } catch (e: SerializationException) {
-                Result.failure(PlaylistException.Remote.Serialization)
-            } catch (e: Exception) {
-                Result.failure(PlaylistException.Remote.Unknown)
-            }
-         */
 
     }
 

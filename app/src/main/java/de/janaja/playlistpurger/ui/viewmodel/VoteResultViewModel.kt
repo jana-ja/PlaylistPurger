@@ -19,7 +19,7 @@ class VoteResultViewModel (
     private val playlistId = args.playlistId
 
 
-    val blub = MutableStateFlow<List<Pair<Track, List<Vote>>>>(emptyList())
+    val tracksWithAllVotes = MutableStateFlow<List<Pair<Track, List<Vote>>>>(emptyList())
 
     init {
         getAllVotes()
@@ -27,7 +27,13 @@ class VoteResultViewModel (
 
     private fun getAllVotes() {
         viewModelScope.launch {
-            blub.value = trackListRepo.loadTracksWithAllVotes(playlistId)
+            val result = trackListRepo.loadTracksWithAllVotes(playlistId)
+            result.onSuccess {
+                tracksWithAllVotes.value = it
+            }.onFailure {
+                // TODO exception handling
+            }
+
         }
     }
 }

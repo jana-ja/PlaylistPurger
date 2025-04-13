@@ -2,7 +2,6 @@ package de.janaja.playlistpurger.domain.exception
 
 sealed class DataException : Exception() {
     sealed class Remote : DataException() {
-        data object MissingAccessToken: Remote()
         data object InvalidAccessToken: Remote()
         data object RequestTimeout : Remote()
         data object TooManyRequests : Remote()
@@ -10,6 +9,12 @@ sealed class DataException : Exception() {
         data object Server : Remote()
         data object Serialization : Remote()
         data object Unknown : Remote()
+    }
+    sealed class Auth: DataException() {
+        data object MissingAccessToken: Auth()
+        data object MissingCurrentUser: Auth() {
+        }
+
     }
 //    sealed class Local : DataException() {
 //        data object DiskFull : Local()

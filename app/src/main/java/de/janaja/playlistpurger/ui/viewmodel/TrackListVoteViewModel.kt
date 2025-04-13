@@ -5,24 +5,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.domain.repository.TokenRepo
 import de.janaja.playlistpurger.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.domain.model.Track
+import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.ui.TrackListRoute
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TrackListVoteViewModel(
-    private val tokenRepo: TokenRepo,
+    private val authService: AuthService,
     private val settingsRepo: SettingsRepo,
     private val trackListRepo: TrackListRepo,
     savedStateHandle: SavedStateHandle
@@ -35,15 +35,7 @@ class TrackListVoteViewModel(
     private val _swipeModeOn = MutableStateFlow(true)
     val swipeModeOn = _swipeModeOn.asStateFlow()
 
-    val trackList = trackListRepo.allTracks
-        .onEach {
-            Log.d(TAG, "allTracks: updated")
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
+    var trackList = MutableStateFlow<List<Track>>(emptyList())
 
     // swipe
     private val unvotedTracks = trackList.map { list ->
@@ -56,7 +48,7 @@ class TrackListVoteViewModel(
     }
 
     init {
-        loadTrackList()
+        observeTrackList()
 
         viewModelScope.launch {
             settingsRepo.showSwipeFirstFlow.first()?.let {
@@ -69,24 +61,44 @@ class TrackListVoteViewModel(
         _swipeModeOn.value = isOn
     }
 
-    private fun loadTrackList() {
+    // TODO job for observing?
+    private fun observeTrackList() {
         viewModelScope.launch {
-            try {
-                trackListRepo.loadTracksWithOwnVotes(playlistId)
+                val result = trackListRepo.loadTracksWithOwnVotes(playlistId)
 
-                // TODO response check und auf 401 reagieren
-//                val bla = trackList.value.map { it.id }
-//                Log.d(TAG, "loadTrackList: $bla")
-//                Log.d(TAG, "loadAllPlaylists: success")
-            } catch (e: Exception) {
+            result.onSuccess { trackListFlow ->
+                trackListFlow.collect {
+                    // TODO besser machen
+                    trackList.value = it
+                }
+            }.onFailure { e ->
                 Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
+                when (e) {
+                    DataException.Remote.InvalidAccessToken -> {
+                        authService.refreshToken()
+                        // TODO try again
+                    }
+                    is DataException -> {
+                        // TODO exception handling, show error message etc
+                    }
+                    else -> {
+
+                    }
+
+                }
             }
         }
     }
 
     fun onChangeVote(track: Track, newVote: VoteOption) {
-        Log.d(TAG, "onChangeVote: $track")
-        trackListRepo.updateVote(playlistId, track.id, newVote)
+        viewModelScope.launch {
+            Log.d(TAG, "onChangeVote: $track")
+            val response = trackListRepo.updateVote(playlistId, track.id, newVote)
+            response.onFailure {
+                Log.e(TAG, "onChangeVote: ", it.cause)
+                // TODO exception handling
+            }
+        }
     }
 
     // swipe mode
