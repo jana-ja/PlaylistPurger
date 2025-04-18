@@ -22,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.ui.screen.PlaylistOverviewScreen
 import de.janaja.playlistpurger.ui.screen.SettingsScreen
-import de.janaja.playlistpurger.ui.screen.TrackListVoteScreen
+import de.janaja.playlistpurger.ui.screen.vote.TrackListVoteScreen
 import de.janaja.playlistpurger.ui.screen.VoteResultScreen
 import kotlinx.serialization.Serializable
 
