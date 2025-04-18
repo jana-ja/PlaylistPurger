@@ -14,6 +14,7 @@ import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.TrackListRoute
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.handleDataException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,16 +32,16 @@ class TrackListVoteViewModel(
     private val args = savedStateHandle.toRoute<TrackListRoute>()
     private val playlistId = args.playlistId
 
-    private val _swipeModeOn = MutableStateFlow(true)
-    val swipeModeOn = _swipeModeOn.asStateFlow()
+    private var observeTrackListJob: Job? = null
 
+    // data states
     private val _dataState =
         MutableStateFlow<DataState<List<Track>>>(DataState.Loading)
     val dataState = _dataState.asStateFlow()
 
     // swipe
     private val unvotedTracks = _dataState.map {
-        if(it is DataState.Ready) {
+        if (it is DataState.Ready) {
             it.data.filter { it.vote == null }
         } else {
             emptyList()
@@ -48,9 +49,14 @@ class TrackListVoteViewModel(
     }
 
     val swipeTracks =
-    unvotedTracks.map { list ->
-        listOfNotNull(list.getOrNull(0), list.getOrNull(1))
-    }
+        unvotedTracks.map { list ->
+            listOfNotNull(list.getOrNull(0), list.getOrNull(1))
+        }
+
+    // ui states
+    private val _swipeModeOn = MutableStateFlow(true)
+    val swipeModeOn = _swipeModeOn.asStateFlow()
+
 
     init {
         observeTrackList()
@@ -66,14 +72,13 @@ class TrackListVoteViewModel(
         _swipeModeOn.value = isOn
     }
 
-    // TODO job for observing?
     private fun observeTrackList() {
-        viewModelScope.launch {
-                val result = trackListRepo.loadTracksWithOwnVotes(playlistId)
+        observeTrackListJob?.cancel()
+        observeTrackListJob = viewModelScope.launch {
+            val result = trackListRepo.loadTracksWithOwnVotes(playlistId)
 
             result.onSuccess { trackListFlow ->
                 trackListFlow.collect {
-                    // TODO besser machen
                     _dataState.value = DataState.Ready(it)
                 }
             }.onFailure { e ->
@@ -91,7 +96,8 @@ class TrackListVoteViewModel(
                         }
                     },
                     onUpdateErrorMessage = {
-                        _dataState.value = DataState.Error(it) }
+                        _dataState.value = DataState.Error(it)
+                    }
                 )
             }
         }
@@ -100,8 +106,8 @@ class TrackListVoteViewModel(
     fun onChangeVote(track: Track, newVote: VoteOption) {
         viewModelScope.launch {
             Log.d(TAG, "onChangeVote: $track")
-            val response = trackListRepo.updateVote(playlistId, track.id, newVote)
-            response.onFailure { e ->
+            val result = trackListRepo.updateVote(playlistId, track.id, newVote)
+            result.onFailure { e ->
                 Log.e(TAG, "onChangeVote: ", e.cause)
                 handleDataException(
                     e = e,
