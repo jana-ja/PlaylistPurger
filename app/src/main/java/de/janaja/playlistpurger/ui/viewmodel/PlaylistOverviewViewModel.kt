@@ -3,13 +3,12 @@ package de.janaja.playlistpurger.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.domain.model.Playlist
-import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.repository.AuthService
+import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.ui.DataState
-import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.handleDataException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,6 +20,9 @@ class PlaylistOverviewViewModel(
 
     private val TAG = "PlaylistOverviewViewModel"
 
+    private var observePlaylistsJob: Job? = null
+
+    // data states
     private val _dataState =
         MutableStateFlow<DataState<List<Playlist>>>(DataState.Loading)
     val dataState = _dataState.asStateFlow()
@@ -35,7 +37,8 @@ class PlaylistOverviewViewModel(
     Aber ich zeige beim refreshen noch nichts an und wenn refresh fehlschlägt wird ein anderer fehler geworfen?
      */
     private fun loadAllPlaylists() {
-        viewModelScope.launch {
+        observePlaylistsJob?.cancel()
+        observePlaylistsJob = viewModelScope.launch {
 
             val result = playListRepo.getPlaylists()
 
