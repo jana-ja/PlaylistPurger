@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.util
+package de.janaja.playlistpurger.data.local
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.BLOCK_MODE_GCM

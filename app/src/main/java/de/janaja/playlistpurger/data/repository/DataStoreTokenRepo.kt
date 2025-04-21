@@ -4,7 +4,7 @@ import android.content.Context
 import de.janaja.playlistpurger.data.local.DataStorePreferences
 import de.janaja.playlistpurger.data.local.DatastoreKeys
 import de.janaja.playlistpurger.domain.repository.TokenRepo
-import de.janaja.playlistpurger.util.SecurityUtil
+import de.janaja.playlistpurger.data.local.SecurityUtil
 
 class DataStoreTokenRepo(context: Context): TokenRepo {
 
