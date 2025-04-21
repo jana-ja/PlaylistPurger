@@ -87,7 +87,9 @@ class TrackListVoteViewModel(
                     e = e,
                     onRefresh = {
                         viewModelScope.launch {
-                            authService.refreshToken()
+                            if (authService.refreshToken()) {
+                                observeTrackList()
+                            }
                         }
                     },
                     onLogout = {
@@ -113,7 +115,9 @@ class TrackListVoteViewModel(
                     e = e,
                     onRefresh = {
                         viewModelScope.launch {
-                            authService.refreshToken()
+                            if (authService.refreshToken()) {
+                                onChangeVote(track, newVote)
+                            }
                         }
                     },
                     onLogout = {

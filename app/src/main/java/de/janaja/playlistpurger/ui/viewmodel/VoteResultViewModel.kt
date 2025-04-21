@@ -41,7 +41,9 @@ class VoteResultViewModel(
                     e = e,
                     onRefresh = {
                         viewModelScope.launch {
-                            authService.refreshToken()
+                            if (authService.refreshToken()) {
+                                getAllVotes()
+                            }
                         }
                     },
                     onLogout = {

@@ -53,7 +53,9 @@ class PlaylistOverviewViewModel(
                     e = e,
                     onRefresh = {
                         viewModelScope.launch {
-                            authService.refreshToken()
+                            if (authService.refreshToken()) {
+                                loadAllPlaylists()
+                            }
                         }
                     },
                     onLogout = {

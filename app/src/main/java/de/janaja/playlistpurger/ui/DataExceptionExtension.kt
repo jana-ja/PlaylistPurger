@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.domain.exception.DataException
 
-fun DataException.toStringResId(): Int {
+fun DataException.toStringResId(): UiText.StringResourceId {
     val stringRes = when(this) {
         DataException.Auth.MissingAccessToken -> R.string.generic_error_message
         DataException.Auth.MissingCurrentUser -> R.string.generic_error_message
@@ -18,7 +18,7 @@ fun DataException.toStringResId(): Int {
         DataException.Remote.Unknown -> R.string.generic_error_message
     }
 
-    return stringRes //UiText.StringResourceId(stringRes)
+    return UiText.StringResourceId(stringRes)
 }
 
 fun ViewModel.handleDataException(
@@ -30,13 +30,12 @@ fun ViewModel.handleDataException(
     if (e is DataException.Remote) {
         if (e is DataException.Remote.InvalidAccessToken)
             onRefresh()
-        // TODO try again
         else {
-            onUpdateErrorMessage(UiText.StringResourceId(e.toStringResId()))
+            onUpdateErrorMessage(e.toStringResId())
         }
     }
     if (e is DataException.Auth) {
-        onUpdateErrorMessage(UiText.StringResourceId(e.toStringResId()))
+        onUpdateErrorMessage(e.toStringResId())
         onLogout()
     }
 }
