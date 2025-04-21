@@ -20,7 +20,7 @@ fun DataException.toStringResId(): UiText.StringResourceId {
 
     return UiText.StringResourceId(stringRes)
 }
-
+// test
 fun ViewModel.handleDataException(
     e: Throwable,
     onRefresh: () -> Unit,
