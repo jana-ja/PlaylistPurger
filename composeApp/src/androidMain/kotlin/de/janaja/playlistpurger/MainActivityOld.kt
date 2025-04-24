@@ -29,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "playlist_purger_datastore")
 
 
-class MainActivity : ComponentActivity() {
+class MainActivityOld : ComponentActivity() {
     private val TAG = "MainActivity"
     private lateinit var authViewModel: AuthViewModel
 
