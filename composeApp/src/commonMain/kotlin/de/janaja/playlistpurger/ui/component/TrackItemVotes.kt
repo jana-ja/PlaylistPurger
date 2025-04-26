@@ -12,9 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.domain.PreviewData
 import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.model.Vote
 import de.janaja.playlistpurger.domain.model.VoteOption
@@ -69,11 +67,4 @@ fun TrackItemVotes(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TrackItemVotesPreview() {
-    // Use Theme here
-    TrackItemVotes(PreviewData.previewTrack, listOf())
 }

@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.R
 
@@ -50,18 +49,4 @@ fun VoteButton(
             tint = backgroundColor
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun VoteButtonSelectedPreview() {
-    // Use Theme here
-    VoteButton(true, {}, R.drawable.baseline_close_24, Color.Red, 1.5f, "")
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun VoteButtonUnselectedPreview() {
-    // Use Theme here
-    VoteButton(false, {}, R.drawable.baseline_close_24, Color.Red, 1.5f, "")
 }

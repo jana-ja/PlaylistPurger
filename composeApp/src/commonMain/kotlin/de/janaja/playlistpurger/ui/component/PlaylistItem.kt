@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.R
@@ -114,30 +113,4 @@ fun PlaylistItem(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PlaylistItemPreview() {
-    // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist, { _, _ -> }, { _, _ -> })
-}
-@Preview(showBackground = true)
-@Composable
-private fun PlaylistItemPreview2() {
-    // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist"), { _, _ -> }, { _, _ -> })
-}
-@Preview(showBackground = true)
-@Composable
-private fun PlaylistItemPreview3() {
-    // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", name = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
-}
-
-@Preview(showBackground = true, widthDp = 500, heightDp = 200)
-@Composable
-private fun PlaylistItemPreview4() {
-    // Use Theme here
-    PlaylistItem(PreviewData.previewPlaylist.copy(name = "Langer Playlist Titel der sehr lang ist", owner = User(id = "", name = "Langer User name der sehr lang ist")), { _, _ -> }, { _, _ -> })
 }

@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
@@ -56,11 +55,4 @@ fun SettingsScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SettingsScreenPreview() {
-    // Use Theme here
-    SettingsScreen()
 }

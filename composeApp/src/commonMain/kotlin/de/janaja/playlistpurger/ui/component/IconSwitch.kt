@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.R
@@ -81,18 +80,4 @@ fun IconSwitch(
         )
     }
 
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun IconSwitchOnPreview() {
-    // Use Theme here
-    IconSwitch(true, {}, Modifier.padding(16.dp))
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun IconSwitchOffPreview() {
-    // Use Theme here
-    IconSwitch(false, {}, Modifier.padding(16.dp))
 }

@@ -13,10 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import de.janaja.playlistpurger.domain.PreviewData
 import de.janaja.playlistpurger.domain.model.Track
 
 @Composable
@@ -51,11 +49,4 @@ fun TrackCard(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TrackCardPreview() {
-    // Use Theme here
-    TrackCard(PreviewData.previewTrack)
 }

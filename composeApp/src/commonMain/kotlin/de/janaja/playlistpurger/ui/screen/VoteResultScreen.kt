@@ -11,12 +11,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.ui.component.DataStateView
 import de.janaja.playlistpurger.ui.component.TrackItemVotes
 import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun VoteResultScreen(
@@ -45,11 +44,4 @@ fun VoteResultScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun VoteResultScreenPreview() {
-    // Use Theme here
-    VoteResultScreen()
 }
