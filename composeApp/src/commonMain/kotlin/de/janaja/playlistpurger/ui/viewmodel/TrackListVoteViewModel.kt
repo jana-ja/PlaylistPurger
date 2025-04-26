@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +13,7 @@ import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.TrackListRoute
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.handleDataException
+import de.janaja.playlistpurger.util.Log
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,7 +82,7 @@ class TrackListVoteViewModel(
                     _dataState.value = DataState.Ready(it)
                 }
             }.onFailure { e ->
-                Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
+                Log.e(TAG, "loadAllPlaylists: ", e)
                 handleDataException(
                     e = e,
                     onRefresh = {
@@ -110,7 +110,7 @@ class TrackListVoteViewModel(
             Log.d(TAG, "onChangeVote: $track")
             val result = trackListRepo.updateVote(playlistId, track.id, newVote)
             result.onFailure { e ->
-                Log.e(TAG, "onChangeVote: ", e.cause)
+                Log.e(TAG, "onChangeVote: ", e)
                 handleDataException(
                     e = e,
                     onRefresh = {

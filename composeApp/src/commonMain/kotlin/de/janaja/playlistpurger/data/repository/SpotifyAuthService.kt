@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.data.repository
 
-import android.util.Log
 import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.data.mapper.toUser
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
@@ -9,6 +8,7 @@ import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.TokenRepo
+import de.janaja.playlistpurger.util.Log
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlin.io.encoding.Base64
@@ -51,7 +51,7 @@ class SpotifyAuthService(
                 Result.success(Unit)
             },
             onFailure = { e ->
-                Log.e(TAG, "loginWithCode: ", e.cause)
+                Log.e(TAG, "loginWithCode: ", e)
                 Result.failure(e)
             }
         )
@@ -73,7 +73,7 @@ class SpotifyAuthService(
                 Log.d(TAG, "token is valid -> logged in")
                 return LoginState.LoggedIn(user.toUser())
             }.onFailure { e ->
-                Log.d(TAG, "loading current user failed: ", e.cause)
+                Log.e(TAG, "loading current user failed: ", e)
                 when (e) {
                     DataException.Remote.InvalidAccessToken -> {
                         Log.d(TAG, "token is not valid - try to refresh")
@@ -119,7 +119,7 @@ class SpotifyAuthService(
                 }
                 return true
             }.onFailure { e ->
-                Log.e(TAG, "refreshToken: Error: ${e.localizedMessage}")
+                Log.e(TAG, "refreshToken: ", e)
                 return false
             }
             // TODO

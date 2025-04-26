@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.janaja.playlistpurger.domain.model.Playlist
@@ -8,6 +7,7 @@ import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
 import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.handleDataException
+import de.janaja.playlistpurger.util.Log
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +47,7 @@ class PlaylistOverviewViewModel(
                 _dataState.value = DataState.Ready(allPlaylists)
 
             }.onFailure { e ->
-                Log.e(TAG, "loadAllPlaylists: ${e.localizedMessage}")
+                Log.e(TAG, "loadAllPlaylists: ", e)
                 // look for authorization error, refresh token, retry
                 handleDataException(
                     e = e,
@@ -72,27 +72,3 @@ class PlaylistOverviewViewModel(
         }
     }
 }
-
-
-/*
-val result = withTokenRefresh(authRepo) {
-                playlistRepo.loadPlaylist()
-            }
- */
-
-//suspend fun <T> withTokenRefresh(
-//    authRepo: AuthRepo,
-//    block: suspend () -> Result<T>
-//): Result<T> {
-//    val result = block()
-//    return if (result.isFailure && result.exceptionOrNull() is DataException.Remote.InvalidAccessToken) {
-//        val refreshResult = authRepo.refreshToken()
-//        if (refreshResult.isSuccess) {
-//            block() // Retry the original operation
-//        } else {
-//            Result.failure(refreshResult.exceptionOrNull() ?: Exception("Token refresh failed"))
-//        }
-//    } else {
-//        result
-//    }
-//}

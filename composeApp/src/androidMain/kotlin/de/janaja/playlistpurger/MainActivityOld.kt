@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,6 +53,7 @@ class MainActivityOld : ComponentActivity() {
                     )
                 }
             )
+            Log.d(TAG, "onCreate: gfsg")
 
             val loginState by authViewModel.loginState.collectAsState()
 //            val isLoading by authViewModel.isLoading.collectAsState()
