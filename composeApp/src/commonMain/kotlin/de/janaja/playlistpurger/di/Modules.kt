@@ -3,7 +3,7 @@ package de.janaja.playlistpurger.di
 //import com.spotify.sdk.android.auth.AuthorizationRequest
 import de.janaja.playlistpurger.data.local.DataStoreFactory
 import de.janaja.playlistpurger.data.local.DataStorePreferences
-import de.janaja.playlistpurger.data.local.SecurityUtil
+//import de.janaja.playlistpurger.data.local.SecurityUtil
 import de.janaja.playlistpurger.data.remote.HttpClientFactory
 import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyWebApiService
@@ -74,7 +74,7 @@ val sharedModule = module {
     // DataStorePreferences uses DataStore
     single {
         DataStorePreferences(
-            SecurityUtil(),
+//            SecurityUtil(),
             get()
         )
     }

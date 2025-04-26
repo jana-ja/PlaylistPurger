@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 // https://iamraghavawasthi.medium.com/securing-your-android-datastore-4c50f3e98d5c
 class DataStorePreferences(
-    private val securityUtil: SecurityUtil,
+//    private val securityUtil: SecurityUtil,
     private val dataStore: DataStore<Preferences>
 ) {
 
@@ -39,9 +39,11 @@ class DataStorePreferences(
 
     suspend fun putSecurePreference(key: Preferences.Key<String>, value: String) {
         dataStore.edit { preferences ->
-            val (iv, secureByteArray) = securityUtil.encryptData(keyAlias, value)
-            val secureString = iv.joinToString(bytesToStringSeperator) + ivToStringSeparator + secureByteArray.joinToString(bytesToStringSeperator)
-            preferences[key] = secureString
+            // TODO add security back
+//            val (iv, secureByteArray) = securityUtil.encryptData(keyAlias, value)
+//            val secureString = iv.joinToString(bytesToStringSeperator) + ivToStringSeparator + secureByteArray.joinToString(bytesToStringSeperator)
+//            preferences[key] = secureString
+            preferences[key] = value
         }
     }
 
@@ -56,11 +58,13 @@ class DataStorePreferences(
         }
     }.map { preferences ->
         val secureString = preferences[key] ?: return@map null
-        val (ivString, encryptedString) = secureString.split(ivToStringSeparator, limit = 2)
-        val iv = ivString.split(bytesToStringSeperator).map { it.toByte() }.toByteArray()
-        val encryptedData = encryptedString.split(bytesToStringSeperator).map { it.toByte() }.toByteArray()
-        val decryptedValue = securityUtil.decryptData(keyAlias, iv, encryptedData)
-        decryptedValue
+        // TODO add security back
+//        val (ivString, encryptedString) = secureString.split(ivToStringSeparator, limit = 2)
+//        val iv = ivString.split(bytesToStringSeperator).map { it.toByte() }.toByteArray()
+//        val encryptedData = encryptedString.split(bytesToStringSeperator).map { it.toByte() }.toByteArray()
+//        val decryptedValue = securityUtil.decryptData(keyAlias, iv, encryptedData)
+//        decryptedValue
+        secureString
 
     }
 
