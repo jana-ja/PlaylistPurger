@@ -10,19 +10,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity // TODO works on ios?
+import de.janaja.playlistpurger.ui.getScreenHeight
+import de.janaja.playlistpurger.ui.getScreenWidth
 import kotlin.math.abs
 
 @Composable
 fun rememberSwipeCardState(): SwipeCardState {
-    val screenWidth = with(LocalDensity.current) {
-        LocalConfiguration.current.screenWidthDp.dp.toPx()
-    }
-    val screenHeight = with(LocalDensity.current) {
-        LocalConfiguration.current.screenHeightDp.dp.toPx()
-    }
+    val screenWidth =
+        with(LocalDensity.current) {
+            getScreenWidth().toPx()
+        }
+    val screenHeight =
+        with(LocalDensity.current) {
+            getScreenHeight().toPx()
+        }
     return remember {
         SwipeCardState(screenWidth, screenHeight)
     }
@@ -48,7 +50,10 @@ class SwipeCardState(
         offset.animateTo(offset(0f, 0f), tween(400))
     }
 
-    suspend fun swipe(direction: SwipeDirection, animationSpec: AnimationSpec<Offset> = tween(400)) {
+    suspend fun swipe(
+        direction: SwipeDirection,
+        animationSpec: AnimationSpec<Offset> = tween(400)
+    ) {
         this.currentSwipeDirection = direction // for onClick button animation
         val endX = maxWidth * 1.5f
         val endY = maxHeight
