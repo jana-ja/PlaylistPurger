@@ -83,7 +83,7 @@ kotlin {
             // spotify
             implementation(libs.spotify.auth)
             // navigation
-            implementation(libs.androidx.navigation.compose)
+            implementation(libs.jetbrains.compose.navigation)
             implementation(libs.kotlinx.serialization)
             // coil
             implementation(libs.coil.compose)
