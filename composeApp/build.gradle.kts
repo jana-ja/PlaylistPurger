@@ -55,7 +55,7 @@ kotlin {
 //        implementation(libs.androidx.ui)
 //        implementation(libs.androidx.ui.graphics)
 //        implementation(libs.androidx.ui.tooling.preview)
-        implementation(libs.androidx.material3)
+//        implementation(libs.androidx.material3)
 //        testImplementation(libs.junit)
 //        androidTestImplementation(libs.androidx.junit)
 //        androidTestImplementation(libs.androidx.espresso.core)
@@ -74,7 +74,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
