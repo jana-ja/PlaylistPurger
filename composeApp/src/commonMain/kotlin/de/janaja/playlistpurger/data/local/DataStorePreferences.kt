@@ -1,23 +1,21 @@
 package de.janaja.playlistpurger.data.local
 
-import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import de.janaja.playlistpurger.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 // https://iamraghavawasthi.medium.com/securing-your-android-datastore-4c50f3e98d5c
 class DataStorePreferences(
-    context: Context,
     private val securityUtil: SecurityUtil,
+    private val dataStore: DataStore<Preferences>
 ) {
 
     private val bytesToStringSeperator = "|"
     private val keyAlias = "appkey"
-    private val dataStore = context.dataStore
     private val ivToStringSeparator= ":iv:"
 
     fun <T> getPreference(key: Preferences.Key<T>, defaultValue: T):

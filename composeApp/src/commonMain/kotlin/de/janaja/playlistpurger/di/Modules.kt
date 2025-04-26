@@ -1,6 +1,10 @@
 package de.janaja.playlistpurger.di
 
-import com.spotify.sdk.android.auth.AuthorizationRequest
+//import com.spotify.sdk.android.auth.AuthorizationRequest
+import de.janaja.playlistpurger.data.local.DataStoreFactory
+import de.janaja.playlistpurger.data.local.DataStorePreferences
+import de.janaja.playlistpurger.data.local.SecurityUtil
+import de.janaja.playlistpurger.data.remote.HttpClientFactory
 import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.KtorSpotifyWebApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
@@ -23,29 +27,23 @@ import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
-import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.bind
 
+expect val platformModule: Module
 
-val appModule = module {
+val sharedModule = module {
+    // HttpClientFactory gets module specific HttpClientEngine
+    single { HttpClientFactory.create(get()) }
 
     // Spotify WebApiService
-    singleOf<SpotifyWebApiService>(::KtorSpotifyWebApiService)
+    singleOf(::KtorSpotifyWebApiService).bind<SpotifyWebApiService>()
 
     // Spotify AccountApiService
-    singleOf<SpotifyAccountApiService>(::KtorSpotifyAccountApiService)
-
-    // TokenRepo
-    single<TokenRepo> {
-        DataStoreTokenRepo(androidContext())
-    }
-
-    // SettingsRepo
-    single<SettingsRepo> {
-        DataStoreSettingsRepo(androidContext())
-    }
+    singleOf(::KtorSpotifyAccountApiService).bind<SpotifyAccountApiService>()
 
     // AuthRepo uses TokenRepo and WebApiService and AccountApiService
     single<AuthService> {
@@ -68,9 +66,31 @@ val appModule = module {
         SpotifyTrackListRepo(get(), get(), get())
     }
 
+    // DataStore - module specific
+    single {
+        get<DataStoreFactory>().create()
+    }
+
+    // DataStorePreferences uses DataStore
+    single {
+        DataStorePreferences(
+            SecurityUtil(),
+            get()
+        )
+    }
+    // TokenRepo
+    single<TokenRepo> {
+        DataStoreTokenRepo(get())
+    }
+
+    // SettingsRepo
+    single<SettingsRepo> {
+        DataStoreSettingsRepo(get())
+    }
+
     // AuthViewModel uses DataStoreRepo
-    viewModel { (onStartLoginActivity: (AuthorizationRequest) -> Unit) ->
-        AuthViewModel(get(), onStartLoginActivity)
+    viewModel { //(onStartLoginActivity: (AuthorizationRequest) -> Unit) ->
+        AuthViewModel(get())//, onStartLoginActivity)
     }
 
     // PlayListViewModel uses PlayListRepo and DataStoreRepo

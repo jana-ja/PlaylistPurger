@@ -14,25 +14,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class KtorSpotifyAccountApiService (
-    private val httpClient: HttpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                    prettyPrint = true
-                    isLenient = true
-                }
-            )
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println(message)
-                }
-            }
-            level = LogLevel.BODY
-        }
-    }
+    private val httpClient: HttpClient
 ): SpotifyAccountApiService {
 
     private val baseUrl = "https://accounts.spotify.com/"

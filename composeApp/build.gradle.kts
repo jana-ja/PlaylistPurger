@@ -63,33 +63,12 @@ kotlin {
 //        androidTestImplementation(libs.androidx.ui.test.junit4)
 //        debugImplementation(libs.androidx.ui.tooling)
 //        debugImplementation(libs.androidx.ui.test.manifest)
-        // spotify
-        implementation(libs.spotify.auth)
-        // viewmodel
-        implementation(libs.androidx.lifecycle.viewmodel.compose)
-        // navigation
-        implementation(libs.androidx.navigation.compose)
-        implementation(libs.kotlinx.serialization)
-        // async image
-        implementation(libs.coil.compose)
-        implementation(libs.coil.network.okhttp)
-        // data store
-        implementation(libs.androidx.datastore.preferences)
-        // koin
-        implementation(project.dependencies.platform(libs.koin.bom))
-        implementation(libs.koin.core)
-        implementation(libs.koin.android)
-        implementation(libs.koin.androidx.compose)
-        // compose preference
-        implementation (libs.compose.preference)
-        // ktor
-        implementation(libs.ktor.client.android) // was macht core stattdessen?
-        implementation(libs.ktor.client.okhttp)
-        implementation(libs.ktor.client.content.negotiation)
-//    implementation(libs.ktor.client.serialization)
-        implementation(libs.ktor.serialization.kotlinx.json)
-        // ktor logging
-        implementation(libs.ktor.client.logging)
+            // koin
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
+            // ktor
+            implementation(libs.ktor.client.okhttp)
+
         }
 
         commonMain.dependencies {
@@ -101,6 +80,37 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            // spotify
+            implementation(libs.spotify.auth)
+            // navigation
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.kotlinx.serialization)
+            // coil
+            implementation(libs.coil.compose)
+            implementation(libs.coil.compose.core)
+            implementation(libs.coil.network.ktor2)
+            implementation(libs.coil.network.ktor3)
+            implementation(libs.coil.mp)
+            // data store
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+            // koin
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            api(libs.koin.core)
+            // compose preference
+            implementation (libs.compose.preference)
+            // ktor
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            // ktor logging
+            implementation(libs.ktor.client.logging)
+        }
+        nativeMain.dependencies {
+            // ktor
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

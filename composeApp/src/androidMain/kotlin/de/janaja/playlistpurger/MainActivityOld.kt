@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,20 +12,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
-import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationClient
-import de.janaja.playlistpurger.ui.screen.WelcomeScreen
-import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
-import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
-import androidx.datastore.preferences.core.Preferences
+import com.spotify.sdk.android.auth.AuthorizationRequest
 import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.ui.AppStart
 import de.janaja.playlistpurger.ui.screen.SplashScreen
+import de.janaja.playlistpurger.ui.screen.WelcomeScreen
+import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
+import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import org.koin.androidx.compose.koinViewModel
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "playlist_purger_datastore")
+//val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "playlist_purger_datastore")
 
 
 class MainActivityOld : ComponentActivity() {
@@ -39,7 +35,7 @@ class MainActivityOld : ComponentActivity() {
 
         val activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-                authViewModel.handleLoginResult(result)
+//                authViewModel.handleLoginResult(result)
             }
 
         enableEdgeToEdge()

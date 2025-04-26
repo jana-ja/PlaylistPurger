@@ -1,17 +1,12 @@
 package de.janaja.playlistpurger.data.repository
 
-import android.content.Context
 import de.janaja.playlistpurger.data.local.DataStorePreferences
 import de.janaja.playlistpurger.data.local.DatastoreKeys
 import de.janaja.playlistpurger.domain.repository.TokenRepo
-import de.janaja.playlistpurger.data.local.SecurityUtil
 
-class DataStoreTokenRepo(context: Context): TokenRepo {
-
-    private val dataStorePreferences = DataStorePreferences(
-        context,
-        SecurityUtil()
-    )
+class DataStoreTokenRepo(
+    private val dataStorePreferences: DataStorePreferences
+): TokenRepo {
 
     override val accessTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
     override val refreshTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.refreshToken)
