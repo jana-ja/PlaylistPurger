@@ -25,8 +25,6 @@ coil3 = "3.0.0-rc02"
 datastorePreferences = "1.1.1"
 # koin
 koin = "4.1.0-Beta4"
-# compose preference
-composePreference = "1.1.1"
 # ktor
 ktor = "3.0.0"
 
@@ -70,8 +68,6 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
-# compose preference
-compose-preference = { module = "me.zhanghai.compose.preference:library", version.ref = "composePreference" }
 # ktor
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }

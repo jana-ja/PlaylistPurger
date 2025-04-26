@@ -98,8 +98,6 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             api(libs.koin.core)
-            // compose preference
-            implementation (libs.compose.preference)
             // ktor
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.auth)
