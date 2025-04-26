@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.ui.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -16,12 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.R
+import org.jetbrains.compose.resources.painterResource
+import playlistpurger.composeapp.generated.resources.Res
+import playlistpurger.composeapp.generated.resources.round_rectangle_24
 
 @Composable
 fun IconSwitch(
@@ -71,7 +69,7 @@ fun IconSwitch(
 //        VerticalDivider()
         // checked
         Icon(
-            painterResource(R.drawable.round_rectangle_24),
+            painterResource(Res.drawable.round_rectangle_24),
             "",
             modifier = (if (checked) selectedModifier else unselectedModifier)
                 .clickable { onCheckedChange(true) }

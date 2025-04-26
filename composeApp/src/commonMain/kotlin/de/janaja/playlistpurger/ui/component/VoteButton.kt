@@ -15,14 +15,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.R
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 
 @Composable
 fun VoteButton(
     selected: Boolean,
     onClick: () -> Unit,
-    iconResId: Int,
+    iconResId: DrawableResource,
     selectionColor: Color,
     selectionScaling: Float,
     contentDescription: String,

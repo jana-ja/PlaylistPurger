@@ -1,21 +1,53 @@
 package de.janaja.playlistpurger.domain.model
 
 import androidx.compose.ui.graphics.Color
-import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.component.SwipeDirection
+import org.jetbrains.compose.resources.DrawableResource
+import playlistpurger.composeapp.generated.resources.Res
+import playlistpurger.composeapp.generated.resources.baseline_check_24
+import playlistpurger.composeapp.generated.resources.baseline_close_24
+import playlistpurger.composeapp.generated.resources.outline_circle_24
 
-enum class VoteOption(val value: Int, val imgResId: Int, val contentDescription: String, val color: Color) {
-    KEEP(1, imgResId = R.drawable.baseline_check_24, contentDescription = "vote keep track", Color.Green),
-    DONT_CARE(0, imgResId = R.drawable.outline_circle_24, contentDescription = "vote dont care", Color.Blue),
-    REMOVE(-1, imgResId = R.drawable.baseline_close_24, contentDescription = "vote remove song", Color.Red);
+enum class VoteOption(val value: Int) {
+    KEEP(1),
+    DONT_CARE(0),
+    REMOVE(-1);
 
-    fun getSwipeDirection(): SwipeDirection {
-        when (this) {
-            KEEP -> return SwipeDirection.Right
-            DONT_CARE -> return SwipeDirection.Up
-            REMOVE -> return SwipeDirection.Left
+    val resource: DrawableResource
+        get() {
+            return when (this) {
+                KEEP -> Res.drawable.baseline_check_24
+                DONT_CARE -> Res.drawable.outline_circle_24
+                REMOVE -> Res.drawable.baseline_close_24
+            }
         }
-    }
+
+    val contentDescription: String
+        get() {
+            return when (this) {
+                KEEP -> "vote keep track"
+                DONT_CARE -> "vote dont care"
+                REMOVE -> "vote remove song"
+            }
+        }
+
+    val color: Color
+        get() {
+            return when (this) {
+                KEEP -> Color.Green
+                DONT_CARE -> Color.Blue
+                REMOVE -> Color.Red
+            }
+        }
+
+    val swipeDirection: SwipeDirection
+        get() {
+            return when (this) {
+                KEEP -> SwipeDirection.Right
+                DONT_CARE -> SwipeDirection.Up
+                REMOVE -> SwipeDirection.Left
+            }
+        }
 
     companion object {
         fun fromSwipeDirection(dir: SwipeDirection): VoteOption? {

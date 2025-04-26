@@ -7,13 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import de.janaja.playlistpurger.R
 import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.SwitchPreference
 import me.zhanghai.compose.preference.TwoTargetIconButtonPreference
-import org.koin.androidx.compose.koinViewModel
+import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
+import playlistpurger.composeapp.generated.resources.Res
+import playlistpurger.composeapp.generated.resources.baseline_logout_24
 
 @Composable
 fun SettingsScreen(
@@ -42,7 +43,7 @@ fun SettingsScreen(
                     },
                     iconButtonIcon = {
                         Icon(
-                            painterResource(R.drawable.baseline_logout_24),
+                            painterResource(Res.drawable.baseline_logout_24),
                             "logout"
                         )
                     },

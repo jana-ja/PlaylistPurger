@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.ui.component.DataStateView
 import de.janaja.playlistpurger.ui.component.PlaylistItem
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PlaylistOverviewScreen(

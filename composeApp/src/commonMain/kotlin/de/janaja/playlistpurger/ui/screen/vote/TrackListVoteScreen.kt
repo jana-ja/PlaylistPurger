@@ -18,7 +18,7 @@ import de.janaja.playlistpurger.ui.component.DataStateView
 import de.janaja.playlistpurger.ui.component.IconSwitch
 import de.janaja.playlistpurger.ui.component.TrackItem
 import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TrackListVoteScreen(

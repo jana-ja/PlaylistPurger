@@ -58,7 +58,7 @@ fun TrackItem(
                     VoteButton(
                         selected = (vote == track.vote),
                         onClick = { onChangeVote(vote) },
-                        iconResId = vote.imgResId,
+                        iconResId = vote.resource,
                         selectionColor = vote.color,
                         selectionScaling = 1.1f,
                         contentDescription = vote.contentDescription

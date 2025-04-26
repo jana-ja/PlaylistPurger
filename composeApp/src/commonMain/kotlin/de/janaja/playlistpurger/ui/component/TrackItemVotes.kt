@@ -52,7 +52,7 @@ fun TrackItemVotes(
                         VoteButton(
                             selected = (((votesByOption[vote]?.count() ?: -1) == max)),
                             onClick = { },
-                            iconResId = vote.imgResId,
+                            iconResId = vote.resource,
                             selectionColor = vote.color,
                             selectionScaling = 1.1f,
                             contentDescription = vote.contentDescription,

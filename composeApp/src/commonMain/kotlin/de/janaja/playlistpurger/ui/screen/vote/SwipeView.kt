@@ -80,10 +80,10 @@ fun SwipeView(
                     }),
                     onClick = {
                         scope.launch {
-                            it.swipe(vote.getSwipeDirection())
+                            it.swipe(vote.swipeDirection)
                         }
                     },
-                    iconResId = vote.imgResId,
+                    iconResId = vote.resource,
                     selectionColor = vote.color,
                     selectionScaling = 1.5f,
                     contentDescription = vote.contentDescription,
