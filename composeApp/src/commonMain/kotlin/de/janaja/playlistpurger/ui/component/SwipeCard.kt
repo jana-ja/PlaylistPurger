@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.ui.component
 
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -15,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import de.janaja.playlistpurger.util.Log
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
