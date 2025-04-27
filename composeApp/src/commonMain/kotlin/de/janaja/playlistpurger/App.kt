@@ -10,11 +10,10 @@ import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import de.janaja.playlistpurger.ui.viewmodel.LoginResult
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-@Preview
+//@Preview
 fun App(
     loginResult: LoginResult?
 ) {
