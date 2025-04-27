@@ -9,23 +9,13 @@ import de.janaja.playlistpurger.ui.screen.SplashScreen
 import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
-import de.janaja.playlistpurger.ui.viewmodel.LoginResult
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-//@Preview
-fun App(
-    loginResult: LoginResult?
-) {
+fun App() {
     val authViewModel: AuthViewModel = koinViewModel()
 
     val loginState by authViewModel.loginState.collectAsState()
-
-    LaunchedEffect(loginResult) {
-        if (loginResult != null) {
-            authViewModel.handleLoginResult(loginResult)
-        }
-    }
 
     PlaylistPurgerTheme {
         when (loginState) {

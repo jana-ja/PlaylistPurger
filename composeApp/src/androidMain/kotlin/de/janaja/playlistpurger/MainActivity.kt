@@ -3,25 +3,23 @@ package de.janaja.playlistpurger
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import de.janaja.playlistpurger.ui.viewmodel.LoginResult
+import de.janaja.playlistpurger.util.LoginResponseHelper
+import org.koin.mp.KoinPlatform.getKoin
 
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // when activity is started from spotify login website -> intent contains response data
-        val intentData = intent.data
-        val loginResult: LoginResult? = intentData?.let {
-            it.getQueryParameter("code")?.let { code ->
-                LoginResult.SuccessLoginResult(code)
-            } ?: it.getQueryParameter("error")?.let { error ->
-                LoginResult.ErrorLoginResult(error)
-            } ?: LoginResult.ErrorLoginResult("unknown")
+        intent.data?.let {
+            val loginResponseHelper: LoginResponseHelper = getKoin().get()
+            loginResponseHelper.handleResponseUrl(it.toString())
         }
 
         setContent {
-            App(loginResult)
+            App()
         }
     }
 }
