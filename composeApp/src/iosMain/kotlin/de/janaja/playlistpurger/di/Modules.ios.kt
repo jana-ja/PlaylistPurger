@@ -12,6 +12,6 @@ actual val platformModule = module {
 
     // DataStore - module specific
     single {
-        get<DataStoreFactory>().create()
+        DataStoreFactory().create()
     }
 }
