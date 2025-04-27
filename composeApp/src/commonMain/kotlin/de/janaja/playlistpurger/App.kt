@@ -9,49 +9,40 @@ import de.janaja.playlistpurger.ui.screen.SplashScreen
 import de.janaja.playlistpurger.ui.screen.WelcomeScreen
 import de.janaja.playlistpurger.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
+import de.janaja.playlistpurger.ui.viewmodel.LoginResult
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
-//import com.spotify.sdk.android.auth.AuthorizationRequest
-//import com.spotify.sdk.android.auth.AuthorizationClient
-
 @Composable
 @Preview
-fun App() {
-    val authViewModel: AuthViewModel = koinViewModel(
-//        parameters = {
-//            org.koin.core.parameter.parametersOf(
-//                { request: AuthorizationRequest ->
-//                    val intent =
-//                        AuthorizationClient.createLoginActivityIntent(this, request)
-//                    activityResultLauncher.launch(intent)
-//                }
-//            )
-//        }
-    )
+fun App(
+    loginResult: LoginResult?
+) {
+    val authViewModel: AuthViewModel = koinViewModel()
 
     val loginState by authViewModel.loginState.collectAsState()
-//            val isLoading by authViewModel.isLoading.collectAsState()
-//            val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+
+    LaunchedEffect(loginResult) {
+        if (loginResult != null) {
+            authViewModel.handleLoginResult(loginResult)
+        }
+    }
 
     PlaylistPurgerTheme {
-            when (loginState) {
-                LoginState.Loading -> {
-                    SplashScreen()
-                }
-
-                is LoginState.LoggedIn -> {
-                    AppStart()
-                }
-
-                LoginState.LoggedOut -> {
-                    WelcomeScreen(
-                        onLogin = {
-                            authViewModel.startLoginProcess()
-                        },
-                        modifier = Modifier.statusBarsPadding()
-                    )
-                }
+        when (loginState) {
+            LoginState.Loading -> {
+                SplashScreen()
             }
+
+            is LoginState.LoggedIn -> {
+                AppStart()
+            }
+
+            LoginState.LoggedOut -> {
+                WelcomeScreen(
+                    modifier = Modifier.statusBarsPadding()
+                )
+            }
+        }
     }
 }

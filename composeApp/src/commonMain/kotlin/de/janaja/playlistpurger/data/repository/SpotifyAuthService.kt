@@ -1,6 +1,5 @@
 package de.janaja.playlistpurger.data.repository
 
-import de.janaja.playlistpurger.BuildConfig
 import de.janaja.playlistpurger.data.mapper.toUser
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyAccountApiService
 import de.janaja.playlistpurger.data.remote.spotify.SpotifyWebApiService
@@ -21,8 +20,8 @@ class SpotifyAuthService(
 ) : AuthService {
     private val TAG = "AuthRepo"
 
-    private val clientSecret = BuildConfig.CLIENT_SECRET
-    private val clientId = BuildConfig.CLIENT_ID
+    private val clientSecret = ""
+    private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
     private val redirectUri = "asdf://callback"
 
     override val accessToken = tokenRepo.accessTokenFlow
