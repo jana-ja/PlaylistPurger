@@ -7,6 +7,7 @@ import de.janaja.playlistpurger.domain.model.LoginState
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.ui.UiText
 import de.janaja.playlistpurger.ui.handleDataException
+import de.janaja.playlistpurger.util.LoginResponseHelper
 import de.janaja.playlistpurger.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,6 +22,7 @@ sealed class LoginResult(){
 
 class AuthViewModel(
     private val authService: AuthService,
+    private val loginResponseHelper: LoginResponseHelper
 ) : ViewModel() {
 
     private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
@@ -39,6 +41,16 @@ class AuthViewModel(
     // TODO how to show?
     private val _errorMessage = MutableStateFlow<UiText?>(null)
     val errorMessage = _errorMessage.asStateFlow()
+
+    private val loginResultFlow = loginResponseHelper.loginResult
+
+    init {
+        viewModelScope.launch {
+            loginResultFlow.collect { loginResult ->
+                handleLoginResult(loginResult)
+            }
+        }
+    }
 
 
     fun startLoginProcess(uriHandler: UriHandler) {

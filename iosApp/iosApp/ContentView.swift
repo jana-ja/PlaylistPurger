@@ -14,6 +14,9 @@ struct ContentView: View {
     var body: some View {
         ComposeView()
                 .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+                .onOpenURL { url in
+                    KoinKt.provideLoginResponseHelper().handleResponseUrl(url: url.absoluteString)
+                }
     }
 }
 

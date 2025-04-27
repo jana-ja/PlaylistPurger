@@ -27,6 +27,10 @@ import de.janaja.playlistpurger.ui.viewmodel.VoteResultViewModel
 import de.janaja.playlistpurger.ui.viewmodel.PlaylistOverviewViewModel
 import de.janaja.playlistpurger.ui.viewmodel.AuthViewModel
 import de.janaja.playlistpurger.ui.viewmodel.SettingsViewModel
+import de.janaja.playlistpurger.util.LoginResponseHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -88,9 +92,17 @@ val sharedModule = module {
         DataStoreSettingsRepo(get())
     }
 
+    // LoginResponseHelper
+    factory { CoroutineScope(Dispatchers.IO) }
+    single { 
+        LoginResponseHelper(
+            scope = get()
+        )
+    }
+
     // AuthViewModel uses DataStoreRepo
     viewModel { //(onStartLoginActivity: (AuthorizationRequest) -> Unit) ->
-        AuthViewModel(get())//, onStartLoginActivity)
+        AuthViewModel(get(), get())//, onStartLoginActivity)
     }
 
     // PlayListViewModel uses PlayListRepo and DataStoreRepo
