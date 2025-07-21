@@ -10,6 +10,7 @@ import de.janaja.playlistpurger.ui.DataState
 import de.janaja.playlistpurger.ui.resultToDataState
 import de.janaja.playlistpurger.util.Log
 import de.janaja.playlistpurger.util.now
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 
 sealed class Filter<T>(val function: (T) -> Boolean) {
-    data object PlaylistFilterNone : Filter<Playlist>({ true })
+    data object PlaylistFilterNone : Filter<Playlist>({ true }) // will very likely be optimised by JVM, resulting in only fast copying the list
     data class PlaylistFilter(val query: String) :
         Filter<Playlist>({ it.name.lowercase().contains(query.lowercase()) })
 
@@ -29,7 +30,8 @@ sealed class Filter<T>(val function: (T) -> Boolean) {
 
     data class OwnerFilter(val query: String) :
         Filter<Playlist>({ it.owner.name.lowercase().contains(query.lowercase()) })
-//    data object NoFilter: Filter<Nothing>({true})
+
+    data object NoFilter : Filter<Nothing>({ true })
 }
 
 
@@ -41,7 +43,8 @@ class PlaylistOverviewViewModel(
     private val TAG = "PlaylistOverviewViewModel"
 
 
-    private val _filtering = MutableStateFlow<Filter<Playlist>?>(null)//(Filter.PlaylistFilterNone)
+    private val _filtering =
+        MutableStateFlow<Filter<Playlist>>(Filter.PlaylistFilterNone)
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
@@ -57,6 +60,7 @@ class PlaylistOverviewViewModel(
 
     // TODO hätte gerne eine funktion die filterung und sortierung allegmein anwendet, dann macht meine filter sealed class sinn sonst eher nicht?
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val dataState =
         _retryTrigger.flatMapLatest { _ ->
 
@@ -68,11 +72,8 @@ class PlaylistOverviewViewModel(
                     resultToDataState(
                         apiResult = playlistResult,
                         successTransform = { lel ->
-                            if (filter != null) {
-                                return@resultToDataState lel.filter(filter.function)
-                            } else {
-                                return@resultToDataState lel
-                            }
+
+                            return@resultToDataState lel.filter(filter.function)
                         },
                         // TODO doch move refresh and logout inside the function?
                         onRefresh = {
@@ -108,7 +109,7 @@ class PlaylistOverviewViewModel(
         if (_searchQuery.value.isNotBlank()) {
             _filtering.value = Filter.PlaylistFilter(value)
         } else {
-            _filtering.value = null
+            _filtering.value = Filter.PlaylistFilterNone
         }
     }
 }
