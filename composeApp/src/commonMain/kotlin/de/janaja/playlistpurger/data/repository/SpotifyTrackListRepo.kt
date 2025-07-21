@@ -41,6 +41,8 @@ class SpotifyTrackListRepo(
 
         val tracksResult = webApiService.getTracksForPlaylist("Bearer $token", playlistId)
 
+        // TODO alternativ: flows nehmen die nur einmal emiten, dann auch möglich retry nach x sek und combine benutzen
+        //  flow<result>
         return tracksResult.fold(
             onSuccess = { tracksResponse ->
                 // TODO parallel
