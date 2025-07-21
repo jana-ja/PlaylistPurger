@@ -6,7 +6,9 @@ import de.janaja.playlistpurger.domain.exception.DataException
 import de.janaja.playlistpurger.domain.model.Playlist
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.PlaylistRepo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 
 class SpotifyPlaylistRepo(
     authService: AuthService,
@@ -15,19 +17,22 @@ class SpotifyPlaylistRepo(
 
     private val tokenFlow = authService.accessToken
 
-    override suspend fun getPlaylists(): Result<List<Playlist>> {
+    override fun getPlaylists(): Flow<Result<List<Playlist>>> = flow {
         val token =
-            tokenFlow.firstOrNull() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-
+            tokenFlow.firstOrNull() ?: emit(
+                Result.failure(DataException.Auth.MissingAccessToken)
+            )
         val result = webApiService.getCurrentUsersPlaylists("Bearer $token")
 
-        return result.fold(
-            onSuccess = { playlistResponse ->
-                Result.success(playlistResponse.items.map { it.toPlaylist() })
-            },
-            onFailure = {
-                Result.failure(it)
-            }
+        emit(
+            result.fold(
+                onSuccess = { playlistResponse ->
+                    Result.success(playlistResponse.items.map { it.toPlaylist() })
+                },
+                onFailure = {
+                    Result.failure(it)
+                }
+            )
         )
     }
 }
