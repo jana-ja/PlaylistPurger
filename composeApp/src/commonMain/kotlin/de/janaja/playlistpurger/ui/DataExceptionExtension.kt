@@ -2,6 +2,7 @@ package de.janaja.playlistpurger.ui
 
 import androidx.lifecycle.ViewModel
 import de.janaja.playlistpurger.domain.exception.DataException
+import de.janaja.playlistpurger.util.Log
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.generic_error_message
 import playlistpurger.composeapp.generated.resources.no_internet_error_message
@@ -42,4 +43,40 @@ fun ViewModel.handleDataException(
         onUpdateErrorMessage(e.toStringResId())
         onLogout()
     }
+}
+
+fun <T, R> ViewModel.resultToDataState( // an result extenden
+    apiResult: Result<T>,
+    successTransform: (T) -> R,
+    onRefresh: () -> Unit,
+    onLogout: () -> Unit,
+): DataState<R> {
+    apiResult.fold(
+        onSuccess = { allPlaylists ->
+            return DataState.Ready(successTransform(allPlaylists))
+        },
+        onFailure = { e ->
+            // look for authorization error, refresh token, retry
+            if (e is DataException.Remote) {
+                if (e is DataException.Remote.InvalidAccessToken) {
+//                    viewModelScope.launch {
+                    Log.i("ViewModel", "resultToDataStore: access token is invalid\ntry to refresh...")
+
+                    onRefresh()
+//                    }
+                    return DataState.Loading
+                } else {
+                    return DataState.Error(e.toStringResId())
+                }
+            } else if (e is DataException.Auth) {
+//                viewModelScope.launch {
+                    onLogout()
+//                }
+                return DataState.Error(e.toStringResId())
+
+            } else {
+                return DataState.Error(UiText.StringResourceId(Res.string.generic_error_message))
+            }
+        }
+    )
 }
