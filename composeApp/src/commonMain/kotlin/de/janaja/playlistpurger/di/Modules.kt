@@ -20,6 +20,8 @@ import de.janaja.playlistpurger.data.remote.vote.VoteApi
 import de.janaja.playlistpurger.data.remote.vote.VoteApiDummyImpl
 import de.janaja.playlistpurger.data.repository.DataStoreSettingsRepo
 import de.janaja.playlistpurger.data.repository.SpotifyAuthService
+import de.janaja.playlistpurger.data.repository.mock.MockAuthService
+import de.janaja.playlistpurger.data.repository.mock.MockPlaylistRepo
 import de.janaja.playlistpurger.domain.repository.AuthService
 import de.janaja.playlistpurger.domain.repository.SettingsRepo
 import de.janaja.playlistpurger.ui.viewmodel.TrackListVoteViewModel
@@ -51,6 +53,7 @@ val sharedModule = module {
 
     // AuthRepo uses TokenRepo and WebApiService and AccountApiService
     single<AuthService> {
+//        MockAuthService(true)
         SpotifyAuthService(get(), get(), get())
     }
 
@@ -61,6 +64,7 @@ val sharedModule = module {
 
     // PlayListRepo uses DataStoreRepo and WebApiService
     single<PlaylistRepo> {
+//        MockPlaylistRepo(true)
         SpotifyPlaylistRepo(get(), get())
     }
 
