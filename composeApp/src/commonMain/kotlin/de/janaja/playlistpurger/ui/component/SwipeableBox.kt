@@ -3,7 +3,6 @@ package de.janaja.playlistpurger.ui.component
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -19,7 +18,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwipeCard(
+fun SwipeableBox(
     onSwiped: (SwipeDirection) -> Unit,
     swipeCardState: SwipeCardState = rememberSwipeCardState(),
     content: @Composable () -> Unit
@@ -48,53 +47,51 @@ fun SwipeCard(
         finalSwipeDirection?.let(onSwiped)
     }
 
-    Column {
-        Box(modifier = Modifier
-            .pointerInput(Unit) {
-                coroutineScope {
-                    detectDragGestures(
-                        onDrag = { change, dragAmount ->
-                            launch {
-                                val original = swipeCardState.offset.targetValue
-                                val summed = original + dragAmount
-                                val newValue = Offset(
-                                    x = summed.x.coerceIn(
-                                        -swipeCardState.maxWidth,
-                                        swipeCardState.maxWidth
-                                    ),
-                                    y = summed.y.coerceIn(
-                                        -swipeCardState.maxHeight,
-                                        swipeCardState.maxHeight
-                                    )
+    Box(
+        modifier = Modifier
+        .pointerInput(Unit) {
+            coroutineScope {
+                detectDragGestures(
+                    onDrag = { change, dragAmount ->
+                        launch {
+                            val original = swipeCardState.offset.targetValue
+                            val summed = original + dragAmount
+                            val newValue = Offset(
+                                x = summed.x.coerceIn(
+                                    -swipeCardState.maxWidth,
+                                    swipeCardState.maxWidth
+                                ),
+                                y = summed.y.coerceIn(
+                                    -swipeCardState.maxHeight,
+                                    swipeCardState.maxHeight
                                 )
-                                if (change.positionChange() != Offset.Zero) change.consume()
+                            )
+                            if (change.positionChange() != Offset.Zero) change.consume()
 
-                                swipeCardState.drag(newValue)
-                            }
-                        },
-                        onDragEnd = {
-                            launch {
-                                val coercedOffset = swipeCardState.offset.targetValue
-                                    .coerceIn(
-                                        listOf(SwipeDirection.Down),
-                                        maxHeight = swipeCardState.maxHeight,
-                                        maxWidth = swipeCardState.maxWidth
-                                    )
-
-                                swipeCardState.dragEnd(coercedOffset)
-                            }
+                            swipeCardState.drag(newValue)
                         }
-                    )
-                }
-            }
-            .graphicsLayer(
-                translationX = offset.value.x,
-                translationY = offset.value.y,
-                rotationZ = animateFloatAsState(offset.value.x / 50).value
-            )) {
-            content()
-        }
+                    },
+                    onDragEnd = {
+                        launch {
+                            val coercedOffset = swipeCardState.offset.targetValue
+                                .coerceIn(
+                                    listOf(SwipeDirection.Down),
+                                    maxHeight = swipeCardState.maxHeight,
+                                    maxWidth = swipeCardState.maxWidth
+                                )
 
+                            swipeCardState.dragEnd(coercedOffset)
+                        }
+                    }
+                )
+            }
+        }
+        .graphicsLayer(
+            translationX = offset.value.x,
+            translationY = offset.value.y,
+            rotationZ = animateFloatAsState(offset.value.x / 50).value
+        )) {
+        content()
     }
 }
 

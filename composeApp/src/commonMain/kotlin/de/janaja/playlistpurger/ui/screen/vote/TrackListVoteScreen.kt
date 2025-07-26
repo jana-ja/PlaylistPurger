@@ -51,7 +51,7 @@ fun TrackListVoteScreen(
 
         DataStateView(dataState) { data ->
             if (swipeModeOn) {
-                SwipeView(
+                SwipeVoteTrackStack(
                     swipeableTracks = swipeableTracks,
                     onSwipe = { dir, track ->
                         trackListVoteViewModel.onSwipe(dir, track)

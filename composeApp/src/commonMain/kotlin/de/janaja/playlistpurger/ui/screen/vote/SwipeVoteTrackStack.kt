@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.domain.model.Track
 import de.janaja.playlistpurger.domain.model.VoteOption
-import de.janaja.playlistpurger.ui.component.SwipeCard
+import de.janaja.playlistpurger.ui.component.SwipeableBox
 import de.janaja.playlistpurger.ui.component.SwipeCardState
 import de.janaja.playlistpurger.ui.component.SwipeDirection
 import de.janaja.playlistpurger.ui.component.TrackCard
@@ -25,7 +25,7 @@ import de.janaja.playlistpurger.ui.component.rememberSwipeCardState
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwipeView(
+fun SwipeVoteTrackStack(
     swipeableTracks: List<Track>,
     onSwipe: (SwipeDirection, Track) -> Unit,
     onSwitchSwipeMode: () -> Unit,
@@ -53,7 +53,7 @@ fun SwipeView(
                 if (index == swipeableTracks.lastIndex) {
                     topSwipeCardState = br
                 }
-                SwipeCard(
+                SwipeableBox(
                     swipeCardState = br,
                     onSwiped = { onSwipe(it, track) },
                 ) {
