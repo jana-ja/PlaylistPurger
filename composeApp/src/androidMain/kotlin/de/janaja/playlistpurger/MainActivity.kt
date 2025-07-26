@@ -3,7 +3,8 @@ package de.janaja.playlistpurger
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import de.janaja.playlistpurger.util.LoginResponseHelper
+import de.janaja.playlistpurger.core.ui.AppEntry
+import de.janaja.playlistpurger.features.auth.domain.helper.OAuthResponseHelper
 import org.koin.mp.KoinPlatform.getKoin
 
 
@@ -14,12 +15,13 @@ class MainActivity : ComponentActivity() {
 
         // when activity is started from spotify login website -> intent contains response data
         intent.data?.let {
-            val loginResponseHelper: LoginResponseHelper = getKoin().get()
-            loginResponseHelper.handleResponseUrl(it.toString())
+            val oAuthResponseHelper: OAuthResponseHelper = getKoin().get()
+
+            oAuthResponseHelper.handleResponseUrl(it.toString())
         }
 
         setContent {
-            App()
+            AppEntry()
         }
     }
 }
