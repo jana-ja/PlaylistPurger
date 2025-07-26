@@ -1,5 +1,6 @@
 package de.janaja.playlistpurger.ui.component
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.domain.model.Track
@@ -38,14 +40,17 @@ fun TrackCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // TODO handle long track names
             Text(
                 track.name,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                modifier = Modifier.basicMarquee()
             )
             Text(
                 track.artists.joinToString(", ") { it.name },
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                modifier = Modifier.basicMarquee()
             )
         }
     }
