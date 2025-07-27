@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepo {
 
-    fun getPlaylists(): Flow<Result<List<Playlist>>>
+    suspend fun getPlaylists(): Result<List<Playlist>>
 
 }

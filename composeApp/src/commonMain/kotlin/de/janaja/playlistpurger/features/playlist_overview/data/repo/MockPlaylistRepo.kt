@@ -3,8 +3,6 @@ package de.janaja.playlistpurger.features.playlist_overview.data.repo
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class MockPlaylistRepo(
     private val isSuccessFul: Boolean
@@ -28,15 +26,13 @@ class MockPlaylistRepo(
 
     }
 
-    override fun getPlaylists(): Flow<Result<List<Playlist>>> = flow {
-        emit(
-            if (isSuccessFul) {
-                Result.success(
-                    playlists
-                )
-            } else {
-                Result.failure(Exception("some exception"))
-            }
-        )
+    override suspend fun getPlaylists(): Result<List<Playlist>> {
+        return if (isSuccessFul) {
+            Result.success(
+                playlists
+            )
+        } else {
+            Result.failure(Exception("some exception"))
+        }
     }
 }

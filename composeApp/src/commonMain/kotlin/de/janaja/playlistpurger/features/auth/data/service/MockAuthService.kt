@@ -1,5 +1,6 @@
 package de.janaja.playlistpurger.features.auth.data.service
 
+import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
@@ -21,8 +22,12 @@ class MockAuthService(
         }
     }
 
-    override suspend fun refreshToken(): Boolean {
-        return isSuccessFul
+    override suspend fun refreshToken(): Result<Unit> {
+        if (isSuccessFul) {
+            return Result.success(Unit)
+        } else {
+            return Result.failure(DataException.Auth.MissingOrInvalidRefreshToken)
+        }
     }
 
     override suspend fun logout() {

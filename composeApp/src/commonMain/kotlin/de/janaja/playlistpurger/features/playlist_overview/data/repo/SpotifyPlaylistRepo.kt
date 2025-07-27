@@ -7,9 +7,7 @@ import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
 import de.janaja.playlistpurger.features.playlist_overview.data.model.toPlaylist
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 
 class SpotifyPlaylistRepo(
     authService: AuthService,
@@ -19,30 +17,27 @@ class SpotifyPlaylistRepo(
 
     private val tokenFlow = authService.accessToken
 
-    override fun getPlaylists(): Flow<Result<List<Playlist>>> = flow {
+    override suspend fun getPlaylists(): Result<List<Playlist>> {
         val token =
-            tokenFlow.firstOrNull() ?: emit(
-                Result.failure(DataException.Auth.MissingAccessToken)
-            )
+            tokenFlow.firstOrNull() ?: return Result.failure(DataException.Auth.MissingAccessToken)
+
         val result = webApi.getCurrentUsersPlaylists("Bearer $token")
 
-        emit(
-            result.fold(
-                onSuccess = { playlistResponse ->
+        return result.fold(
+            onSuccess = { playlistResponse ->
 
-                    Result.success(playlistResponse.items.map {
-                        val user = userRepo.getUserForId(it.owner.id)
-                            .fold(
-                                onSuccess = { user -> user },
-                                onFailure = { null }
-                            )
-                        it.toPlaylist(user)
-                    })
-                },
-                onFailure = {
-                    Result.failure(it)
-                }
-            )
+                Result.success(playlistResponse.items.map {
+                    val user = userRepo.getUserForId(it.owner.id)
+                        .fold(
+                            onSuccess = { user -> user },
+                            onFailure = { null }
+                        )
+                    it.toPlaylist(user)
+                })
+            },
+            onFailure = {
+                Result.failure(it)
+            }
         )
     }
 }

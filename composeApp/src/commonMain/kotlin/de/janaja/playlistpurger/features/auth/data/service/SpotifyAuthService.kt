@@ -77,7 +77,7 @@ class SpotifyAuthService(
                     DataException.Remote.InvalidAccessToken -> {
                         Log.d(TAG, "token is not valid - try to refresh")
 
-                        if (!refreshToken()) {
+                        if (refreshToken().isFailure) {
                             // TODO show something to user, maybe go default exception handling function path
                             logout()
                         }
@@ -90,7 +90,7 @@ class SpotifyAuthService(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun refreshToken(): Boolean {
+    override suspend fun refreshToken(): Result<Unit> {
         // unsuccessful -> call logout - this will delete token and trigger checkToken to set the loginState
         // successful -> update access token - this will trigger checkToken to set the loginState
 
@@ -101,7 +101,7 @@ class SpotifyAuthService(
         if (value == null) {
             Log.d(TAG, "no saved refresh token -> logout to delete all tokens")
             logout()
-            return false
+            return Result.failure(DataException.Auth.MissingOrInvalidRefreshToken)
         } else {
             // TODO improve error handling
             Log.d(TAG, "found saved refresh token -> get fresh access token with it")
@@ -116,13 +116,13 @@ class SpotifyAuthService(
                 if (tokenRequestResponse.refreshToken != "") {
                     tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
                 }
-                return true
+                return Result.success(Unit)
             }.onFailure { e ->
                 Log.e(TAG, "refreshToken: ", e)
-                return false
+                return Result.failure(e)
             }
             // TODO
-            return false
+            return Result.failure(DataException.Remote.Unknown)
         }
     }
 
