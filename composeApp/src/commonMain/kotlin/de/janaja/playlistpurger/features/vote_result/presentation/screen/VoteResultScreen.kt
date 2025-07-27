@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.DataStateView
-import de.janaja.playlistpurger.features.vote_result.presentation.component.TrackItemVotes
+import de.janaja.playlistpurger.features.vote_result.presentation.component.TrackVoteResultItem
 import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.VoteResultViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -39,7 +39,7 @@ fun VoteResultScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(data) { (track, voteList) ->
-                    TrackItemVotes(track, voteList)
+                    TrackVoteResultItem(track, voteList)
                 }
             }
         }

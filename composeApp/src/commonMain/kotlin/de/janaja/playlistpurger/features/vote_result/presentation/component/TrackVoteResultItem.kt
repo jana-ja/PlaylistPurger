@@ -20,7 +20,7 @@ import de.janaja.playlistpurger.features.track_voting.presentation.component.Vot
 
 
 @Composable
-fun TrackItemVotes(
+fun TrackVoteResultItem(
     track: Track,
     voteList: List<Vote>,
     modifier: Modifier = Modifier
