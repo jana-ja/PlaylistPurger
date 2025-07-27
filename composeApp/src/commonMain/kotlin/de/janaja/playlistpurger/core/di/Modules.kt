@@ -3,10 +3,10 @@ package de.janaja.playlistpurger.core.di
 import de.janaja.playlistpurger.core.data.local.DataStoreFactory
 import de.janaja.playlistpurger.features.settings.data.local.DataStorePreferences
 import de.janaja.playlistpurger.core.data.remote.HttpClientFactory
-import de.janaja.playlistpurger.features.auth.data.remote.KtorSpotifyAccountApiService
-import de.janaja.playlistpurger.features.auth.data.remote.KtorSpotifyWebApiService
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyAccountApiService
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyWebApiService
+import de.janaja.playlistpurger.features.auth.data.remote.KtorSpotifyAccountApi
+import de.janaja.playlistpurger.shared.data.remote.KtorSpotifyWebApi
+import de.janaja.playlistpurger.features.auth.data.remote.SpotifyAccountApi
+import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.features.auth.data.repo.DataStoreTokenRepo
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
@@ -43,10 +43,10 @@ val sharedModule = module {
     single { HttpClientFactory.create(get()) }
 
     // Spotify WebApiService
-    singleOf(::KtorSpotifyWebApiService).bind<SpotifyWebApiService>()
+    singleOf(::KtorSpotifyWebApi).bind<SpotifyWebApi>()
 
     // Spotify AccountApiService
-    singleOf(::KtorSpotifyAccountApiService).bind<SpotifyAccountApiService>()
+    singleOf(::KtorSpotifyAccountApi).bind<SpotifyAccountApi>()
 
     // AuthRepo uses TokenRepo and WebApiService and AccountApiService
     single<AuthService> {

@@ -7,9 +7,9 @@ import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.headers
 import io.ktor.http.parameters
 
-class KtorSpotifyAccountApiService (
+class KtorSpotifyAccountApi (
     private val httpClient: HttpClient
-): SpotifyAccountApiService {
+): SpotifyAccountApi {
 
     private val baseUrl = "https://accounts.spotify.com/"
 

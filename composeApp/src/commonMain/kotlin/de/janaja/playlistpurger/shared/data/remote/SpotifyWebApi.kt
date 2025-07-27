@@ -1,11 +1,10 @@
-package de.janaja.playlistpurger.features.auth.data.remote
+package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.shared.data.model.PlaylistResponseDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserDto
 
-
-interface SpotifyWebApiService {
+interface SpotifyWebApi {
     suspend fun getCurrentUsersPlaylists(
         token: String
     ): Result<PlaylistResponseDto>

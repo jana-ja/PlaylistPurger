@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.features.playlist_overview.data.repo
 
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyWebApiService
+import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 
 class SpotifyPlaylistRepo(
     authService: AuthService,
-    private val webApiService: SpotifyWebApiService
+    private val webApi: SpotifyWebApi
 ) : PlaylistRepo {
 
     private val tokenFlow = authService.accessToken
@@ -22,7 +22,7 @@ class SpotifyPlaylistRepo(
             tokenFlow.firstOrNull() ?: emit(
                 Result.failure(DataException.Auth.MissingAccessToken)
             )
-        val result = webApiService.getCurrentUsersPlaylists("Bearer $token")
+        val result = webApi.getCurrentUsersPlaylists("Bearer $token")
 
         emit(
             result.fold(

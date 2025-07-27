@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.shared.data.repo
 
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyWebApiService
+import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.map
 class SpotifyTrackListRepo(
     authService: AuthService,
     private val voteApi: VoteApi,
-    private val webApiService: SpotifyWebApiService
+    private val webApi: SpotifyWebApi
 
 ) : TrackListRepo {
 
@@ -39,7 +39,7 @@ class SpotifyTrackListRepo(
         val currentUserId =
             userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
-        val tracksResult = webApiService.getTracksForPlaylist("Bearer $token", playlistId)
+        val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
 
         // TODO alternativ: flows nehmen die nur einmal emiten, dann auch möglich retry nach x sek und combine benutzen
         //  flow<result>

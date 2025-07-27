@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.features.auth.data.remote
+package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.core.data.remote.safeCall
 import de.janaja.playlistpurger.shared.data.model.PlaylistResponseDto
@@ -8,9 +8,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 
-class KtorSpotifyWebApiService (
+class KtorSpotifyWebApi (
     private val httpClient: HttpClient
-) : SpotifyWebApiService {
+) : SpotifyWebApi {
 
     private val baseUrl = "https://api.spotify.com/v1/"
 

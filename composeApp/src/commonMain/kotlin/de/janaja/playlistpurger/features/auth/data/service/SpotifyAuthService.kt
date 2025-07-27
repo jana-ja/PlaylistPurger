@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.features.auth.data.service
 
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyAccountApiService
-import de.janaja.playlistpurger.features.auth.data.remote.SpotifyWebApiService
+import de.janaja.playlistpurger.features.auth.data.remote.SpotifyAccountApi
+import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
@@ -15,8 +15,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SpotifyAuthService(
     private val tokenRepo: TokenRepo,
-    private val webApiService: SpotifyWebApiService,
-    private val accountApiService: SpotifyAccountApiService
+    private val webApi: SpotifyWebApi,
+    private val accountApi: SpotifyAccountApi
 ) : AuthService {
     private val TAG = "AuthRepo"
 
@@ -37,7 +37,7 @@ class SpotifyAuthService(
         // TODO loginState -> loading
         Log.d(TAG, "loginWithCode: try receive token for code: $code")
 
-        val result = this.accountApiService.getToken(
+        val result = this.accountApi.getToken(
             client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
             code = code,
             redirectUri = redirectUri,
@@ -66,7 +66,7 @@ class SpotifyAuthService(
             return LoginState.LoggedOut
         } else {
             Log.d(TAG, "found saved token -> check if valid by loading current user")
-            val result = this.webApiService.getCurrentUser("Bearer $token")
+            val result = this.webApi.getCurrentUser("Bearer $token")
 
             result.onSuccess { user ->
                 Log.d(TAG, "token is valid -> logged in")
@@ -105,7 +105,7 @@ class SpotifyAuthService(
         } else {
             // TODO improve error handling
             Log.d(TAG, "found saved refresh token -> get fresh access token with it")
-            val result = this.accountApiService.refreshToken(
+            val result = this.accountApi.refreshToken(
                 client = "Basic " + Base64.encode("$clientId:$clientSecret".encodeToByteArray()),
                 refreshToken = value,
             )
