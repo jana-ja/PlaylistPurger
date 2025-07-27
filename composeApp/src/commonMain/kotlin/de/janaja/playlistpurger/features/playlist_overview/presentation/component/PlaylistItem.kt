@@ -91,20 +91,20 @@ fun PlaylistItem(
                 ) {
                     BigCardButton(
                         onClick = {
-                            onNavToResult(playlist.id, playlist.name)
+                            onNavToVote(playlist.id, playlist.name)
                         },
-                        icon = Res.drawable.baseline_poll_24,
-                        text = "Result"
+                        icon = Res.drawable.baseline_compare_arrows_24,
+                        text = "Vote"
                     )
 
                     Spacer(Modifier.width(16.dp))
 
                     BigCardButton(
                         onClick = {
-                            onNavToVote(playlist.id, playlist.name)
+                            onNavToResult(playlist.id, playlist.name)
                         },
-                        icon = Res.drawable.baseline_compare_arrows_24,
-                        text = "Vote"
+                        icon = Res.drawable.baseline_poll_24,
+                        text = "Result"
                     )
                 }
             }
