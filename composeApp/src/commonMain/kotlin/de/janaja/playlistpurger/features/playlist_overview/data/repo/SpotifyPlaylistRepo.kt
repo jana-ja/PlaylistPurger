@@ -5,7 +5,7 @@ import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
-import de.janaja.playlistpurger.shared.data.model.toPlaylist
+import de.janaja.playlistpurger.features.playlist_overview.data.model.toPlaylist
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow

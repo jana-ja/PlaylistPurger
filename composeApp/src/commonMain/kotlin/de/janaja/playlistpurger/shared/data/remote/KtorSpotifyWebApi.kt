@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.core.data.remote.safeCall
-import de.janaja.playlistpurger.shared.data.model.PlaylistResponseDto
+import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserDto
 import io.ktor.client.HttpClient

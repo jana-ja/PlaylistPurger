@@ -1,6 +1,9 @@
-package de.janaja.playlistpurger.shared.data.model
+package de.janaja.playlistpurger.features.playlist_overview.data.model
 
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
+import de.janaja.playlistpurger.shared.data.model.ImageDto
+import de.janaja.playlistpurger.shared.data.model.UserDto
+import de.janaja.playlistpurger.shared.data.model.toUser
 import kotlinx.serialization.Serializable
 
 @Serializable

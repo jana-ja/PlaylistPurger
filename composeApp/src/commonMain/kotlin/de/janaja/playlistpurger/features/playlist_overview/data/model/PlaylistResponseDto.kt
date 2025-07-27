@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.shared.data.model
+package de.janaja.playlistpurger.features.playlist_overview.data.model
 
 import kotlinx.serialization.Serializable
 
