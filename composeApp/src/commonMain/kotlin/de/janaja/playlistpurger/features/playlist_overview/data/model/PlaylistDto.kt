@@ -3,7 +3,9 @@ package de.janaja.playlistpurger.features.playlist_overview.data.model
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.shared.data.model.ImageDto
 import de.janaja.playlistpurger.shared.data.model.UserDto
+import de.janaja.playlistpurger.shared.data.model.UserRefDto
 import de.janaja.playlistpurger.shared.data.model.toUser
+import de.janaja.playlistpurger.shared.domain.model.User
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,12 +16,11 @@ data class PlaylistDto(
     val collaborative: Boolean,
     val public: Boolean,
     val images: List<ImageDto>,
-    // owner TODO
     val tracks: PlaylistTracksDto,
-    val owner: UserDto,
+    val owner: UserRefDto, // displayName but no images
     val type: String,
 )
-fun PlaylistDto.toPlaylist(): Playlist {
+fun PlaylistDto.toPlaylist(owner: User?): Playlist {
     return Playlist(
         id = this.id,
         name = this.name,
@@ -28,7 +29,7 @@ fun PlaylistDto.toPlaylist(): Playlist {
         public = this.public,
         imageUrl = this.images.firstOrNull()?.url,
         trackCount = this.tracks.total,
-        owner = this.owner.toUser()
+        owner = owner
     )
 }
 

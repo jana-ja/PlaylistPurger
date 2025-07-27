@@ -29,7 +29,7 @@ sealed class Filter<T>(val function: (T) -> Boolean) {
         Filter<Track>({ it.name.lowercase().contains(query.lowercase()) })
 
     data class OwnerFilter(val query: String) :
-        Filter<Playlist>({ it.owner.name.lowercase().contains(query.lowercase()) })
+        Filter<Playlist>({ it.owner?.name?.lowercase()?.contains(query.lowercase()) ?: false })
 
     data object NoFilter : Filter<Nothing>({ true })
 }

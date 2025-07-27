@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class TrackWrapperDto(
     val track: TrackDto,
     @SerialName("added_by")
-    val addedBy: UserDto, // hat hier keinen display name
+    val addedBy: UserRefDto,
 )
 /*
 {

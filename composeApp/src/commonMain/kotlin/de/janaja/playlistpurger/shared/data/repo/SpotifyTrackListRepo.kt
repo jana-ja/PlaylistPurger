@@ -12,6 +12,7 @@ import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.model.toUser
 import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -20,7 +21,8 @@ import kotlinx.coroutines.flow.map
 class SpotifyTrackListRepo(
     authService: AuthService,
     private val voteApi: VoteApi,
-    private val webApi: SpotifyWebApi
+    private val webApi: SpotifyWebApi,
+    private val userRepo: UserRepo
 
 ) : TrackListRepo {
 
@@ -85,7 +87,7 @@ class SpotifyTrackListRepo(
                 // TODO load each user just once, maybe in UserRepo with in-memory cache map of user ids and user
                 //  then coordinate from use case?
                 val voteList = voteDtoList.map {
-                    val user = getUserForId(it.userId)
+                    val user = userRepo.getUserForId(it.userId)
                         .fold(
                             onSuccess = { user -> user },
                             onFailure = { null }
@@ -108,18 +110,7 @@ class SpotifyTrackListRepo(
         )
     }
 
-    private suspend fun getUserForId(userId: String): Result<User> {
-        val token =
-            tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-        webApi.getUserForId("Bearer $token", userId).fold(
-            onSuccess = {
-                return Result.success(it.toUser())
-            },
-            onFailure = {
-                return Result.failure(it)
-            }
-        )
-    }
+
 
     override suspend fun updateVote(
         playlistId: String,

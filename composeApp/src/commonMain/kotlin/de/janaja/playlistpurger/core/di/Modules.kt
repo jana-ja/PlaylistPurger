@@ -26,7 +26,9 @@ import de.janaja.playlistpurger.features.auth.presentation.viewmodel.AuthViewMod
 import de.janaja.playlistpurger.features.settings.presentation.viewmodel.SettingsViewModel
 import de.janaja.playlistpurger.features.auth.data.helper.SpotifyOAuthResponseHelper
 import de.janaja.playlistpurger.features.auth.domain.helper.OAuthResponseHelper
+import de.janaja.playlistpurger.shared.data.repo.SpotifyUserRepo
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -59,16 +61,21 @@ val sharedModule = module {
         MockVoteApi()
     }
 
+    // PlaylistRepo
+    single<UserRepo> {
+        SpotifyUserRepo(get(), get())
+    }
+
     // PlayListRepo uses DataStoreRepo and WebApiService
     single<PlaylistRepo> {
 //        MockPlaylistRepo(true)
-        SpotifyPlaylistRepo(get(), get())
+        SpotifyPlaylistRepo(get(), get(), get())
     }
 
     // TrackListRepo uses DataStoreRepo and VoteRepo and WebApiService
 //    singleOf(::TrackListRepoImpl)
     single<TrackListRepo> {
-        SpotifyTrackListRepo(get(), get(), get())
+        SpotifyTrackListRepo(get(), get(), get(), get())
     }
 
     // DataStore - module specific

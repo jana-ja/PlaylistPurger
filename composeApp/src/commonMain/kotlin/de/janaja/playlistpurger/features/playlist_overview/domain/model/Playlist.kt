@@ -11,5 +11,5 @@ data class Playlist(
     val imageUrl: String?, // nullable?
     val trackCount: Int,
 //    val tracks: List<Track>,
-    val owner: User,
+    val owner: User?, // TODO?
 )

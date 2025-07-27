@@ -78,7 +78,7 @@ fun PlaylistItem(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        playlist.owner.name,
+                        playlist.owner?.name ?: "Unknown User",
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

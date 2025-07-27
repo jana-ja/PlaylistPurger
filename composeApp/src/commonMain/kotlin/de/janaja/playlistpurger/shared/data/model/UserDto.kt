@@ -8,15 +8,14 @@ import kotlinx.serialization.Serializable
 data class UserDto(
     val id: String,
     @SerialName("display_name")
-    val displayName: String = "Unknown User", // in playlist tracks: added by hat dieses field nicht
-    val images: List<ImageDto>? = null // does not always exist, for example when loading a playlist the owner is a user without images. when loading a user by itself it has images // 0 -> big image 300:300, 1 -> thumbnail 64:64
-    // TODO maybe split to user and detailuser?
+    val displayName: String, // in playlist tracks: added by hat dieses field nicht
+    val images: List<ImageDto> // 0 -> big image 300:300, 1 -> thumbnail 64:64
 )
 fun UserDto.toUser(): User {
     return User(
         id = this.id,
         name = this.displayName,
-        thumbnailImage = this.images?.getOrNull(1)?.url
+        thumbnailImage = this.images.getOrNull(1)?.url
     )
 }
 /*
