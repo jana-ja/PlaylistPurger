@@ -11,7 +11,7 @@ import de.janaja.playlistpurger.features.settings.domain.repo.SettingsRepo
 import de.janaja.playlistpurger.core.ui.TrackListRoute
 import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.core.ui.util.handleDataException
-import de.janaja.playlistpurger.shared.presentation.component.SwipeDirection
+import de.janaja.playlistpurger.core.ui.component.SwipeDirection
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.Job

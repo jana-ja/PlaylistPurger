@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.shared.presentation.component.DataStateView
+import de.janaja.playlistpurger.core.ui.component.DataStateView
 import de.janaja.playlistpurger.features.vote_result.presentation.component.TrackItemVotes
 import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.VoteResultViewModel
 import org.koin.compose.viewmodel.koinViewModel

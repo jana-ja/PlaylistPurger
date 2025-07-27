@@ -13,8 +13,8 @@ import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistR
 import de.janaja.playlistpurger.features.playlist_overview.data.repo.SpotifyPlaylistRepo
 import org.koin.dsl.module
 import de.janaja.playlistpurger.shared.data.repo.SpotifyTrackListRepo
-import de.janaja.playlistpurger.shared.data.remote.vote.VoteApi
-import de.janaja.playlistpurger.shared.data.remote.vote.MockVoteApi
+import de.janaja.playlistpurger.shared.data.remote.VoteApi
+import de.janaja.playlistpurger.shared.data.remote.MockVoteApi
 import de.janaja.playlistpurger.features.settings.data.repo.DataStoreSettingsRepo
 import de.janaja.playlistpurger.features.auth.data.service.SpotifyAuthService
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService

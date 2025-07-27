@@ -14,8 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.shared.presentation.component.DataStateView
-import de.janaja.playlistpurger.shared.presentation.component.IconSwitch
+import de.janaja.playlistpurger.core.ui.component.DataStateView
+import de.janaja.playlistpurger.core.ui.component.IconSwitch
 import de.janaja.playlistpurger.features.track_voting.presentation.component.TrackItem
 import de.janaja.playlistpurger.features.track_voting.presentation.component.SwipeVoteTrackStack
 import de.janaja.playlistpurger.features.track_voting.presentation.viewmodel.TrackListVoteViewModel

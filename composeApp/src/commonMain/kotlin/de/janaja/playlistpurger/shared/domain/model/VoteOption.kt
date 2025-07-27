@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.shared.domain.model
 
 import androidx.compose.ui.graphics.Color
-import de.janaja.playlistpurger.shared.presentation.component.SwipeDirection
+import de.janaja.playlistpurger.core.ui.component.SwipeDirection
 import org.jetbrains.compose.resources.DrawableResource
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.baseline_check_24

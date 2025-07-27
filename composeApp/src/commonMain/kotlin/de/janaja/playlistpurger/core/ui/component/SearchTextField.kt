@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.shared.presentation.component
+package de.janaja.playlistpurger.core.ui.component
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions

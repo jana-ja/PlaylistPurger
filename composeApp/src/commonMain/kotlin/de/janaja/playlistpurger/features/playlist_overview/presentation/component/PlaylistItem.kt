@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import de.janaja.playlistpurger.shared.presentation.component.BigCardButton
+import de.janaja.playlistpurger.core.ui.component.BigCardButton
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import org.jetbrains.compose.resources.painterResource
 import playlistpurger.composeapp.generated.resources.Res

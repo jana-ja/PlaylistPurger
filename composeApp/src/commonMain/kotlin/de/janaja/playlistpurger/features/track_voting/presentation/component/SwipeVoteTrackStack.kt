@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
-import de.janaja.playlistpurger.shared.presentation.component.SwipeableBox
-import de.janaja.playlistpurger.shared.presentation.component.SwipeCardState
-import de.janaja.playlistpurger.shared.presentation.component.SwipeDirection
-import de.janaja.playlistpurger.shared.presentation.component.rememberSwipeCardState
+import de.janaja.playlistpurger.core.ui.component.SwipeableBox
+import de.janaja.playlistpurger.core.ui.component.SwipeCardState
+import de.janaja.playlistpurger.core.ui.component.SwipeDirection
+import de.janaja.playlistpurger.core.ui.component.rememberSwipeCardState
 import kotlinx.coroutines.launch
 
 @Composable

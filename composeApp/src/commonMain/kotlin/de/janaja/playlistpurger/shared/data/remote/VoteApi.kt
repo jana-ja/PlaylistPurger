@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.shared.data.remote.vote
+package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption

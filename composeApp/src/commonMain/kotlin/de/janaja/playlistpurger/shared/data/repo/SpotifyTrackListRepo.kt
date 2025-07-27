@@ -3,7 +3,7 @@ package de.janaja.playlistpurger.shared.data.repo
 import de.janaja.playlistpurger.features.auth.data.remote.SpotifyWebApiService
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
-import de.janaja.playlistpurger.shared.data.remote.vote.VoteApi
+import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.shared.domain.model.Track
