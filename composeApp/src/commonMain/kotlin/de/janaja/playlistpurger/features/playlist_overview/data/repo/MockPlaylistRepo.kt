@@ -22,6 +22,7 @@ class MockPlaylistRepo(
             owner = User(
                 "0",
                 name = "Test User",
+                thumbnailImage = "https://i.scdn.co/image/ab67757000003b82f63072e4fad4e5170c1fda52"
             )
         )
 

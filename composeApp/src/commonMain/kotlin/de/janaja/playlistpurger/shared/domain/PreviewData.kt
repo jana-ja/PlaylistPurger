@@ -17,7 +17,8 @@ object PreviewData {
         trackCount = 1,
         owner = User(
             id = "id",
-            name = "Name"
+            name = "Name",
+            thumbnailImage = "https://i.scdn.co/image/ab67757000003b82f63072e4fad4e5170c1fda52"
         ),
     )
     val previewTrack = Track(

@@ -11,7 +11,7 @@ class MockAuthService(
 
     override val accessToken = MutableStateFlow("access token")
 
-    override val loginState = MutableStateFlow(LoginState.LoggedIn(User("0", "Test User")))
+    override val loginState = MutableStateFlow(LoginState.LoggedIn(User("0", "Test User", "https://i.scdn.co/image/ab67757000003b82f63072e4fad4e5170c1fda52")))
 
     override suspend fun loginWithCode(code: String): Result<Unit> {
         return if (isSuccessFul) {
