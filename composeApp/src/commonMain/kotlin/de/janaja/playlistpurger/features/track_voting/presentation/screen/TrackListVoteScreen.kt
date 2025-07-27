@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.DataStateView
 import de.janaja.playlistpurger.core.ui.component.IconSwitch
+import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.features.track_voting.presentation.component.TrackItem
 import de.janaja.playlistpurger.features.track_voting.presentation.component.SwipeVoteTrackStack
 import de.janaja.playlistpurger.features.track_voting.presentation.viewmodel.TrackListVoteViewModel
@@ -34,6 +36,8 @@ fun TrackListVoteScreen(
     val swipeableTracks by trackListVoteViewModel.swipeTracks.collectAsState(
         emptyList()
     )
+    val allTracksCount by trackListVoteViewModel.allTracksCount.collectAsState(0)
+    val votedTracksCount by trackListVoteViewModel.votedTracksCount.collectAsState(0)
 
     Column(
         modifier = modifier
@@ -43,6 +47,9 @@ fun TrackListVoteScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row {
+            if (dataState is DataState.Ready) {
+                Text("$votedTracksCount/$allTracksCount")
+            }
             Spacer(Modifier.weight(1f))
             IconSwitch(
                 checked = swipeModeOn,

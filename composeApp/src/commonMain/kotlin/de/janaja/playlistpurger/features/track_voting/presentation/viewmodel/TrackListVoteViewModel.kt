@@ -17,8 +17,11 @@ import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class TrackListVoteViewModel(
@@ -40,17 +43,31 @@ class TrackListVoteViewModel(
     val dataState = _dataState.asStateFlow()
 
     // swipe
-    private val unvotedTracks = _dataState.map {
-        if (it is DataState.Ready) {
-            it.data.filter { it.vote == null }
-        } else {
-            emptyList()
+    private val allTracks = _dataState
+        .mapNotNull {
+            if (it is DataState.Ready) {
+                it.data
+            } else {
+                null
+            }
         }
-    }
+    private val unvotedTracks = allTracks
+        .map { trackList ->
+            trackList.filter { it.vote == null }
+        }
+        .distinctUntilChanged()
 
     val swipeTracks =
         unvotedTracks.map { list ->
             listOfNotNull(list.getOrNull(0), list.getOrNull(1))
+        }
+
+    val allTracksCount = allTracks
+        .map { it.count() }
+
+    val votedTracksCount = allTracksCount
+        .combine(unvotedTracks) { allCount, unvotedTracks ->
+            allCount - unvotedTracks.count()
         }
 
     // ui states
