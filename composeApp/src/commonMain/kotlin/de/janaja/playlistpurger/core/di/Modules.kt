@@ -58,16 +58,7 @@ val coreModule = module {
         MockVoteApi()
     }
 
-    // PlaylistRepo
-    single<UserRepo> {
-        SpotifyUserRepo(get(), get())
-    }
 
-    // PlayListRepo uses DataStoreRepo and WebApiService
-    single<PlaylistRepo> {
-//        MockPlaylistRepo(true)
-        SpotifyPlaylistRepo(get(), get(), get())
-    }
 
     // TrackListRepo uses DataStoreRepo and VoteRepo and WebApiService
 //    singleOf(::TrackListRepoImpl)
