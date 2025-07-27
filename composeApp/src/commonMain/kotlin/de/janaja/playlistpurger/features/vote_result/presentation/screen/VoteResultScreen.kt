@@ -26,9 +26,10 @@ fun VoteResultScreen(
     val dataState by voteResultViewModel.dataState.collectAsState()
     // song mit den vote dingern mit anzahl der votes, wenn alle abgestimmt haben ist grün hinterlegt oder so
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(horizontal = 16.dp),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -39,7 +40,12 @@ fun VoteResultScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(data) { (track, voteList) ->
-                    TrackVoteResultItem(track, voteList)
+                    TrackVoteResultItem(
+                        track = track,
+                        usersByVoteOption = voteList
+                            .groupBy { it.voteOption }
+                            .mapValues { it.value.map { it.user } }
+                    )
                 }
             }
         }
