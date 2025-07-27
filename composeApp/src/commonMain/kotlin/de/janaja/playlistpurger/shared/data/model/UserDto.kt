@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 data class UserDto(
     val id: String,
     @SerialName("display_name")
-//    @Json(name = "display_name")
     val displayName: String = "Unknown User", // in playlist tracks: added by hat dieses field nicht
 )
 fun UserDto.toUser(): User {

@@ -9,6 +9,8 @@ import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.model.toTrack
+import de.janaja.playlistpurger.shared.data.model.toUser
+import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,14 +81,42 @@ class SpotifyTrackListRepo(
         // get all votes
         val allVotesResult = voteApi.getAllVotesForPlaylist(playlistId)
         return allVotesResult.fold(
-            onSuccess = { allVotes ->
-                val allVotesByTrackId = allVotes.groupBy { it.trackId }
+            onSuccess = { voteDtoList ->
+                // TODO load each user just once, maybe in UserRepo with in-memory cache map of user ids and user
+                //  then coordinate from use case?
+                val voteList = voteDtoList.map {
+                    val user = getUserForId(it.userId)
+                        .fold(
+                            onSuccess = { user -> user },
+                            onFailure = { null }
+                        )
+                    Vote(
+                        playlistId = it.playlistId,
+                        trackId = it.trackId,
+                        user = user,
+                        voteOption = it.voteOption
+                    )
+                }
+                val allVotesByTrackId = voteList.groupBy { it.trackId }
                 Result.success(
                     allTracks.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
                 )
             },
             onFailure = {
                 Result.failure(it)
+            }
+        )
+    }
+
+    private suspend fun getUserForId(userId: String): Result<User> {
+        val token =
+            tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
+        webApi.getUserForId("Bearer $token", userId).fold(
+            onSuccess = {
+                return Result.success(it.toUser())
+            },
+            onFailure = {
+                return Result.failure(it)
             }
         )
     }

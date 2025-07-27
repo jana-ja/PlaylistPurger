@@ -17,4 +17,9 @@ interface SpotifyWebApi {
     suspend fun getCurrentUser(
         token: String,
     ): Result<UserDto>
+
+    suspend fun getUserForId(
+        token: String,
+        userId: String
+    ): Result<UserDto>
 }

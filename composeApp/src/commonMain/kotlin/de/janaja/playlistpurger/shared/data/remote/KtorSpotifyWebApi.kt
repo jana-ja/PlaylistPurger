@@ -45,4 +45,14 @@ class KtorSpotifyWebApi (
             }
         }
     }
+
+    override suspend fun getUserForId(token: String, userId: String): Result<UserDto> {
+        return safeCall<UserDto> {
+            httpClient.get(baseUrl + "users/10l2hi9lk1gobeh479bwvysps") {
+                header("Authorization", token)
+            }
+        }
+
+    }
+
 }
