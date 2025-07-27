@@ -43,6 +43,12 @@ fun TrackVoteResultItem(
                     track.artists.joinToString(", ") { it.name },
                     style = MaterialTheme.typography.bodyMedium
                 )
+
+                VotesByUsers(
+                    usersByVoteOption = votesByOption.mapValues { entry ->
+                        entry.value.map { it.user }
+                    }
+                )
             }
 
             Row {
