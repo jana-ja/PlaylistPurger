@@ -20,12 +20,12 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel = koinViewModel(),
 ) {
-    val showSwipeFirst by settingsViewModel.showSwipeFirst.collectAsState()
+    val settings by settingsViewModel.settings.collectAsState()
     Column(
         modifier
     ) {
         SwitchPreference(
-            value = showSwipeFirst,
+            value = settings.showSwipeFirst,
             onValueChange = {
                 settingsViewModel.updateShowSwipeFirst(it)
             },

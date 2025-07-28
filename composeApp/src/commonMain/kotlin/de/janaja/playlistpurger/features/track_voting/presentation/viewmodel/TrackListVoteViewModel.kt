@@ -13,6 +13,7 @@ import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.core.ui.util.handleDataException
 import de.janaja.playlistpurger.core.ui.component.SwipeDirection
 import de.janaja.playlistpurger.core.util.Log
+import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +27,8 @@ import kotlinx.coroutines.launch
 
 class TrackListVoteViewModel(
     private val authService: AuthService,
-    private val settingsRepo: SettingsRepo,
     private val trackListRepo: TrackListRepo,
+    private val observeSettingsUseCase: ObserveSettingsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val TAG = "TrackListViewModel"
@@ -79,8 +80,8 @@ class TrackListVoteViewModel(
         observeTrackList()
 
         viewModelScope.launch {
-            settingsRepo.showSwipeFirstFlow.first()?.let {
-                _swipeModeOn.value = it
+            observeSettingsUseCase().first().let {
+                _swipeModeOn.value = it.showSwipeFirst
             }
         }
     }

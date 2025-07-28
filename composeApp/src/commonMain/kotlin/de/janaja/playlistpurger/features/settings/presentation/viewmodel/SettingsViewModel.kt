@@ -2,35 +2,39 @@ package de.janaja.playlistpurger.features.settings.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.janaja.playlistpurger.features.auth.domain.service.AuthService
-import de.janaja.playlistpurger.features.settings.domain.repo.SettingsRepo
+import de.janaja.playlistpurger.features.auth.domain.usecase.LogoutUseCase
+import de.janaja.playlistpurger.features.settings.domain.Settings
+import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
+import de.janaja.playlistpurger.features.settings.domain.usecase.UpdateShowSwipeFirstSettingUseCase
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+// use case and Settings data class
+// new client secret!
 class SettingsViewModel(
-    private val settingsRepo: SettingsRepo,
-    private val authService: AuthService,
-    ): ViewModel() {
+    observeSettingsUseCase: ObserveSettingsUseCase,
+    private val updateShowSwipeFirstSettingUseCase: UpdateShowSwipeFirstSettingUseCase,
+    private val logoutUseCase: LogoutUseCase
+) : ViewModel() {
 
-    val showSwipeFirst = settingsRepo.showSwipeFirstFlow
-        .map { it ?: true }
+    val settings = observeSettingsUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = true
+            initialValue = Settings()
         )
 
-    fun updateShowSwipeFirst(newValue: Boolean){
+
+    fun updateShowSwipeFirst(newValue: Boolean) {
         viewModelScope.launch {
-            settingsRepo.updateShowSwipeFirst(newValue)
+            updateShowSwipeFirstSettingUseCase(newValue)
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            authService.logout()
+            logoutUseCase()
         }
     }
 
