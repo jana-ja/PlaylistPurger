@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// use case and Settings data class
-// new client secret!
 class SettingsViewModel(
     observeSettingsUseCase: ObserveSettingsUseCase,
     private val updateShowSwipeFirstSettingUseCase: UpdateShowSwipeFirstSettingUseCase,

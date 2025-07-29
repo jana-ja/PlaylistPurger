@@ -7,6 +7,7 @@ import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.core.util.Log
+import de.janaja.playlistpurger.hiddenClientSecret
 import de.janaja.playlistpurger.shared.data.model.toUser
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -20,7 +21,7 @@ class SpotifyAuthService(
 ) : AuthService {
     private val TAG = "AuthRepo"
 
-    private val clientSecret = "72efc9ca1b3d45f0bb51a131d3534973" // TODO switch to kcmp
+    private val clientSecret = hiddenClientSecret // TODO switch to kcmp
     private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
     private val redirectUri = "asdf://callback"
 
