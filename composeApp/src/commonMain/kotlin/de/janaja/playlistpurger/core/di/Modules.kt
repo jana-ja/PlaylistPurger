@@ -11,21 +11,13 @@ import de.janaja.playlistpurger.features.auth.data.service.SpotifyAuthService
 import de.janaja.playlistpurger.features.auth.domain.helper.OAuthResponseHelper
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
-import de.janaja.playlistpurger.features.auth.domain.usecase.LogoutUseCase
-import de.janaja.playlistpurger.features.auth.domain.usecase.RefreshTokenUseCase
-import de.janaja.playlistpurger.features.playlist_overview.data.repo.SpotifyPlaylistRepo
-import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
 import de.janaja.playlistpurger.features.settings.data.local.DataStorePreferences
-import de.janaja.playlistpurger.features.settings.data.repo.DataStoreSettingsRepo
-import de.janaja.playlistpurger.features.settings.domain.repo.SettingsRepo
 import de.janaja.playlistpurger.shared.data.remote.KtorSpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.MockVoteApi
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.shared.data.repo.SpotifyTrackListRepo
-import de.janaja.playlistpurger.shared.data.repo.SpotifyUserRepo
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
-import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -81,11 +73,6 @@ val coreModule = module {
     // TokenRepo
     single<TokenRepo> {
         DataStoreTokenRepo(get())
-    }
-
-    // SettingsRepo
-    single<SettingsRepo> {
-        DataStoreSettingsRepo(get())
     }
 
     // LoginResponseHelper
