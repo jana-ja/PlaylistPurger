@@ -1,21 +1,19 @@
 package de.janaja.playlistpurger.shared.data.repo
 
-import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
-import de.janaja.playlistpurger.shared.domain.model.Vote
-import de.janaja.playlistpurger.shared.domain.model.VoteOption
-import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.LoginState
-import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.model.toTrack
-import de.janaja.playlistpurger.shared.data.model.toUser
-import de.janaja.playlistpurger.shared.domain.model.User
+import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
+import de.janaja.playlistpurger.shared.data.remote.VoteApi
+import de.janaja.playlistpurger.shared.domain.model.Track
+import de.janaja.playlistpurger.shared.domain.model.Vote
+import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -37,9 +35,12 @@ class SpotifyTrackListRepo(
             return@map null
     }
 
+    // repo handles state
     private val allTracks = MutableStateFlow<List<Track>>(listOf())
 
-    override suspend fun loadTracksWithOwnVotes(playlistId: String): Result<Flow<List<Track>>> {
+    override fun observeCurrentPlaylistTracks() = allTracks.asStateFlow()
+
+    override suspend fun refreshTracksWithOwnVotes(playlistId: String): Result<Unit> {
         // TODO cache lists for ids in memory?
         val token =
             tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
@@ -48,8 +49,6 @@ class SpotifyTrackListRepo(
 
         val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
 
-        // TODO alternativ: flows nehmen die nur einmal emiten, dann auch möglich retry nach x sek und combine benutzen
-        //  flow<result>
         return tracksResult.fold(
             onSuccess = { tracksResponse ->
                 // TODO parallel
@@ -63,7 +62,7 @@ class SpotifyTrackListRepo(
 
                         allTracks.value = mergedTracks
 
-                        Result.success(allTracks)
+                        Result.success(Unit)
                     },
                     onFailure = { e ->
                         Result.failure(e)
@@ -80,7 +79,7 @@ class SpotifyTrackListRepo(
 
 //        if (allTracks.value.isEmpty()) {
 //            // TODO error handling??
-        loadTracksWithOwnVotes(playlistId)
+        refreshTracksWithOwnVotes(playlistId)
 //        }
 
         // get all votes

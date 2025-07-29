@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface TrackListRepo {
 
-    suspend fun loadTracksWithOwnVotes(playlistId: String): Result<Flow<List<Track>>>
+    suspend fun refreshTracksWithOwnVotes(playlistId: String): Result<Unit>
+    fun observeCurrentPlaylistTracks(): Flow<List<Track>>
 
     // need newVote, trackId, playlistId, userId - where should this be stored?
     // inject current user id into repo? and token datastore thing?
