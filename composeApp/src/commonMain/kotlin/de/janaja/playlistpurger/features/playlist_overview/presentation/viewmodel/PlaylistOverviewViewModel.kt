@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.generic_error_message
@@ -67,7 +66,6 @@ class PlaylistOverviewViewModel(
                     }
                 )
             }
-            .onStart { emit(DataState.Loading) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
