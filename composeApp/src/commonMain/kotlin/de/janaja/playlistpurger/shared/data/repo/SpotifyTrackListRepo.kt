@@ -115,7 +115,7 @@ class SpotifyTrackListRepo(
 
 
 
-    override suspend fun updateVote(
+    override suspend fun upsertVote(
         playlistId: String,
         trackId: String,
         newVote: VoteOption

@@ -5,19 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.core.domain.exception.DataException
-import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.VoteOption
-import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.core.ui.TrackListRoute
-import de.janaja.playlistpurger.core.ui.model.DataState
-import de.janaja.playlistpurger.core.ui.util.handleDataException
 import de.janaja.playlistpurger.core.ui.component.SwipeDirection
+import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.ui.util.toStringResId
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.ObserveTracksWithOwnVotesUseCase
-import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
+import de.janaja.playlistpurger.features.track_voting.domain.usecase.UpsertVoteUseCase
+import de.janaja.playlistpurger.shared.domain.model.Track
+import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,16 +24,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.generic_error_message
 
 class TrackListVoteViewModel(
-    private val authService: AuthService,
-    private val trackListRepo: TrackListRepo,
-    private val observeTracksWithOwnVotesUseCase: ObserveTracksWithOwnVotesUseCase,
+    observeTracksWithOwnVotesUseCase: ObserveTracksWithOwnVotesUseCase,
+    private val upsertVoteUseCase: UpsertVoteUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -45,8 +41,6 @@ class TrackListVoteViewModel(
     private val playlistId = args.playlistId
 
     // data states
-//    private val _dataState =
-//        MutableStateFlow<DataState<List<Track>>>(DataState.Loading)
     val dataState = observeTracksWithOwnVotesUseCase(playlistId)
         .map { result ->
             result.fold(
@@ -63,7 +57,6 @@ class TrackListVoteViewModel(
                 }
             )
         }
-//        .onStart { DataState.Loading }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -119,28 +112,12 @@ class TrackListVoteViewModel(
     fun onChangeVote(track: Track, newVote: VoteOption) {
         viewModelScope.launch {
             Log.d(TAG, "onChangeVote: $track")
-            val result = trackListRepo.updateVote(playlistId, track.id, newVote)
-            result.onFailure { e ->
-                Log.e(TAG, "onChangeVote: ", e)
-                handleDataException(
-                    e = e,
-                    onRefresh = {
-                        viewModelScope.launch {
-                            if (authService.refreshToken().isSuccess) {
-                                onChangeVote(track, newVote)
-                            }
-                        }
-                    },
-                    onLogout = {
-                        viewModelScope.launch {
-                            authService.logout()
-                        }
-                    },
-                    onUpdateErrorMessage = {
-                        // TODO just show toast instead?
-//                        _dataState.value = DataState.Error(it) // TODO update code to usecase
-                    }
-                )
+
+            val result = upsertVoteUseCase(playlistId, track.id, newVote)
+            result.onFailure {
+                // TODO error handling
+                // upsert failed, old value was already restored
+                // show something to user
             }
         }
     }

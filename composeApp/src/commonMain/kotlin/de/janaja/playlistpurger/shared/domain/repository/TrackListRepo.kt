@@ -12,7 +12,7 @@ interface TrackListRepo {
 
     // need newVote, trackId, playlistId, userId - where should this be stored?
     // inject current user id into repo? and token datastore thing?
-    suspend fun updateVote(playlistId: String, trackId: String, newVote: VoteOption): Result<Unit>
+    suspend fun upsertVote(playlistId: String, trackId: String, newVote: VoteOption): Result<Unit>
 
     suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>>
 }
