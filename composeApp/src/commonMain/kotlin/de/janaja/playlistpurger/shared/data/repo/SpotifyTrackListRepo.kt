@@ -36,9 +36,10 @@ class SpotifyTrackListRepo(
     }
 
     // repo handles state
-    private val allTracks = MutableStateFlow<List<Track>>(listOf())
+    // TODO map with id or something to cache multiple playlists
+    private val allTracksWithOwnVotes = MutableStateFlow<List<Track>>(listOf())
 
-    override fun observeCurrentPlaylistTracks() = allTracks.asStateFlow()
+    override fun observeCurrentPlaylistTracks() = allTracksWithOwnVotes.asStateFlow()
 
     override suspend fun refreshTracksWithOwnVotes(playlistId: String): Result<Unit> {
         // TODO cache lists for ids in memory?
@@ -60,7 +61,7 @@ class SpotifyTrackListRepo(
                         val mergedTracks =
                             tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
 
-                        allTracks.value = mergedTracks
+                        allTracksWithOwnVotes.value = mergedTracks
 
                         Result.success(Unit)
                     },
@@ -103,7 +104,7 @@ class SpotifyTrackListRepo(
                 }
                 val allVotesByTrackId = voteList.groupBy { it.trackId }
                 Result.success(
-                    allTracks.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
+                    allTracksWithOwnVotes.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
                 )
             },
             onFailure = {
@@ -123,14 +124,14 @@ class SpotifyTrackListRepo(
             userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
         // store old value
-        val trackToUpdate = allTracks.value.find { it.id == trackId }
+        val trackToUpdate = allTracksWithOwnVotes.value.find { it.id == trackId }
         if (trackToUpdate == null) {
             return Result.failure(DataException.Remote.Unknown) // TODO right exception
         }
         val oldValue = trackToUpdate.vote
 
         // update locally
-        allTracks.value = allTracks.value.map {
+        allTracksWithOwnVotes.value = allTracksWithOwnVotes.value.map {
             if (it.id == trackId)
                 it.copy(vote = newVote)
             else
@@ -144,7 +145,7 @@ class SpotifyTrackListRepo(
             },
             onFailure = {
                 // rollback
-                allTracks.value = allTracks.value.map {
+                allTracksWithOwnVotes.value = allTracksWithOwnVotes.value.map {
                     if (it.id == trackId) {
                         it.copy(vote = oldValue)
                     } else {
