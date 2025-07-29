@@ -5,6 +5,7 @@ import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
+import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.LoginState
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
@@ -25,6 +26,8 @@ class SpotifyTrackListRepo(
     private val userRepo: UserRepo
 
 ) : TrackListRepo {
+
+    private val TAG = "TrackListRepo"
 
     private val tokenFlow = authService.accessToken
     private val userFlow = authService.loginState.map { state ->
@@ -120,16 +123,40 @@ class SpotifyTrackListRepo(
         val currentUserId =
             userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
-        voteApi.upsertVote(playlistId, trackId, currentUserId, newVote)
-        // TODO auf antwort warten, dabei feedback für user anzeigen, dann lokal ändern?
-        //  oder lokal ändern und alten wert cachen, dann updaten, wenn fehler user anzeigen und zurück nehmen.
+        // store old value
+        val trackToUpdate = allTracks.value.find { it.id == trackId }
+        if (trackToUpdate == null) {
+            return Result.failure(DataException.Remote.Unknown) // TODO right exception
+        }
+        val oldValue = trackToUpdate.vote
+
+        // update locally
         allTracks.value = allTracks.value.map {
             if (it.id == trackId)
                 it.copy(vote = newVote)
             else
                 it
         }
-        return Result.success(Unit)
+        // update globally
+        val updateResult = voteApi.upsertVote(playlistId, trackId, currentUserId, newVote)
+        return updateResult.fold(
+            onSuccess = {
+                Result.success(Unit)
+            },
+            onFailure = {
+                // rollback
+                allTracks.value = allTracks.value.map {
+                    if (it.id == trackId) {
+                        it.copy(vote = oldValue)
+                    } else {
+                        it
+                    }
+                }
+                Log.e(TAG, "Failed to update vote on Api, rolled back.", DataException.Remote.Unknown) //TODO real exception
+                Result.failure(DataException.Remote.Unknown)
+
+            }
+        )
     }
 
 

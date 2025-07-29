@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.shared.data.model.VoteDto
-import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 
 class MockVoteApi: VoteApi {
@@ -60,7 +59,7 @@ class MockVoteApi: VoteApi {
         trackId: String,
         userId: String,
         newVote: VoteOption
-    ) {
+    ): Result<Unit> {
 
         val oldVote =
             dummyData.firstOrNull { it.playlistId == playlistId && it.trackId == trackId && it.userId == userId }
@@ -68,6 +67,8 @@ class MockVoteApi: VoteApi {
         dummyData.remove(oldVote)
 
         dummyData.add(VoteDto(playlistId, trackId, userId, newVote))
+
+        return Result.success(Unit)
     }
 
 }
