@@ -19,7 +19,7 @@ class SpotifyAuthService(
     private val webApi: SpotifyWebApi,
     private val accountApi: SpotifyAccountApi
 ) : AuthService {
-    private val TAG = "AuthRepo"
+    private val TAG = "AuthService"
 
     private val clientSecret = hiddenClientSecret // TODO switch to kcmp
     private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
@@ -73,6 +73,8 @@ class SpotifyAuthService(
                 Log.d(TAG, "token is valid -> logged in")
                 return UserLoginState.LoggedIn(user.toUser())
             }.onFailure { e ->
+                // TODO wenn man kein internet hat gibt: java.net.UnknownHostException
+                //  grade endlos splash screen
                 Log.e(TAG, "loading current user failed: ", e)
                 when (e) {
                     DataException.Remote.InvalidAccessToken -> {
