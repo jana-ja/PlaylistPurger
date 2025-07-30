@@ -7,6 +7,7 @@ import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.LoginResult
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
+import de.janaja.playlistpurger.features.auth.domain.usecase.InitiateThirdPartyAuthUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.LoginWithCodeUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveThirdPartyAuthResultUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveUserLoginStateUseCase
@@ -17,13 +18,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
+    private val initiateThirdPartyAuthUseCase: InitiateThirdPartyAuthUseCase,
     observeUserLoginStateUseCase: ObserveUserLoginStateUseCase,
     private val observeThirdPartyAuthResultUseCase: ObserveThirdPartyAuthResultUseCase,
     private val loginWithCodeUseCase: LoginWithCodeUseCase,
 ) : ViewModel() {
-
-    private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
-    private val redirectUri = "asdf://callback"
 
     private val TAG = "AuthViewModel"
 
@@ -38,24 +37,16 @@ class AuthViewModel(
     private val _errorMessage = MutableStateFlow<UiText?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
-
     init {
         observeLoginResult()
     }
 
     fun startLoginProcess(uriHandler: UriHandler) {
 
-        // TODO
-        val urlString = "https://accounts.spotify.com/de/authorize?" +
-                "scope=playlist-read-private" +
-                "&response_type=code" +
-                "&redirect_uri=asdf%3A%2F%2Fcallback" +
-                "&client_id=1f7401f5d27847b99a6dfe6908c5ccac" +
-                "&show_dialog=true"
-
-        uriHandler.openUri(
-            uri = urlString,
-        )
+        val result = initiateThirdPartyAuthUseCase(uriHandler)
+        result.onFailure {
+            // TODO error handling
+        }
     }
 
     private fun observeLoginResult() {

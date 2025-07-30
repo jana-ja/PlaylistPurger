@@ -92,6 +92,16 @@ class SpotifyAuthService(
         }
     }
 
+    override fun getAuthenticationUrl(): String {
+        val urlString = "https://accounts.spotify.com/de/authorize?" +
+                "scope=playlist-read-private" +
+                "&response_type=code" +
+                "&redirect_uri=$redirectUri" + // asdf%3A%2F%2Fcallback
+                "&client_id=$clientId" +
+                "&show_dialog=true"
+        return urlString
+    }
+
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun refreshToken(): Result<Unit> {
         // unsuccessful -> call logout - this will delete token and trigger checkToken to set the loginState

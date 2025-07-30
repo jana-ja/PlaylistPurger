@@ -30,6 +30,10 @@ class MockAuthService(
         }
     }
 
+    override fun getAuthenticationUrl(): String {
+        return ""
+    }
+
     override suspend fun logout() {
 
     }
