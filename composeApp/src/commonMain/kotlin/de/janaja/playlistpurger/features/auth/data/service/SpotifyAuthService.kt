@@ -3,7 +3,7 @@ package de.janaja.playlistpurger.features.auth.data.service
 import de.janaja.playlistpurger.features.auth.data.remote.SpotifyAccountApi
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.core.domain.exception.DataException
-import de.janaja.playlistpurger.features.auth.domain.model.LoginState
+import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.core.util.Log
@@ -29,7 +29,7 @@ class SpotifyAuthService(
 
     private val refreshTokenFlow = tokenRepo.refreshTokenFlow
 
-    override val loginState = accessToken
+    override val userLoginState = accessToken
         .map { checkToken(it) }
 
 
@@ -59,19 +59,19 @@ class SpotifyAuthService(
 
     }
 
-    private suspend fun checkToken(token: String?): LoginState {
+    private suspend fun checkToken(token: String?): UserLoginState {
         Log.d(TAG, "received token: $token")
 
         if (token == null) {
             Log.d(TAG, "no saved token -> logged out")
-            return LoginState.LoggedOut
+            return UserLoginState.LoggedOut
         } else {
             Log.d(TAG, "found saved token -> check if valid by loading current user")
             val result = this.webApi.getCurrentUser("Bearer $token")
 
             result.onSuccess { user ->
                 Log.d(TAG, "token is valid -> logged in")
-                return LoginState.LoggedIn(user.toUser())
+                return UserLoginState.LoggedIn(user.toUser())
             }.onFailure { e ->
                 Log.e(TAG, "loading current user failed: ", e)
                 when (e) {
@@ -86,7 +86,7 @@ class SpotifyAuthService(
                 }
                 // TODO improve error handling and think about loadingState flows in exception case (endless refresh/reload or loadingState?)
             }
-            return LoginState.Loading
+            return UserLoginState.Loading
         }
     }
 

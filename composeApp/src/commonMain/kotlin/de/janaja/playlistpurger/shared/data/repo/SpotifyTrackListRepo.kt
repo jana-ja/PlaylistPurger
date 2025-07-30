@@ -2,7 +2,7 @@ package de.janaja.playlistpurger.shared.data.repo
 
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.util.Log
-import de.janaja.playlistpurger.features.auth.domain.model.LoginState
+import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
@@ -28,8 +28,8 @@ class SpotifyTrackListRepo(
     private val TAG = "TrackListRepo"
 
     private val tokenFlow = authService.accessToken
-    private val userFlow = authService.loginState.map { state ->
-        if (state is LoginState.LoggedIn)
+    private val userFlow = authService.userLoginState.map { state ->
+        if (state is UserLoginState.LoggedIn)
             return@map state.user
         else
             return@map null

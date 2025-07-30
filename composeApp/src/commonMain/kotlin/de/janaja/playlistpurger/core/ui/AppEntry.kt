@@ -3,7 +3,7 @@ package de.janaja.playlistpurger.core.ui
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import de.janaja.playlistpurger.features.auth.domain.model.LoginState
+import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.presentation.screen.WelcomeScreen
 import de.janaja.playlistpurger.core.ui.theme.PlaylistPurgerTheme
 import de.janaja.playlistpurger.features.auth.presentation.viewmodel.AuthViewModel
@@ -13,19 +13,19 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppEntry() {
     val authViewModel: AuthViewModel = koinViewModel()
 
-    val loginState by authViewModel.loginState.collectAsState()
+    val loginState by authViewModel.userLoginState.collectAsState()
 
     PlaylistPurgerTheme {
         when (loginState) {
-            LoginState.Loading -> {
+            UserLoginState.Loading -> {
                 SplashScreen()
             }
 
-            is LoginState.LoggedIn -> {
+            is UserLoginState.LoggedIn -> {
                 MainAppScaffold()
             }
 
-            LoginState.LoggedOut -> {
+            UserLoginState.LoggedOut -> {
                 WelcomeScreen(
                     modifier = Modifier.statusBarsPadding()
                 )

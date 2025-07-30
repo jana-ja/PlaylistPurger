@@ -4,8 +4,7 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.janaja.playlistpurger.features.auth.domain.model.LoginResult
-import de.janaja.playlistpurger.features.auth.domain.model.LoginState
-import de.janaja.playlistpurger.features.auth.domain.service.AuthService
+import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.ui.util.handleDataException
 import de.janaja.playlistpurger.core.util.Log
@@ -26,12 +25,11 @@ class AuthViewModel(
 
     private val TAG = "AuthViewModel"
 
-
-    val loginState = authService.loginState
+    val userLoginState = observeUserLoginStateUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = LoginState.Loading
+            initialValue = UserLoginState.Loading
         )
 
     // TODO how to show?
