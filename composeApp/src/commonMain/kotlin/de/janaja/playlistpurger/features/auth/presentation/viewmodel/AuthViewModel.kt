@@ -3,12 +3,13 @@ package de.janaja.playlistpurger.features.auth.presentation.viewmodel
 import androidx.compose.ui.platform.UriHandler
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.janaja.playlistpurger.core.ui.util.UiText
+import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.LoginResult
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
-import de.janaja.playlistpurger.core.ui.util.UiText
-import de.janaja.playlistpurger.core.ui.util.handleDataException
-import de.janaja.playlistpurger.core.util.Log
-import de.janaja.playlistpurger.features.auth.domain.helper.OAuthResponseHelper
+import de.janaja.playlistpurger.features.auth.domain.usecase.LoginWithCodeUseCase
+import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveLoginResponseResultUseCase
+import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveUserLoginStateUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +17,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val authService: AuthService,
-    private val oAuthResponseHelper: OAuthResponseHelper
+    observeUserLoginStateUseCase: ObserveUserLoginStateUseCase,
+    private val observeLoginResponseResultUseCase: ObserveLoginResponseResultUseCase,
+    private val loginWithCodeUseCase: LoginWithCodeUseCase,
 ) : ViewModel() {
 
     private val clientId = "1f7401f5d27847b99a6dfe6908c5ccac"
@@ -36,27 +38,33 @@ class AuthViewModel(
     private val _errorMessage = MutableStateFlow<UiText?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
-    private val loginResultFlow = oAuthResponseHelper.loginResult
 
     init {
-        viewModelScope.launch {
-            loginResultFlow.collect { loginResult ->
-                handleLoginResult(loginResult)
-            }
-        }
+        observeLoginResult()
     }
-
 
     fun startLoginProcess(uriHandler: UriHandler) {
 
         // TODO
-        val urlString = "https://accounts.spotify.com/de/authorize?scope=playlist-read-private&response_type=code&redirect_uri=asdf%3A%2F%2Fcallback&client_id=1f7401f5d27847b99a6dfe6908c5ccac&show_dialog=true"
-//    val urlString = "https://accounts.spotify.com/de/login?continue=https%3A%2F%2Faccounts.spotify.com%2Fauthorize%3Fscope%3Dplaylist-read-private%26response_type%3Dcode%26redirect_uri%3Dasdf%253A%252F%252Fcallback%26client_id%3D1f7401f5d27847b99a6dfe6908c5ccac%26show_dialog%3Dtrue"
-
+        val urlString = "https://accounts.spotify.com/de/authorize?" +
+                "scope=playlist-read-private" +
+                "&response_type=code" +
+                "&redirect_uri=asdf%3A%2F%2Fcallback" +
+                "&client_id=1f7401f5d27847b99a6dfe6908c5ccac" +
+                "&show_dialog=true"
 
         uriHandler.openUri(
             uri = urlString,
         )
+    }
+
+    private fun observeLoginResult() {
+        viewModelScope.launch {
+            val loginResultFlow = observeLoginResponseResultUseCase()
+            loginResultFlow.collect { loginResult ->
+                handleLoginResult(loginResult)
+            }
+        }
     }
 
     private fun handleLoginResult(loginResult: LoginResult) {
@@ -65,24 +73,11 @@ class AuthViewModel(
                 Log.e(TAG, "error logging in: ${loginResult.errorMessage}")
             }
             is LoginResult.SuccessLoginResult -> {
+
                 viewModelScope.launch {
-                    val authResult = authService.loginWithCode(loginResult.code)
-                    authResult.onFailure { e ->
-                        Log.e(TAG, "handleLoginResult: ", e)
-                        handleDataException(
-                            e = e,
-                            onRefresh = {
-                                viewModelScope.launch {
-                                    authService.refreshToken()
-                                }
-                            },
-                            onLogout = {
-                                viewModelScope.launch {
-                                    authService.logout()
-                                }
-                            },
-                            onUpdateErrorMessage = { _errorMessage.value = it }
-                        )
+                    val result = loginWithCodeUseCase(loginResult.code)
+                    result.onFailure {
+                        // TODO error handling
                     }
                 }
             }
