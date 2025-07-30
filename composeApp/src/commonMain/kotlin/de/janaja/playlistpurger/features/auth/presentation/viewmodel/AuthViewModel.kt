@@ -8,7 +8,7 @@ import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.LoginResult
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.domain.usecase.LoginWithCodeUseCase
-import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveLoginResponseResultUseCase
+import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveThirdPartyAuthResultUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveUserLoginStateUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     observeUserLoginStateUseCase: ObserveUserLoginStateUseCase,
-    private val observeLoginResponseResultUseCase: ObserveLoginResponseResultUseCase,
+    private val observeThirdPartyAuthResultUseCase: ObserveThirdPartyAuthResultUseCase,
     private val loginWithCodeUseCase: LoginWithCodeUseCase,
 ) : ViewModel() {
 
@@ -60,7 +60,7 @@ class AuthViewModel(
 
     private fun observeLoginResult() {
         viewModelScope.launch {
-            val loginResultFlow = observeLoginResponseResultUseCase()
+            val loginResultFlow = observeThirdPartyAuthResultUseCase()
             loginResultFlow.collect { loginResult ->
                 handleLoginResult(loginResult)
             }
