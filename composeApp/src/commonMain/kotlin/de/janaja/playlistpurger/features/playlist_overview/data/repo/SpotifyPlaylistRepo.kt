@@ -26,12 +26,17 @@ class SpotifyPlaylistRepo(
         return result.fold(
             onSuccess = { playlistResponse ->
 
+                val uniqueUserIds = playlistResponse.items.map { it.owner.id }.distinct()
+
+                val userMap = uniqueUserIds.associateWith {
+                    userRepo.getUserForId(it).fold(
+                        onSuccess = { user -> user },
+                        onFailure = { null }
+                    )
+                }
+
                 Result.success(playlistResponse.items.map {
-                    val user = userRepo.getUserForId(it.owner.id)
-                        .fold(
-                            onSuccess = { user -> user },
-                            onFailure = { null }
-                        )
+                    val user = userMap[it.owner.id]
                     it.toPlaylist(user)
                 })
             },

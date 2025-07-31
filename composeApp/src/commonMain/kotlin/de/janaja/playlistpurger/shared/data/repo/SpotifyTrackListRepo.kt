@@ -87,14 +87,19 @@ class SpotifyTrackListRepo(
         val allVotesResult = voteApi.getAllVotesForPlaylist(playlistId)
         return allVotesResult.fold(
             onSuccess = { voteDtoList ->
-                // TODO load each user just once, maybe in UserRepo with in-memory cache map of user ids and user
-                //  then coordinate from use case?
+
+                val uniqueUserIds = voteDtoList.map { it.userId }.distinct()
+
+                val userMap = uniqueUserIds.associateWith {
+                    userRepo.getUserForId(it).fold(
+                        onSuccess = { user -> user },
+                        onFailure = { null }
+                    )
+                }
+
                 val voteList = voteDtoList.map {
-                    val user = userRepo.getUserForId(it.userId)
-                        .fold(
-                            onSuccess = { user -> user },
-                            onFailure = { null }
-                        )
+                    val user = userMap[it.userId]
+                    // TODO how to handle null in app?
                     Vote(
                         playlistId = it.playlistId,
                         trackId = it.trackId,
@@ -112,7 +117,6 @@ class SpotifyTrackListRepo(
             }
         )
     }
-
 
 
     override suspend fun upsertVote(
