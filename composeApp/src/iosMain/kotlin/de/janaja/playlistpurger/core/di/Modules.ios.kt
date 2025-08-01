@@ -7,10 +7,8 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
 
-    // TODO
     single<HttpClientEngine> { Darwin.create() }
 
-    // DataStore - module specific
     single {
         DataStoreFactory().create()
     }
