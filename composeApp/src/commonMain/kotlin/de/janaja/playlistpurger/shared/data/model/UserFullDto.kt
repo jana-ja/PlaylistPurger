@@ -5,13 +5,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserDto(
+data class UserFullDto(
     val id: String,
     @SerialName("display_name")
     val displayName: String, // in playlist tracks: added by hat dieses field nicht
     val images: List<ImageDto> // 0 -> big image 300:300, 1 -> thumbnail 64:64
 )
-fun UserDto.toUser(): User {
+fun UserFullDto.toUser(): User {
     return User(
         id = this.id,
         name = this.displayName,
