@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface SettingsRepo {
 
     fun observeSettings(): Flow<Settings>
-    suspend fun updateShowSwipeFirst(value: Boolean)
+    suspend fun updateShowSwipeFirst(value: Boolean): Result<Unit>
 }

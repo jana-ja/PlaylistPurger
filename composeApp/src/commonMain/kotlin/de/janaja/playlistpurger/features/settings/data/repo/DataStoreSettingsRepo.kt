@@ -20,10 +20,14 @@ class DataStoreSettingsRepo(
             )
         }
     }
-    override suspend fun updateShowSwipeFirst(value: Boolean) {
-        // TODO error handling IO Exception
-        dataStore.edit { preferences ->
-            preferences[DatastoreKeys.showSwipeFirst]
+    override suspend fun updateShowSwipeFirst(value: Boolean): Result<Unit> {
+       return try {
+            dataStore.edit { preferences ->
+                preferences[DatastoreKeys.showSwipeFirst]
+            }
+           return Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }

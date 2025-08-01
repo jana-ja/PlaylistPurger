@@ -26,7 +26,10 @@ class SettingsViewModel(
 
     fun updateShowSwipeFirst(newValue: Boolean) {
         viewModelScope.launch {
-            updateShowSwipeFirstSettingUseCase(newValue)
+            val result = updateShowSwipeFirstSettingUseCase(newValue)
+            result.onFailure {
+                // TODO do something
+            }
         }
     }
 
