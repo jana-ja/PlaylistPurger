@@ -1,33 +1,40 @@
 package de.janaja.playlistpurger.features.auth.data.repo
 
-import de.janaja.playlistpurger.features.settings.data.local.DataStorePreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import de.janaja.playlistpurger.features.settings.data.local.DatastoreKeys
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
+import kotlinx.coroutines.flow.map
 
-// TODO update this remove dataStorePreferences
 class DataStoreTokenRepo(
-    private val dataStorePreferences: DataStorePreferences
+    private val dataStore: DataStore<Preferences>
 ): TokenRepo {
 
-    override val accessTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.accessToken)
-    override val refreshTokenFlow = dataStorePreferences.getSecurePreference(DatastoreKeys.refreshToken)
+    override val accessTokenFlow = dataStore.data.map { preferences ->
+        preferences[DatastoreKeys.accessToken]
+    }
+
+    override val refreshTokenFlow = dataStore.data.map { preferences ->
+        preferences[DatastoreKeys.refreshToken]
+    }
 
     override suspend fun updateAccessToken(token: String) {
-        dataStorePreferences.putSecurePreference(
-            DatastoreKeys.accessToken,
-            token
-        )
+        dataStore.edit { preferences ->
+            preferences[DatastoreKeys.accessToken] = token
+        }
     }
 
     override suspend fun updateRefreshToken(token: String) {
-        dataStorePreferences.putSecurePreference(
-            DatastoreKeys.refreshToken,
-            token
-        )
+        dataStore.edit { preferences ->
+            preferences[DatastoreKeys.refreshToken] = token
+        }
     }
 
     override suspend fun deleteAllToken() {
-        dataStorePreferences.removePreference(DatastoreKeys.accessToken)
-        dataStorePreferences.removePreference(DatastoreKeys.refreshToken)
+        dataStore.edit { preferences ->
+            preferences.remove(DatastoreKeys.accessToken)
+            preferences.remove(DatastoreKeys.refreshToken)
+        }
     }
 }

@@ -11,7 +11,6 @@ import de.janaja.playlistpurger.features.auth.data.service.SpotifyAuthService
 import de.janaja.playlistpurger.features.auth.domain.helper.OAuthResponseHelper
 import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
-import de.janaja.playlistpurger.features.settings.data.local.DataStorePreferences
 import de.janaja.playlistpurger.shared.data.remote.KtorSpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.MockVoteApi
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
@@ -63,13 +62,6 @@ val coreModule = module {
         get<DataStoreFactory>().create()
     }
 
-    // DataStorePreferences uses DataStore
-    single {
-        DataStorePreferences(
-//            SecurityUtil(),
-            get()
-        )
-    }
     // TokenRepo
     single<TokenRepo> {
         DataStoreTokenRepo(get())
