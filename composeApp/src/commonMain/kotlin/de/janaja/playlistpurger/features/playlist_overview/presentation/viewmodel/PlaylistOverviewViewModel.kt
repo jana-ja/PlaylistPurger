@@ -76,7 +76,6 @@ class PlaylistOverviewViewModel(
     fun onSearchTextChange(value: String) {
         _searchQuery.value = value
 
-        // TODO
         if (_searchQuery.value.isNotBlank()) {
             _filtering.value = Filter.PlaylistFilter(value)
         } else {
