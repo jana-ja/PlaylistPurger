@@ -3,14 +3,16 @@ package de.janaja.playlistpurger.core.domain.usecase
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.usecase.LogoutUseCase
-import de.janaja.playlistpurger.features.auth.domain.usecase.RefreshTokenUseCase
+import de.janaja.playlistpurger.features.auth.domain.usecase.RefreshTokenOrLogoutUseCase
 
-// TODO richtig einsortieren
 class ExecuteAuthenticatedRequestUseCase(
-    private val refreshTokenUseCase: RefreshTokenUseCase,
+    private val refreshTokenOrLogoutUseCase: RefreshTokenOrLogoutUseCase,
     private val logoutUseCase: LogoutUseCase
 ) {
-    private val TAG = "ExecuteAuthenticatedRequestUseCase"
+    companion object {
+        private const val TAG = "ExecuteAuthenticatedRequestUseCase"
+    }
+
     suspend operator fun <T> invoke(request: suspend () -> Result<T>): Result<T> {
         Log.d("ExecuteAuthenticatedRequestUseCase", "invoke")
         val result = request()
@@ -24,15 +26,12 @@ class ExecuteAuthenticatedRequestUseCase(
 
                         Log.i(TAG, "access token is invalid\ntry to refresh...")
 
-                        refreshTokenUseCase().fold(
+                        refreshTokenOrLogoutUseCase().fold(
                             onSuccess = {
                                 // try again after refresh
                                 return request()
                             },
                             onFailure = {
-                                // TODO logout here?
-                                //  is logout handled automatically by checkToken in authService? should it really?
-                                //  handle logout from viewmodel?
                                 return Result.failure(it)
                             }
                         )

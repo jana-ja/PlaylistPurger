@@ -5,7 +5,7 @@ import de.janaja.playlistpurger.features.auth.domain.usecase.LoginWithCodeUseCas
 import de.janaja.playlistpurger.features.auth.domain.usecase.LogoutUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveThirdPartyAuthResultUseCase
 import de.janaja.playlistpurger.features.auth.domain.usecase.ObserveUserLoginStateUseCase
-import de.janaja.playlistpurger.features.auth.domain.usecase.RefreshTokenUseCase
+import de.janaja.playlistpurger.features.auth.domain.usecase.RefreshTokenOrLogoutUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
@@ -16,5 +16,5 @@ val authModule = module {
     factoryOf(::LogoutUseCase)
     factoryOf(::ObserveThirdPartyAuthResultUseCase)
     factoryOf(::ObserveUserLoginStateUseCase)
-    factoryOf(::RefreshTokenUseCase)
+    factoryOf(::RefreshTokenOrLogoutUseCase)
 }

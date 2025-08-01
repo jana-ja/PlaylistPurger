@@ -30,7 +30,7 @@ class SpotifyAuthService(
     private val refreshTokenFlow = tokenRepo.refreshTokenFlow
 
     override val userLoginState = accessToken
-        .map { checkToken(it) }
+        .map { checkSavedToken(it) }
 
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -59,7 +59,7 @@ class SpotifyAuthService(
 
     }
 
-    private suspend fun checkToken(token: String?): UserLoginState {
+    private suspend fun checkSavedToken(token: String?): UserLoginState {
         Log.d(TAG, "received token: $token")
 
         if (token == null) {
@@ -80,10 +80,12 @@ class SpotifyAuthService(
                     DataException.Remote.InvalidAccessToken -> {
                         Log.d(TAG, "token is not valid - try to refresh")
 
-                        if (refreshToken().isFailure) {
+                        if (refreshTokenOrLogout().isFailure) {
                             // TODO show something to user, maybe go default exception handling function path
-                            logout()
+                            return UserLoginState.LoggedOut
+
                         }
+                        // TODO if successful try to load user again?
                     }
                 }
                 // TODO improve error handling and think about loadingState flows in exception case (endless refresh/reload or loadingState?)
@@ -103,7 +105,7 @@ class SpotifyAuthService(
     }
 
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun refreshToken(): Result<Unit> {
+    override suspend fun refreshTokenOrLogout(): Result<Unit> {
         // unsuccessful -> call logout - this will delete token and trigger checkToken to set the loginState
         // successful -> update access token - this will trigger checkToken to set the loginState
 
@@ -123,19 +125,21 @@ class SpotifyAuthService(
                 refreshToken = value,
             )
 
-            result.onSuccess { tokenRequestResponse ->
-                Log.d(TAG, "got fresh access token -> save it")
-                tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
-                if (tokenRequestResponse.refreshToken != "") {
-                    tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+            result.fold(
+                onSuccess = { tokenRequestResponse ->
+                    Log.d(TAG, "got fresh access token -> save it")
+                    tokenRepo.updateAccessToken(tokenRequestResponse.accessToken)
+                    if (tokenRequestResponse.refreshToken != "") {
+                        tokenRepo.updateRefreshToken(tokenRequestResponse.refreshToken)
+                    }
+                    return Result.success(Unit)
+                },
+                onFailure = { e ->
+                    Log.e(TAG, "refreshToken: getting fresh access token failed. Logging out", e)
+                    logout()
+                    return Result.failure(e)
                 }
-                return Result.success(Unit)
-            }.onFailure { e ->
-                Log.e(TAG, "refreshToken: ", e)
-                return Result.failure(e)
-            }
-            // TODO
-            return Result.failure(DataException.Remote.Unknown)
+            )
         }
     }
 
