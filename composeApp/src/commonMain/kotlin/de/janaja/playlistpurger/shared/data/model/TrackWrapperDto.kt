@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.shared.data.model
 
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.TrackAdder
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,7 +13,7 @@ data class TrackWrapperDto(
     val addedBy: UserRefDto,
 )
 
-fun TrackWrapperDto.toTrack(voteOption: VoteOption?, addedBy: TrackAdder): Track {
+fun TrackWrapperDto.toTrack(voteOption: VoteOption?, addedBy: UserDetails): Track {
     return Track(
         id = this.track.id,
         name = this.track.name,

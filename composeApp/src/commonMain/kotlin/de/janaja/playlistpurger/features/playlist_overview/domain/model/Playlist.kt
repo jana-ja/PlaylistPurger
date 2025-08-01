@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.features.playlist_overview.domain.model
 
-import de.janaja.playlistpurger.shared.domain.model.User
+import de.janaja.playlistpurger.shared.domain.model.UserWithName
 
 data class Playlist(
     val id: String,
@@ -11,5 +11,5 @@ data class Playlist(
     val imageUrl: String?, // nullable?
     val trackCount: Int,
 //    val tracks: List<Track>,
-    val owner: User?, // TODO?
+    val owner: UserWithName
 )

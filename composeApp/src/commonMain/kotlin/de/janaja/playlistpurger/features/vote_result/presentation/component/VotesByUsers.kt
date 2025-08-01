@@ -12,13 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.CircleUserImage
-import de.janaja.playlistpurger.shared.domain.model.User
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun VotesByUsers(
-    usersByVoteOption: Map<VoteOption, List<User?>>,
+    usersByVoteOption: Map<VoteOption, List<UserDetails>>,
     modifier: Modifier = Modifier
 ) {
 
@@ -40,12 +40,10 @@ fun VotesByUsers(
                 )
                 Spacer(Modifier.width(4.dp))
                 usersByVoteOption[vote]?.forEach { user ->
-                    user?.let { user ->
-                        CircleUserImage(
-                            user,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    CircleUserImage(
+                        user,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }

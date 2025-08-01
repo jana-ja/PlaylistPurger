@@ -1,8 +1,8 @@
 package de.janaja.playlistpurger.features.playlist_overview.data.repo
 
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
-import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 
 class MockPlaylistRepo(
     private val isSuccessFul: Boolean
@@ -17,10 +17,10 @@ class MockPlaylistRepo(
             public = true,
             imageUrl = "",
             trackCount = 5,
-            owner = User(
+            owner = UserDetails.Full(
                 "0",
                 name = "Test User",
-                thumbnailImage = "https://i.scdn.co/image/ab67757000003b82f63072e4fad4e5170c1fda52"
+                thumbnailUrl = "https://i.scdn.co/image/ab67757000003b82f63072e4fad4e5170c1fda52"
             )
         )
 

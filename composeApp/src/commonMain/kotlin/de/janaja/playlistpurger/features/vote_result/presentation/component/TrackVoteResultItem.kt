@@ -33,8 +33,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import de.janaja.playlistpurger.core.ui.component.CircleUserImage
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.User
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import org.jetbrains.compose.resources.painterResource
 import playlistpurger.composeapp.generated.resources.Res
@@ -44,8 +45,7 @@ import playlistpurger.composeapp.generated.resources.outline_question_mark_24
 @Composable
 fun TrackVoteResultItem(
     track: Track,
-    usersByVoteOption: Map<VoteOption, List<User?>>,
-
+    usersByVoteOption: Map<VoteOption, List<UserDetails>>,
     modifier: Modifier = Modifier
 ) {
 
@@ -133,6 +133,20 @@ fun TrackVoteResultItem(
                         style = MaterialTheme.typography.bodyLarge,
                         maxLines = 1
                     )
+                }
+
+                if (textColumnSize.height > 0) {
+                    CircleUserImage(
+                        track.addedBy,
+                        modifier = Modifier
+                            .size(
+                                width = with(density) { (textColumnSize.height/1.5f).toDp() },
+                                height = with(density) { (textColumnSize.height/1.5f).toDp() }
+                            )
+                    )
+                } else {
+                    // Placeholder
+                    Box(modifier = Modifier.size(1.dp))
                 }
             }
 

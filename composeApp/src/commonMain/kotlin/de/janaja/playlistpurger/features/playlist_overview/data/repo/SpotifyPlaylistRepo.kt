@@ -6,6 +6,7 @@ import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.features.playlist_overview.domain.repo.PlaylistRepo
 import de.janaja.playlistpurger.features.playlist_overview.data.model.toPlaylist
+import de.janaja.playlistpurger.shared.data.model.toUserDetails
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -36,8 +37,9 @@ class SpotifyPlaylistRepo(
                 }
 
                 Result.success(playlistResponse.items.map {
-                    val user = userMap[it.owner.id]
-                    it.toPlaylist(user)
+                    val userDto = it.owner
+                    val userDetails = userMap[it.owner.id] ?: userDto.toUserDetails()
+                    it.toPlaylist(userDetails)
                 })
             },
             onFailure = {

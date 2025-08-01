@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.shared.data.model
 
-import de.janaja.playlistpurger.shared.domain.model.User
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
+import de.janaja.playlistpurger.shared.domain.model.UserWithName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,12 +12,20 @@ data class UserFullDto(
     val displayName: String, // in playlist tracks: added by hat dieses field nicht
     val images: List<ImageDto> // 0 -> big image 300:300, 1 -> thumbnail 64:64
 )
-fun UserFullDto.toUser(): User {
-    return User(
-        id = this.id,
-        name = this.displayName,
-        thumbnailImage = this.images.getOrNull(1)?.url
-    )
+fun UserFullDto.toUser(): UserWithName {
+    val thumbnailUrl = this.images.getOrNull(1)?.url
+    return if (thumbnailUrl != null) {
+        UserDetails.Full(
+            id = this.id,
+            name = this.displayName,
+            thumbnailUrl = thumbnailUrl
+        )
+    } else {
+        UserDetails.Partial(
+            id = this.id,
+            name = this.displayName,
+        )
+    }
 }
 /*
 "owner": {

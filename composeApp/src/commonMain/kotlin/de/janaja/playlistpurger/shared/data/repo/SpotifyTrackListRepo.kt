@@ -6,10 +6,11 @@ import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.model.toTrack
+import de.janaja.playlistpurger.shared.data.model.toUserDetails
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.TrackAdder
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
@@ -44,7 +45,8 @@ class SpotifyTrackListRepo(
             return@map null
     }
 
-    private val trackListCache: MutableMap<String, List<Track>> = ConcurrentLruCache(MAX_CACHED_PLAYLISTS)
+    private val trackListCache: MutableMap<String, List<Track>> =
+        ConcurrentLruCache(MAX_CACHED_PLAYLISTS)
 
     // repo handles state
     private val currentTracksWithOwnVotes = MutableStateFlow<List<Track>>(listOf())
@@ -65,15 +67,17 @@ class SpotifyTrackListRepo(
                 "loadCurrentPlaylistTracks: did not find trackList in cache. try loading from api"
             )
             val token =
-                tokenFlow.first() ?: return@withContext Result.failure(DataException.Auth.MissingAccessToken)
+                tokenFlow.first()
+                    ?: return@withContext Result.failure(DataException.Auth.MissingAccessToken)
             val currentUserId =
-                userFlow.first()?.id ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
+                userFlow.first()?.id
+                    ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
 
             val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
 
             return@withContext tracksResult.fold(
                 onSuccess = { tracksResponse ->
-                    val tracksFromSpotify = tracksResponse.items//.map { it.track }
+                    val tracksFromSpotify = tracksResponse.items
                     val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
 
                     votesResult.fold(
@@ -91,14 +95,20 @@ class SpotifyTrackListRepo(
 
                             val mergedTracks =
                                 tracksFromSpotify.map { trackWrapper ->
-                                    val userId = trackWrapper.addedBy.id
-                                    val user = userMap[trackWrapper.addedBy.id]
-                                    val trackAdderInfo: TrackAdder = if (user != null) TrackAdder.FullUser(user) else TrackAdder.IdOnly(userId)
+                                    val userDto = trackWrapper.addedBy
+                                    val userWithName =
+                                        userMap[trackWrapper.addedBy.id]
+                                    // TODO have to type check here because i return UserWithName in toUser extension of UserFullDto if there is no thumbnail image. want it like that?
+                                    val userDetails = when (userWithName) {
+                                        is UserDetails.Full -> userWithName
+                                        is UserDetails.Partial -> userWithName
+                                        else -> userDto.toUserDetails()
+                                    }
 
                                     trackWrapper.toTrack(
                                         votesForPlaylist.firstOrNull { it.trackId == trackWrapper.track.id }?.voteOption,
-                                        trackAdderInfo
-                                        )
+                                        userDetails
+                                    )
 
                                 }
 
@@ -138,18 +148,29 @@ class SpotifyTrackListRepo(
                 }
 
                 val voteList = voteDtoList.map {
-                    val user = userMap[it.userId]
-                    // TODO how to handle null in app?
+                    val userWithName =
+                        userMap[it.userId]
+                    // TODO have to type check here because i return UserWithName in toUser extension of UserFullDto if there is no thumbnail image. want it like that?
+                    val userDetails = when (userWithName) {
+                        is UserDetails.Full -> userWithName
+                        is UserDetails.Partial -> userWithName
+                        else -> UserDetails.Minimal(it.userId)
+                    }
                     Vote(
                         playlistId = it.playlistId,
                         trackId = it.trackId,
-                        user = user,
+                        user = userDetails,
                         voteOption = it.voteOption
                     )
                 }
                 val allVotesByTrackId = voteList.groupBy { it.trackId }
                 Result.success(
-                    currentTracksWithOwnVotes.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
+                    currentTracksWithOwnVotes.value.map {
+                        Pair(
+                            it,
+                            allVotesByTrackId[it.id] ?: emptyList()
+                        )
+                    }
                 )
             },
             onFailure = {
