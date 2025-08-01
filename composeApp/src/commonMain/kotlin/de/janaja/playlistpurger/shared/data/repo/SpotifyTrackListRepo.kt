@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.shared.data.repo
 
 import de.janaja.playlistpurger.core.domain.exception.DataException
+import de.janaja.playlistpurger.core.util.ConcurrentLruCache
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
@@ -12,10 +13,13 @@ import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class SpotifyTrackListRepo(
     authService: AuthService,
@@ -25,7 +29,11 @@ class SpotifyTrackListRepo(
 
 ) : TrackListRepo {
 
-    private val TAG = "TrackListRepo"
+    private companion object {
+
+        const val TAG = "TrackListRepo"
+        const val MAX_CACHED_PLAYLISTS = 5
+    }
 
     private val tokenFlow = authService.accessToken
     private val userFlow = authService.userLoginState.map { state ->
@@ -35,53 +43,63 @@ class SpotifyTrackListRepo(
             return@map null
     }
 
+    private val trackListCache: MutableMap<String, List<Track>> = ConcurrentLruCache(MAX_CACHED_PLAYLISTS)
+
     // repo handles state
-    // TODO map with id or something to cache multiple playlists
-    private val allTracksWithOwnVotes = MutableStateFlow<List<Track>>(listOf())
+    private val currentTracksWithOwnVotes = MutableStateFlow<List<Track>>(listOf())
 
-    override fun observeCurrentPlaylistTracks() = allTracksWithOwnVotes.asStateFlow()
+    override fun observeCurrentPlaylistTracks() = currentTracksWithOwnVotes.asStateFlow()
 
-    override suspend fun refreshTracksWithOwnVotes(playlistId: String): Result<Unit> {
-        // TODO cache lists for ids in memory?
-        val token =
-            tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-        val currentUserId =
-            userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
+    override suspend fun loadCurrentPlaylistTracks(playlistId: String): Result<Unit> {
 
-        val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
-
-        return tracksResult.fold(
-            onSuccess = { tracksResponse ->
-                // TODO parallel
-                val tracksFromSpotify = tracksResponse.items.map { it.track }
-                val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
-
-                votesResult.fold(
-                    onSuccess = { votesForPlaylist ->
-                        val mergedTracks =
-                            tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
-
-                        allTracksWithOwnVotes.value = mergedTracks
-
-                        Result.success(Unit)
-                    },
-                    onFailure = { e ->
-                        Result.failure(e)
-                    }
-                )
-            },
-            onFailure = {
-                Result.failure(it)
+        return withContext(Dispatchers.IO) {
+            trackListCache[playlistId]?.let { cachedTrackList ->
+                Log.d(TAG, "loadCurrentPlaylistTracks: found trackList in cache")
+                currentTracksWithOwnVotes.value = cachedTrackList
+                return@withContext Result.success(Unit)
             }
-        )
+
+            Log.d(
+                TAG,
+                "loadCurrentPlaylistTracks: did not find trackList in cache. try loading from api"
+            )
+            val token =
+                tokenFlow.first() ?: return@withContext Result.failure(DataException.Auth.MissingAccessToken)
+            val currentUserId =
+                userFlow.first()?.id ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
+
+            val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
+
+            return@withContext tracksResult.fold(
+                onSuccess = { tracksResponse ->
+                    val tracksFromSpotify = tracksResponse.items.map { it.track }
+                    val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
+
+                    votesResult.fold(
+                        onSuccess = { votesForPlaylist ->
+                            val mergedTracks =
+                                tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
+
+                            currentTracksWithOwnVotes.value = mergedTracks
+                            trackListCache[playlistId] = mergedTracks
+
+                            Result.success(Unit)
+                        },
+                        onFailure = { e ->
+                            Result.failure(e)
+                        }
+                    )
+                },
+                onFailure = {
+                    Result.failure(it)
+                }
+            )
+        }
     }
 
     override suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>> {
 
-//        if (allTracks.value.isEmpty()) {
-//            // TODO error handling??
-        refreshTracksWithOwnVotes(playlistId)
-//        }
+        loadCurrentPlaylistTracks(playlistId)
 
         // get all votes
         val allVotesResult = voteApi.getAllVotesForPlaylist(playlistId)
@@ -109,7 +127,7 @@ class SpotifyTrackListRepo(
                 }
                 val allVotesByTrackId = voteList.groupBy { it.trackId }
                 Result.success(
-                    allTracksWithOwnVotes.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
+                    currentTracksWithOwnVotes.value.map { Pair(it, allVotesByTrackId[it.id] ?: emptyList()) }
                 )
             },
             onFailure = {
@@ -128,14 +146,14 @@ class SpotifyTrackListRepo(
             userFlow.first()?.id ?: return Result.failure(DataException.Auth.MissingCurrentUser)
 
         // store old value
-        val trackToUpdate = allTracksWithOwnVotes.value.find { it.id == trackId }
+        val trackToUpdate = currentTracksWithOwnVotes.value.find { it.id == trackId }
         if (trackToUpdate == null) {
             return Result.failure(DataException.Remote.Unknown) // TODO right exception
         }
         val oldValue = trackToUpdate.vote
 
         // update locally
-        allTracksWithOwnVotes.value = allTracksWithOwnVotes.value.map {
+        currentTracksWithOwnVotes.value = currentTracksWithOwnVotes.value.map {
             if (it.id == trackId)
                 it.copy(vote = newVote)
             else
@@ -149,7 +167,7 @@ class SpotifyTrackListRepo(
             },
             onFailure = {
                 // rollback
-                allTracksWithOwnVotes.value = allTracksWithOwnVotes.value.map {
+                currentTracksWithOwnVotes.value = currentTracksWithOwnVotes.value.map {
                     if (it.id == trackId) {
                         it.copy(vote = oldValue)
                     } else {

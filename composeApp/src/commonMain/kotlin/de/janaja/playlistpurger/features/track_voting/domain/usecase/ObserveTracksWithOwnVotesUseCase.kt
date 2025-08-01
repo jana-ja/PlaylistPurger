@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.features.track_voting.domain.usecase
 
 import de.janaja.playlistpurger.core.domain.usecase.ExecuteAuthenticatedRequestUseCase
+import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.Flow
@@ -12,9 +13,10 @@ class ObserveTracksWithOwnVotesUseCase(
     private val executeAuthenticatedRequestUseCase: ExecuteAuthenticatedRequestUseCase
 ) {
     operator fun invoke(playlistId: String): Flow<Result<List<Track>>> = flow {
+        Log.d("ObserveTracksWithOwnVotes", "invoke")
         // try refresh/load TracksWithOwnVotes
         val result = executeAuthenticatedRequestUseCase {
-            trackListRepo.refreshTracksWithOwnVotes(playlistId)
+            trackListRepo.loadCurrentPlaylistTracks(playlistId)
         }
 
         // if failure then stop
