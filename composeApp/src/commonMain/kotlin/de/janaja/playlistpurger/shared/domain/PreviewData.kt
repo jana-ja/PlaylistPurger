@@ -4,6 +4,7 @@ import de.janaja.playlistpurger.shared.domain.model.Album
 import de.janaja.playlistpurger.shared.domain.model.Artist
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
 import de.janaja.playlistpurger.shared.domain.model.Track
+import de.janaja.playlistpurger.shared.domain.model.TrackAdder
 import de.janaja.playlistpurger.shared.domain.model.User
 
 object PreviewData {
@@ -26,6 +27,7 @@ object PreviewData {
         name = "Track Name",
         durationMillis = 2000000,
         album = Album("id", "", ""),
-        artists = listOf(Artist("", "Artist Name"))
+        artists = listOf(Artist("", "Artist Name")),
+        addedBy = TrackAdder.IdOnly(""),
     )
 }

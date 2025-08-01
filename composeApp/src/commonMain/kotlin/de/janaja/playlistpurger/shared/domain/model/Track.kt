@@ -7,5 +7,6 @@ data class Track(
     val durationMillis: Int,
     val album: Album,
     val artists: List<Artist>,
-    val vote: VoteOption? = null
+    val vote: VoteOption? = null,
+    val addedBy: TrackAdder
 )

@@ -9,6 +9,7 @@ import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.shared.domain.model.Track
+import de.janaja.playlistpurger.shared.domain.model.TrackAdder
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
@@ -72,13 +73,34 @@ class SpotifyTrackListRepo(
 
             return@withContext tracksResult.fold(
                 onSuccess = { tracksResponse ->
-                    val tracksFromSpotify = tracksResponse.items.map { it.track }
+                    val tracksFromSpotify = tracksResponse.items//.map { it.track }
                     val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
 
                     votesResult.fold(
                         onSuccess = { votesForPlaylist ->
+                            // load users
+                            val uniqueUserIds = tracksFromSpotify
+                                .map { it.addedBy.id }
+                                .distinct()
+                            val userMap = uniqueUserIds.associateWith {
+                                userRepo.getUserForId(it).fold(
+                                    onSuccess = { user -> user },
+                                    onFailure = { null }
+                                )
+                            }
+
                             val mergedTracks =
-                                tracksFromSpotify.map { track -> track.toTrack(votesForPlaylist.firstOrNull { it.trackId == track.id }?.voteOption) }
+                                tracksFromSpotify.map { trackWrapper ->
+                                    val userId = trackWrapper.addedBy.id
+                                    val user = userMap[trackWrapper.addedBy.id]
+                                    val trackAdderInfo: TrackAdder = if (user != null) TrackAdder.FullUser(user) else TrackAdder.IdOnly(userId)
+
+                                    trackWrapper.toTrack(
+                                        votesForPlaylist.firstOrNull { it.trackId == trackWrapper.track.id }?.voteOption,
+                                        trackAdderInfo
+                                        )
+
+                                }
 
                             currentTracksWithOwnVotes.value = mergedTracks
                             trackListCache[playlistId] = mergedTracks
@@ -174,7 +196,11 @@ class SpotifyTrackListRepo(
                         it
                     }
                 }
-                Log.e(TAG, "Failed to update vote on Api, rolled back.", DataException.Remote.Unknown) //TODO real exception
+                Log.e(
+                    TAG,
+                    "Failed to update vote on Api, rolled back.",
+                    DataException.Remote.Unknown
+                ) //TODO real exception
                 Result.failure(DataException.Remote.Unknown)
 
             }
