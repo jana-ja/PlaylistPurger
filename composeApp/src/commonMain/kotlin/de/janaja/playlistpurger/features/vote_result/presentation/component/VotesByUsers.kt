@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.janaja.playlistpurger.core.ui.component.CircleAsyncImage
+import de.janaja.playlistpurger.core.ui.component.CircleUserImage
 import de.janaja.playlistpurger.shared.domain.model.User
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import org.jetbrains.compose.resources.painterResource
@@ -41,9 +41,8 @@ fun VotesByUsers(
                 Spacer(Modifier.width(4.dp))
                 usersByVoteOption[vote]?.forEach { user ->
                     user?.let { user ->
-                        CircleAsyncImage(
-                            url = user.thumbnailImage ?: "", // TODO
-                            contentDescription = user.name,
+                        CircleUserImage(
+                            user,
                             modifier = Modifier.size(24.dp)
                         )
                     }

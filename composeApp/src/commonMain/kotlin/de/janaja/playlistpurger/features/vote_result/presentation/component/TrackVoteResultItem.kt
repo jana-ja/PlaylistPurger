@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.features.vote_result.presentation.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -105,6 +101,7 @@ fun TrackVoteResultItem(
                 // Bypassing Complex Intrinsic Logic: We are not relying as heavily on the nuances of how IntrinsicSize interacts with AsyncImage's own measurement logic for downscaling.
                 // multiple recomposition passes that onSizeChanged might introduce (though for a stable list item, it's usually fine).
                 if (textColumnSize.height > 0) {
+                    // TODO placeholder
                     AsyncImage(
                         model = track.album.imageUrl,
                         contentDescription = "album cover",
