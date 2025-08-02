@@ -73,7 +73,7 @@ class SpotifyTrackListRepo(
                 userFlow.first()?.id
                     ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
 
-            val tracksResult = webApi.getTracksForPlaylist("Bearer $token", playlistId)
+            val tracksResult = webApi.getTracksForPlaylist(token, playlistId)
 
             return@withContext tracksResult.fold(
                 onSuccess = { tracksResponse ->

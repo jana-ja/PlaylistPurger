@@ -30,7 +30,7 @@ class SpotifyUserRepo(
 
         val token =
             tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-        webApi.getUserForId("Bearer $token", userId).fold(
+        webApi.getUserForId(token, userId).fold(
             onSuccess = {
                 val user = it.toUser()
                 userCache[userId] = user

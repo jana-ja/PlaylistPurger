@@ -67,7 +67,7 @@ class SpotifyAuthService(
             return UserLoginState.LoggedOut
         } else {
             Log.d(TAG, "found saved token -> check if valid by loading current user")
-            val result = this.webApi.getCurrentUser("Bearer $token")
+            val result = this.webApi.getCurrentUser(token)
 
             result.onSuccess { user ->
                 Log.d(TAG, "token is valid -> logged in")

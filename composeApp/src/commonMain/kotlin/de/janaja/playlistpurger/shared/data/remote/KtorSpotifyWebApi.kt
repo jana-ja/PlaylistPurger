@@ -19,7 +19,7 @@ class KtorSpotifyWebApi (
     ): Result<PlaylistResponseDto> {
         return safeCall {
             httpClient.get(baseUrl + "me/playlists") {
-                header("Authorization", token)
+                header("Authorization", "Bearer $token")
                 // TODO test bearerAuth instead of header
             }
         }
@@ -31,7 +31,7 @@ class KtorSpotifyWebApi (
     ): Result<TracksResponseDto> {
         return safeCall {
             httpClient.get(baseUrl + "playlists/${playlistId}/tracks") {
-                header("Authorization", token)
+                header("Authorization", "Bearer $token")
             }
         }
     }
@@ -41,7 +41,7 @@ class KtorSpotifyWebApi (
     ): Result<UserFullDto> {
         return safeCall<UserFullDto> {
             httpClient.get(baseUrl + "me") {
-                header("Authorization", token)
+                header("Authorization", "Bearer $token")
             }
         }
     }
@@ -49,7 +49,7 @@ class KtorSpotifyWebApi (
     override suspend fun getUserForId(token: String, userId: String): Result<UserFullDto> {
         return safeCall<UserFullDto> {
             httpClient.get(baseUrl + "users/$userId") {
-                header("Authorization", token)
+                header("Authorization", "Bearer $token")
             }
         }
 

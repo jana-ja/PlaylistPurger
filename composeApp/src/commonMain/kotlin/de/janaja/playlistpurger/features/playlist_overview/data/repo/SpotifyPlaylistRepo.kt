@@ -22,7 +22,7 @@ class SpotifyPlaylistRepo(
         val token =
             tokenFlow.firstOrNull() ?: return Result.failure(DataException.Auth.MissingAccessToken)
 
-        val result = webApi.getCurrentUsersPlaylists("Bearer $token")
+        val result = webApi.getCurrentUsersPlaylists(token)
 
         return result.fold(
             onSuccess = { playlistResponse ->
