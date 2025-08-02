@@ -5,7 +5,7 @@ import de.janaja.playlistpurger.core.util.ConcurrentCache
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.model.toUser
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
-import de.janaja.playlistpurger.shared.domain.model.UserWithName
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.flow.first
 
@@ -21,10 +21,9 @@ class SpotifyUserRepo(
     // TODO LRU (least recently used) mit number of items
     // no invalidation, user image could become stale but thats okay
     // no time to live (ttl)
-    // TODO is this okay or does it need to be UserDetails.Full? then imageUrl would have to be nullable
-    private val userCache: MutableMap<String, UserWithName> = ConcurrentCache()
+    private val userCache: MutableMap<String, UserDetails.Full> = ConcurrentCache()
 
-    override suspend fun getUserForId(userId: String): Result<UserWithName> {
+    override suspend fun getUserForId(userId: String): Result<UserDetails.Full> {
         userCache[userId]?.let { cachedUser ->
             return Result.success(cachedUser)
         }

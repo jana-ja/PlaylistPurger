@@ -96,20 +96,13 @@ class SpotifyTrackListRepo(
                             val mergedTracks =
                                 tracksFromSpotify.map { trackWrapper ->
                                     val userDto = trackWrapper.addedBy
-                                    val userWithName =
-                                        userMap[trackWrapper.addedBy.id]
-                                    // TODO have to type check here because i return UserWithName in toUser extension of UserFullDto if there is no thumbnail image. want it like that?
-                                    val userDetails = when (userWithName) {
-                                        is UserDetails.Full -> userWithName
-                                        is UserDetails.Partial -> userWithName
-                                        else -> userDto.toUserDetails()
-                                    }
+                                    val userDetails =
+                                        userMap[trackWrapper.addedBy.id] ?: userDto.toUserDetails()
 
                                     trackWrapper.toTrack(
                                         votesForPlaylist.firstOrNull { it.trackId == trackWrapper.track.id }?.voteOption,
                                         userDetails
                                     )
-
                                 }
 
                             currentTracksWithOwnVotes.value = mergedTracks
@@ -148,14 +141,8 @@ class SpotifyTrackListRepo(
                 }
 
                 val voteList = voteDtoList.map {
-                    val userWithName =
-                        userMap[it.userId]
-                    // TODO have to type check here because i return UserWithName in toUser extension of UserFullDto if there is no thumbnail image. want it like that?
-                    val userDetails = when (userWithName) {
-                        is UserDetails.Full -> userWithName
-                        is UserDetails.Partial -> userWithName
-                        else -> UserDetails.Minimal(it.userId)
-                    }
+                    val userDetails =
+                        userMap[it.userId] ?: UserDetails.Minimal(it.userId)
                     Vote(
                         playlistId = it.playlistId,
                         trackId = it.trackId,

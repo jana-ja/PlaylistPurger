@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.shared.domain.model.UserDetails
+import de.janaja.playlistpurger.shared.domain.model.UserWithName
 import org.jetbrains.compose.resources.painterResource
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.outline_question_mark_24
@@ -24,40 +25,25 @@ fun CircleUserImage(
     modifier: Modifier = Modifier.size(24.dp)
 ) {
 
-    when (user) {
-        is UserDetails.Full -> {
-            AsyncImage(
-                model = user.thumbnailUrl,
-                contentDescription = "Profile Picture of ${user.name}",
-                placeholder = painterResource(Res.drawable.outline_question_mark_24),
-                contentScale = ContentScale.Crop,
-                modifier = modifier.clip(CircleShape)
+    if (user is UserDetails.Full && user.thumbnailUrl != null) {
+        AsyncImage(
+            model = user.thumbnailUrl,
+            contentDescription = "Profile Picture of ${user.name}",
+            placeholder = painterResource(Res.drawable.outline_question_mark_24),
+            contentScale = ContentScale.Crop,
+            modifier = modifier.clip(CircleShape)
+        )
+    } else {
+        Box(
+            modifier = modifier.clip(CircleShape).background(user.color),
+            contentAlignment = Alignment.Center
+        ) {
+            val text = if (user is UserWithName) user.name.firstOrNull()?.lowercase()
+                ?: "-" else "?"
+            Text(
+                text = text,
+                textAlign = TextAlign.Center
             )
-        }
-        is UserDetails.Partial -> {
-            Box(
-                modifier = modifier.clip(CircleShape).background(user.color),
-                contentAlignment = Alignment.Center
-            ) {
-                val text = user.name.firstOrNull()?.lowercase()
-                    ?: "-"
-                Text(
-                    text = text,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        is UserDetails.Minimal -> {
-            Box(
-                modifier = modifier.clip(CircleShape).background(user.color),
-                contentAlignment = Alignment.Center
-            ) {
-                val text = "?"
-                Text(
-                    text = text,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
