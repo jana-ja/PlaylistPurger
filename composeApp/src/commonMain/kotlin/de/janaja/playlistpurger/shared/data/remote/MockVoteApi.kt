@@ -5,7 +5,6 @@ import de.janaja.playlistpurger.shared.domain.model.VoteOption
 
 class MockVoteApi: VoteApi {
     private val testPlaylistId = "26YTAFslmPya0jBIFSglKd"
-    // TODO need user id here, get from AuthService
     private val myUserId = "janajansen-de"
 
     private val user2Id = "user2"
@@ -44,7 +43,6 @@ class MockVoteApi: VoteApi {
         )
     )
 
-    // TODO: current user id vllt in datastore speichern oder in inem repo halten wo das sinn macht. erstmal den code zu token flow machen, vllt dann code gegen accessToken und refreshToken eintauschen und dabei auch die userId abfragen, dann alles speichern?
     override fun getUsersVotesForPlaylist(playlistId: String, userId: String): Result<List<VoteDto>> {
         return Result.success(dummyData.filter { it.playlistId == playlistId && it.userId == userId })
     }
