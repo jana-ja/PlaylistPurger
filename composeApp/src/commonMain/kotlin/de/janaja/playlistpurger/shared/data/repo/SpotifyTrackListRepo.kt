@@ -189,6 +189,18 @@ class SpotifyTrackListRepo(
             else
                 it
         }
+        Log.d(TAG, "upsertVote: Optimistically updated StateFlow for playlistId: $playlistId")
+        trackListCache[playlistId]?.let { cachedList ->
+            trackListCache[playlistId] = cachedList.map {
+                if (it.id == trackId)
+                    it.copy(vote = newVote)
+                else
+                    it
+            }
+
+            Log.d(TAG, "upsertVote: Optimistically updated cache for playlistId: $playlistId")
+
+        }
         // update globally
         val updateResult = voteApi.upsertVote(playlistId, trackId, currentUserId, newVote)
         return updateResult.fold(
@@ -204,9 +216,17 @@ class SpotifyTrackListRepo(
                         it
                     }
                 }
+                trackListCache[playlistId]?.let { cachedList ->
+                    trackListCache[playlistId] = cachedList.map {
+                        if (it.id == trackId)
+                            it.copy(vote = oldValue)
+                        else
+                            it
+                    }
+                }
                 Log.e(
                     TAG,
-                    "Failed to update vote on Api, rolled back.",
+                    "Failed to update vote on Api, rolled back StateFlow and Cache.",
                     DataException.Remote.Unknown
                 ) //TODO real exception
                 Result.failure(DataException.Remote.Unknown)
