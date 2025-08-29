@@ -6,7 +6,7 @@ import de.janaja.playlistpurger.shared.domain.model.VoteOption
 
 interface VoteApi {
 
-    fun getUsersVotesForPlaylist(playlistId: String, userId: String): Result<List<VoteDto>>
-    fun getAllVotesForPlaylist(playlistId: String): Result<List<VoteDto>>
-    fun upsertVote(playlistId: String, trackId: String, userId: String, newVote: VoteOption): Result<Unit>
+    suspend fun getUsersVotesForPlaylist(playlistId: String, userId: String): Result<List<VoteDto>>
+    suspend fun getAllVotesForPlaylist(playlistId: String): Result<List<VoteDto>>
+    suspend fun upsertVote(playlistId: String, trackId: String, userId: String, newVote: VoteOption): Result<Unit>
 }

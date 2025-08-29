@@ -43,16 +43,16 @@ class MockVoteApi: VoteApi {
         )
     )
 
-    override fun getUsersVotesForPlaylist(playlistId: String, userId: String): Result<List<VoteDto>> {
+    override suspend fun getUsersVotesForPlaylist(playlistId: String, userId: String): Result<List<VoteDto>> {
         return Result.success(dummyData.filter { it.playlistId == playlistId && it.userId == userId })
     }
 
     // 572g
-    override fun getAllVotesForPlaylist(playlistId: String): Result<List<VoteDto>> {
+    override suspend fun getAllVotesForPlaylist(playlistId: String): Result<List<VoteDto>> {
         return Result.success(dummyData.filter { it.playlistId == playlistId })
     }
 
-    override fun upsertVote(
+    override suspend fun upsertVote(
         playlistId: String,
         trackId: String,
         userId: String,
