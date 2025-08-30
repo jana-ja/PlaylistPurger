@@ -20,6 +20,7 @@ import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -41,7 +42,7 @@ val coreModule = module {
     // AuthRepo uses TokenRepo and WebApiService and AccountApiService
     single<AuthService> {
 //        MockAuthService(true)
-        SpotifyAuthService(get(), get(), get())
+        SpotifyAuthService(get(), get(), get(), get())
     }
 
     // VoteRepo
@@ -62,9 +63,12 @@ val coreModule = module {
         get<DataStoreFactory>().create()
     }
 
+
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
+
     // TokenRepo
     single<TokenRepo> {
-        DataStoreTokenRepo(get())
+        DataStoreTokenRepo(get(), get())
     }
 
     // LoginResponseHelper

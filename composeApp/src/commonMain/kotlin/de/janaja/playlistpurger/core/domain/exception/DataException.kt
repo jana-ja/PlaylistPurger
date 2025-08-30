@@ -14,6 +14,7 @@ sealed class DataException : Exception() {
         data object MissingAccessToken: Auth()
         data object MissingCurrentUser: Auth()
         data object MissingOrInvalidRefreshToken: Auth()
+        data object TokenNotReady: Auth()
 
     }
 //    sealed class Local : DataException() {

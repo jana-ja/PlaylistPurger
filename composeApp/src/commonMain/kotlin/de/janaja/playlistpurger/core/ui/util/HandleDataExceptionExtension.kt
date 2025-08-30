@@ -15,6 +15,7 @@ fun DataException.toStringResId(): UiText {
         DataException.Auth.MissingAccessToken -> Res.string.generic_error_message
         DataException.Auth.MissingCurrentUser -> Res.string.generic_error_message
         DataException.Auth.MissingOrInvalidRefreshToken -> Res.string.generic_error_message
+        DataException.Auth.TokenNotReady -> Res.string.generic_error_message
         DataException.Remote.InvalidAccessToken -> Res.string.generic_error_message
         DataException.Remote.NoInternet -> Res.string.no_internet_error_message
         DataException.Remote.RequestTimeout -> Res.string.no_internet_error_message

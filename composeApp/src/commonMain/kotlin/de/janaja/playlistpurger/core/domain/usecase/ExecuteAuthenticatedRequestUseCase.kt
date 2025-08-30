@@ -36,6 +36,12 @@ class ExecuteAuthenticatedRequestUseCase(
                             }
                         )
                     }
+                    is DataException.Auth.TokenNotReady -> {
+                        // TODO what to do here?
+                        //  dont logout, user has to wait and try again
+                        //  will not happen
+                        return Result.failure(e)
+                    }
                     is DataException.Auth -> {
                         logoutUseCase()
                         return Result.failure(e)

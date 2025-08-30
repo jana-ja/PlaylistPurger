@@ -3,11 +3,11 @@ package de.janaja.playlistpurger.shared.data.repo
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.util.ConcurrentLruCache
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
+import de.janaja.playlistpurger.features.playlist_overview.domain.model.TokenState
 import de.janaja.playlistpurger.shared.data.model.toUser
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
-import kotlinx.coroutines.flow.first
 
 class SpotifyUserRepo(
     authService: AuthService,
@@ -25,17 +25,27 @@ class SpotifyUserRepo(
             return Result.success(cachedUser)
         }
 
-        val token =
-            tokenFlow.first() ?: return Result.failure(DataException.Auth.MissingAccessToken)
-        webApi.getUserForId(token, userId).fold(
-            onSuccess = {
-                val user = it.toUser()
-                userCache[userId] = user
-                return Result.success(user)
-            },
-            onFailure = {
-                return Result.failure(it)
+        val tokenState = tokenFlow.value
+        when (tokenState) {
+            TokenState.Loading -> {
+                return Result.failure(DataException.Auth.TokenNotReady)
             }
-        )
+            TokenState.NoToken -> {
+                return Result.failure(DataException.Auth.MissingAccessToken)
+            }
+            is TokenState.Loaded -> {
+                val token = tokenState.token
+                webApi.getUserForId(token, userId).fold(
+                    onSuccess = {
+                        val user = it.toUser()
+                        userCache[userId] = user
+                        return Result.success(user)
+                    },
+                    onFailure = {
+                        return Result.failure(it)
+                    }
+                )
+            }
+        }
     }
 }
