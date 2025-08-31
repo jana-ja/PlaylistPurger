@@ -13,6 +13,7 @@ import de.janaja.playlistpurger.features.auth.domain.repo.TokenRepo
 import de.janaja.playlistpurger.features.auth.domain.service.AuthService
 import de.janaja.playlistpurger.shared.data.remote.KtorSpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.MockVoteApi
+import de.janaja.playlistpurger.shared.data.remote.MyVoteApi
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
 import de.janaja.playlistpurger.shared.data.repo.SpotifyTrackListRepo
@@ -47,7 +48,8 @@ val coreModule = module {
 
     // VoteRepo
     single<VoteApi> {
-        MockVoteApi()
+//        MockVoteApi()
+        MyVoteApi(get())
     }
 
 
