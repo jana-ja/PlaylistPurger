@@ -3,9 +3,6 @@ package de.janaja.playlistpurger.shared.data.repo
 import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.util.ConcurrentLruCache
 import de.janaja.playlistpurger.core.util.Log
-import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
-import de.janaja.playlistpurger.features.auth.domain.service.AuthService
-import de.janaja.playlistpurger.features.playlist_overview.domain.model.TokenState
 import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.model.toUserDetails
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
@@ -21,11 +18,9 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class SpotifyTrackListRepo(
-    authService: AuthService,
     private val voteApi: VoteApi,
     private val webApi: SpotifyWebApi,
     private val userRepo: UserRepo
@@ -37,13 +32,7 @@ class SpotifyTrackListRepo(
         const val MAX_CACHED_PLAYLISTS = 5
     }
 
-    private val tokenFlow = authService.accessToken
-    private val userFlow = authService.userLoginState.map { state ->
-        if (state is UserLoginState.LoggedIn)
-            return@map state.user
-        else
-            return@map null
-    }
+    private val userFlow = userRepo.currentUser
 
     private val trackListCache: MutableMap<String, List<Track>> =
         ConcurrentLruCache(MAX_CACHED_PLAYLISTS)
@@ -66,83 +55,69 @@ class SpotifyTrackListRepo(
                 TAG,
                 "loadCurrentPlaylistTracks: did not find trackList in cache. try loading from api"
             )
-            val tokenState = tokenFlow.value
-            Log.d(
-                TAG,
-                "loadCurrentPlaylistTracks: tokenState $tokenState"
-            )
-            when (tokenState) {
-                TokenState.Loading -> {
-                    return@withContext Result.failure(DataException.Auth.TokenNotReady)
-                }
-                TokenState.NoToken -> {
-                    return@withContext Result.failure(DataException.Auth.MissingAccessToken)
-                }
-                is TokenState.Loaded -> {
-                    Log.d(
-                        TAG,
-                        "loadCurrentPlaylistTracks: did not find trackList in cache. try loading from api"
-                    )
-                    val token = tokenState.token
-                    val currentUserId =
-                        userFlow.first()?.id
-                            ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
 
-                    val tracksResult = webApi.getTracksForPlaylist(token, playlistId)
+            /*
+            The key is that .value doesn't keep WhileSubscribed alive on its own. An active .collect {} operation is needed somewhere in the chain for the duration you need the data to be fresh (or within the stopTimeoutMillis).
+             */
+            val currentUserId = userFlow.value?.id
+                ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
 
-                    return@withContext tracksResult.fold(
-                        onSuccess = { tracksResponse ->
-                            val tracksFromSpotify = tracksResponse.items
-                            val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
+            val tracksResult = webApi.getTracksForPlaylist(playlistId)
 
-                            votesResult.fold(
-                                onSuccess = { votesForPlaylist ->
-                                    // load users
-                                    val uniqueUserIds = tracksFromSpotify
-                                        .map { it.addedBy.id }
-                                        .distinct()
-                                    val userMap = uniqueUserIds.associateWith {
-                                        userRepo.getUserForId(it).fold(
-                                            onSuccess = { user -> user },
-                                            onFailure = { null }
-                                        )
-                                    }
+            return@withContext tracksResult.fold(
+                onSuccess = { tracksResponse ->
+                    val tracksFromSpotify = tracksResponse.items
+                    val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
 
-                                    val mergedTracks =
-                                        tracksFromSpotify.map { trackWrapper ->
-                                            val userDto = trackWrapper.addedBy
-                                            val userDetails =
-                                                userMap[trackWrapper.addedBy.id] ?: userDto.toUserDetails()
+                    votesResult.fold(
+                        onSuccess = { votesForPlaylist ->
+                            // load users
+                            val uniqueUserIds = tracksFromSpotify
+                                .map { it.addedBy.id }
+                                .distinct()
+                            val userMap = uniqueUserIds.associateWith {
+                                userRepo.getUserForId(it).fold(
+                                    onSuccess = { user -> user },
+                                    onFailure = { null }
+                                )
+                            }
 
-                                            trackWrapper.toTrack(
-                                                votesForPlaylist.firstOrNull { it.trackId == trackWrapper.track.id }?.voteOption,
-                                                userDetails
-                                            )
-                                        }
+                            val mergedTracks =
+                                tracksFromSpotify.map { trackWrapper ->
+                                    val userDto = trackWrapper.addedBy
+                                    val userDetails =
+                                        userMap[trackWrapper.addedBy.id] ?: userDto.toUserDetails()
 
-                                    currentTracksWithOwnVotes.value = mergedTracks
-                                    trackListCache[playlistId] = mergedTracks
-
-                                    Result.success(Unit)
-                                },
-                                onFailure = { e ->
-                                    Result.failure(e)
+                                    trackWrapper.toTrack(
+                                        votesForPlaylist.firstOrNull { it.trackId == trackWrapper.track.id }?.voteOption,
+                                        userDetails
+                                    )
                                 }
-                            )
+
+                            currentTracksWithOwnVotes.value = mergedTracks
+                            trackListCache[playlistId] = mergedTracks
+
+                            Result.success(Unit)
                         },
-                        onFailure = {
-                            Result.failure(it)
+                        onFailure = { e ->
+                            Result.failure(e)
                         }
                     )
+                },
+                onFailure = {
+                    Result.failure(it)
                 }
-            }
-
+            )
         }
     }
 
     override suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>> {
 
-        loadCurrentPlaylistTracks(playlistId)
+        val result = loadCurrentPlaylistTracks(playlistId)
+        result.onFailure { e ->
+            Log.e(TAG, "loadTracksWithAllVotes: failed to load current playlist tracks", e)
+            return Result.failure(e)
+        }
 
         // get all votes
         val allVotesResult = voteApi.getAllVotesForPlaylist(playlistId)
@@ -252,6 +227,4 @@ class SpotifyTrackListRepo(
             }
         )
     }
-
-
 }

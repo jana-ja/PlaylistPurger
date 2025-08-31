@@ -5,21 +5,11 @@ import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 
 interface SpotifyWebApi {
-    suspend fun getCurrentUsersPlaylists(
-        token: String
-    ): Result<PlaylistResponseDto>
+    suspend fun getCurrentUsersPlaylists(): Result<PlaylistResponseDto>
 
-    suspend fun getTracksForPlaylist(
-        token: String,
-        playlistId: String,
-    ): Result<TracksResponseDto>
+    suspend fun getTracksForPlaylist(playlistId: String, ): Result<TracksResponseDto>
 
-    suspend fun getCurrentUser(
-        token: String,
-    ): Result<UserFullDto>
+    suspend fun getCurrentUser(): Result<UserFullDto>
 
-    suspend fun getUserForId(
-        token: String,
-        userId: String
-    ): Result<UserFullDto>
+    suspend fun getUserForId(userId: String): Result<UserFullDto>
 }

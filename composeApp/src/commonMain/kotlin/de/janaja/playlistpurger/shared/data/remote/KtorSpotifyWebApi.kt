@@ -6,53 +6,33 @@ import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 
 class KtorSpotifyWebApi (
     private val httpClient: HttpClient
 ) : SpotifyWebApi {
 
-    private val baseUrl = "https://api.spotify.com/v1/"
-
-    override suspend fun getCurrentUsersPlaylists(
-        token: String
-    ): Result<PlaylistResponseDto> {
+    override suspend fun getCurrentUsersPlaylists(): Result<PlaylistResponseDto> {
         return safeCall {
-            httpClient.get(baseUrl + "me/playlists") {
-                header("Authorization", "Bearer $token")
-                // TODO test bearerAuth instead of header
-            }
+            httpClient.get("me/playlists")
         }
     }
 
-    override suspend fun getTracksForPlaylist(
-        token: String,
-        playlistId: String,
-    ): Result<TracksResponseDto> {
+    override suspend fun getTracksForPlaylist(playlistId: String): Result<TracksResponseDto> {
         return safeCall {
-            httpClient.get(baseUrl + "playlists/${playlistId}/tracks") {
-                header("Authorization", "Bearer $token")
-            }
+            httpClient.get("playlists/${playlistId}/tracks")
         }
     }
 
-    override suspend fun getCurrentUser(
-        token: String,
-    ): Result<UserFullDto> {
+    override suspend fun getCurrentUser(): Result<UserFullDto> {
         return safeCall<UserFullDto> {
-            httpClient.get(baseUrl + "me") {
-                header("Authorization", "Bearer $token")
-            }
+            httpClient.get("me")
         }
     }
 
-    override suspend fun getUserForId(token: String, userId: String): Result<UserFullDto> {
+    override suspend fun getUserForId(userId: String): Result<UserFullDto> {
         return safeCall<UserFullDto> {
-            httpClient.get(baseUrl + "users/$userId") {
-                header("Authorization", "Bearer $token")
-            }
+            httpClient.get("users/$userId")
         }
 
     }
-
 }

@@ -11,12 +11,12 @@ import org.koin.dsl.module
 
 val playlistOverviewModule = module {
     single<UserRepo> {
-        SpotifyUserRepo(get(), get())
+        SpotifyUserRepo(get(), get(), get())
     }
 
     single<PlaylistRepo> {
 //        MockPlaylistRepo(true)
-        SpotifyPlaylistRepo(get(), get(), get())
+        SpotifyPlaylistRepo(get(), get())
     }
 
     factoryOf(::GetPlaylistsUseCase)
