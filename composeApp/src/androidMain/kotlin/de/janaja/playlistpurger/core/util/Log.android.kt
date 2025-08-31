@@ -12,11 +12,11 @@ actual class Log {
         }
 
         actual fun e(tag: String, msg: String) {
-            android.util.Log.i(tag, msg)
+            android.util.Log.e(tag, msg)
         }
 
         actual fun e(tag: String, msg: String, e: Throwable) {
-            android.util.Log.i(tag, msg)
+            android.util.Log.e(tag, msg, e)
         }
     }
 }
