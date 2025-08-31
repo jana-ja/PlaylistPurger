@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.DataStateView
 import de.janaja.playlistpurger.features.vote_result.presentation.component.TrackVoteResultItem
+import de.janaja.playlistpurger.features.vote_result.presentation.component.VoteResultHeader
 import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.VoteResultViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -36,15 +37,15 @@ fun VoteResultScreen(
         DataStateView(
             dataState
         ) { data ->
+            VoteResultHeader(data)
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(data) { (track, voteList) ->
+                items(data.tracksWithVotes) { (track, voteResult) ->
                     TrackVoteResultItem(
                         track = track,
-                        usersByVoteOption = voteList
-                            .groupBy { it.voteOption }
-                            .mapValues { it.value.map { it.user } }
+                        voteResult = voteResult
                     )
                 }
             }

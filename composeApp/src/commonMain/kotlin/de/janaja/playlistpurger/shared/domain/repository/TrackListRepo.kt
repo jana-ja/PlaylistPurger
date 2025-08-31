@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.shared.domain.repository
 
+import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import kotlinx.coroutines.flow.Flow
 
@@ -27,5 +27,5 @@ interface TrackListRepo {
     // inject current user id into repo? and token datastore thing?
     suspend fun upsertVote(playlistId: String, trackId: String, newVote: VoteOption): Result<Unit>
 
-    suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>>
+    suspend fun loadTracksWithAllVotes(playlistId: String): Result<PlaylistVoteResults>
 }

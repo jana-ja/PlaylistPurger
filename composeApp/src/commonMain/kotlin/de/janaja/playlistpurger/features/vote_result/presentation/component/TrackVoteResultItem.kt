@@ -1,7 +1,6 @@
 package de.janaja.playlistpurger.features.vote_result.presentation.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,35 +32,25 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import de.janaja.playlistpurger.core.ui.component.CircleUserImage
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.model.UserDetails
-import de.janaja.playlistpurger.shared.domain.model.VoteOption
-import org.jetbrains.compose.resources.painterResource
-import playlistpurger.composeapp.generated.resources.Res
-import playlistpurger.composeapp.generated.resources.outline_question_mark_24
+import de.janaja.playlistpurger.shared.domain.model.VoteResult
 
 
 @Composable
 fun TrackVoteResultItem(
     track: Track,
-    usersByVoteOption: Map<VoteOption, List<UserDetails>>,
+    voteResult: VoteResult,
     modifier: Modifier = Modifier
 ) {
 
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
-    val maxVoteCount: Int? = usersByVoteOption.values.maxOfOrNull { userList -> userList.size }
-    val optionWithMostVotes: VoteOption? = if (maxVoteCount != null) {
-        val options =
-            usersByVoteOption.filter { entry -> entry.value.size == maxVoteCount }.map { it.key }
-        if (options.size == 1) options[0] else null
-    } else {
-        null
-    }
+    val usersByVoteOption = voteResult.votes.groupBy { it.voteOption }
+        .mapValues { it.value.map { it.user } }
 
     var textColumnSize by remember { mutableStateOf(IntSize.Zero) }
     val density = LocalDensity.current
 
-    val backgroundColor = optionWithMostVotes?.color?.makePastelByMixing()
+    val backgroundColor = voteResult.resultOption?.color?.makePastelByMixing()
         ?: CardDefaults.elevatedCardColors().containerColor
 
     ElevatedCard(
@@ -170,16 +157,7 @@ fun TrackVoteResultItem(
                         )
 
 //                // TODO show max result?
-                        Icon(
-                            painter = painterResource(
-                                optionWithMostVotes?.resource
-                                    ?: Res.drawable.outline_question_mark_24
-                            ),
-                            contentDescription = optionWithMostVotes?.contentDescription
-                                ?: "no final result yet",
-                            modifier = Modifier.padding(end = 16.dp).size(42.dp)
-                                .border(1.dp, Color.Black, CircleShape).padding(8.dp)
-                        )
+                        VoteOptionIcon(voteResult.resultOption)
 
                     }
                 }

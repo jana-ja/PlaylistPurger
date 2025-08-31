@@ -7,10 +7,12 @@ import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.model.toUserDetails
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
+import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.Vote
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
+import de.janaja.playlistpurger.shared.domain.model.VoteResult
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.Dispatchers
@@ -75,10 +77,10 @@ class SpotifyTrackListRepo(
                             val uniqueUserIds = tracksFromSpotify
                                 .map { it.addedBy.id }
                                 .distinct()
-                            val userMap = uniqueUserIds.associateWith {
-                                userRepo.getUserForId(it).fold(
+                            val userMap = uniqueUserIds.associateWith { userId ->
+                                userRepo.getUserForId(userId).fold(
                                     onSuccess = { user -> user },
-                                    onFailure = { null }
+                                    onFailure = { UserDetails.Minimal(userId) }
                                 )
                             }
 
@@ -111,7 +113,7 @@ class SpotifyTrackListRepo(
         }
     }
 
-    override suspend fun loadTracksWithAllVotes(playlistId: String): Result<List<Pair<Track, List<Vote>>>> {
+    override suspend fun loadTracksWithAllVotes(playlistId: String): Result<PlaylistVoteResults> {
 
         val result = loadCurrentPlaylistTracks(playlistId)
         result.onFailure { e ->
@@ -124,12 +126,13 @@ class SpotifyTrackListRepo(
         return allVotesResult.fold(
             onSuccess = { voteDtoList ->
 
+                val tracksWithOwnVotes = currentTracksWithOwnVotes.value
                 val uniqueUserIds = voteDtoList.map { it.userId }.distinct()
 
-                val userMap = uniqueUserIds.associateWith {
-                    userRepo.getUserForId(it).fold(
+                val userMap = uniqueUserIds.associateWith { userId ->
+                    userRepo.getUserForId(userId).fold(
                         onSuccess = { user -> user },
-                        onFailure = { null }
+                        onFailure = { UserDetails.Minimal(userId) }
                     )
                 }
 
@@ -144,13 +147,32 @@ class SpotifyTrackListRepo(
                     )
                 }
                 val allVotesByTrackId = voteList.groupBy { it.trackId }
-                Result.success(
-                    currentTracksWithOwnVotes.value.map {
-                        Pair(
-                            it,
-                            allVotesByTrackId[it.id] ?: emptyList()
-                        )
+                val tracksWithVotes = tracksWithOwnVotes.map {
+                    val votes = allVotesByTrackId[it.id] ?: emptyList()
+                    val votesByVoteOption = votes.groupBy { it.voteOption }
+                    val maxVoteCount: Int? = votesByVoteOption.values.maxOfOrNull { userList -> userList.size }
+                    val optionWithMostVotes: VoteOption? = if (maxVoteCount != null) {
+                        val options =
+                            votesByVoteOption.filter { entry -> entry.value.size == maxVoteCount }.map { it.key }
+                        if (options.size == 1) options[0] else null
+                    } else {
+                        null
                     }
+
+                    Pair(
+                        it,
+                        VoteResult(
+                            votes,
+                            optionWithMostVotes
+                        )
+                    )
+                }
+                Result.success(
+                    PlaylistVoteResults(
+                        playlistId = playlistId,
+                        collaborators = (userMap.values.toList() + tracksWithOwnVotes.map { it.addedBy }.distinct()).distinct(),
+                        tracksWithVotes = tracksWithVotes
+                    )
                 )
             },
             onFailure = {
