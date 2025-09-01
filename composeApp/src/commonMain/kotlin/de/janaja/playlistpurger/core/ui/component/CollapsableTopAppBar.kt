@@ -94,7 +94,6 @@ fun CollapsableTopAppBar(
         FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
     )
 
-    // TODO make content scroll with the exact same speed as the lazycolumn
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -119,7 +118,7 @@ fun CollapsableTopAppBar(
 //                        .requiredHeight(expandedHeight-collapsedHeight)
                         .graphicsLayer {
                             alpha = 1f - scrollBehavior.state.collapsedFraction
-//                            translationY = scrollBehavior.state.heightOffset
+                            translationY = - (expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
                         }
                         .clipToBounds()
                 ) {
