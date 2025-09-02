@@ -4,20 +4,12 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -29,14 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import de.janaja.playlistpurger.core.util.Log
-import de.janaja.playlistpurger.core.util.Log.Companion.d
-import kotlinx.coroutines.NonCancellable.start
-import kotlinx.serialization.json.JsonNull.content
 
 /*
 val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -63,7 +50,7 @@ fun CollapsableTopAppBar(
     title: @Composable (() -> Unit),
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
-    navigationIcon: @Composable (() -> Unit)? = null,
+    navigationIcon: @Composable (() -> Unit) = { },
     actions: @Composable (RowScope.() -> Unit) = {},
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
     contentMaxHeight: Dp = 80.dp,
@@ -107,8 +94,7 @@ fun CollapsableTopAppBar(
         colors.scrolledContainerColor,
         FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
     )
-    Log.d("jhs", "${TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal).asPaddingValues(density)}")
-Log.d("jhs", "${windowInsetsPadding.calculateStartPadding(LocalLayoutDirection.current)}")
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -119,7 +105,7 @@ Log.d("jhs", "${windowInsetsPadding.calculateStartPadding(LocalLayoutDirection.c
     ) {
         Column {
             TopAppBar(
-                navigationIcon = navigationIcon ?: {},
+                navigationIcon = navigationIcon,
                 title = title,
                 actions = actions,
                 colors = TopAppBarDefaults.mediumTopAppBarColors()
@@ -134,11 +120,7 @@ Log.d("jhs", "${windowInsetsPadding.calculateStartPadding(LocalLayoutDirection.c
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        // WindowInsets horizontal padding is 0.dp, TopAppBar seems to be using something else
-                        .padding(horizontal = if (navigationIcon != null) 4.dp else 12.dp)
-//                        .padding(TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal).asPaddingValues(density))
-//                        .height(currentFilterUiHeight)
-//                        .requiredHeight(expandedHeight-collapsedHeight)
+                        .padding(12.dp)
                         .graphicsLayer {
                             alpha = 1f - scrollBehavior.state.collapsedFraction
                             translationY = - (expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
