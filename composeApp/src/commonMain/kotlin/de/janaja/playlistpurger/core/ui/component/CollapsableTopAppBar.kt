@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
@@ -89,11 +91,11 @@ fun CollapsableTopAppBar(
     val currentFilterUiHeight = lerp(contentMaxHeight, 0.dp, scrollBehavior.state.collapsedFraction)
 
     // color
-    val color = androidx.compose.ui.graphics.lerp(
-        colors.containerColor,
-        colors.scrolledContainerColor,
-        FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
-    )
+    val color = colors.scrolledContainerColor//androidx.compose.ui.graphics.lerp(
+//        colors.containerColor,
+//        colors.scrolledContainerColor,
+//        FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
+//    )
 
     Surface(
         modifier = modifier
@@ -103,7 +105,39 @@ fun CollapsableTopAppBar(
         color = color,
 //        tonalElevation = if (scrollBehavior.state.collapsedFraction < 1f) 2.dp else 0.dp // Example
     ) {
-        Column {
+        Box {
+
+//            Column {
+//                Box(Modifier.heightIn(max = collapsedHeight))//.requiredHeight(collapsedHeight))
+                /*
+                inset of TopAppBar
+                navIcon has 4.dp horizontal padding, nothing more
+                title has 4.dp horizontal padding + max(width of navIcon, TopAppBarTitleInset = 16.dp - TopAppBarHorizontalPadding = 12.dp)
+                 */
+                if (currentFilterUiHeight > 0.dp) { // Only compose if there's space
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                            .height(currentAppBarHeight)
+                            .graphicsLayer {
+                                alpha = 1f - scrollBehavior.state.collapsedFraction// * 2
+//                                translationY =
+//                                    -(expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
+                            },
+                        contentAlignment = Alignment.BottomCenter
+//                        .clipToBounds()
+                    ) {
+                        // for fixed height
+                        Box(
+                            modifier = Modifier.requiredHeight(expandedHeight - collapsedHeight)
+                        ) {
+                            content()
+                        }
+                    }
+                }
+
+//            }
             TopAppBar(
                 navigationIcon = navigationIcon,
                 title = title,
@@ -111,31 +145,6 @@ fun CollapsableTopAppBar(
                 colors = TopAppBarDefaults.mediumTopAppBarColors()
                     .copy(containerColor = color, scrolledContainerColor = color)
             )
-            /*
-            inset of TopAppBar
-            navIcon has 4.dp horizontal padding, nothing more
-            title has 4.dp horizontal padding + max(width of navIcon, TopAppBarTitleInset = 16.dp - TopAppBarHorizontalPadding = 12.dp)
-             */
-            if (currentFilterUiHeight > 0.dp) { // Only compose if there's space
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                        .graphicsLayer {
-                            alpha = 1f - scrollBehavior.state.collapsedFraction
-                            translationY = - (expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
-                        }
-                        .clipToBounds()
-                ) {
-                    // for fixed height
-                    Box(
-                        modifier = Modifier.requiredHeight(expandedHeight-collapsedHeight)
-                    ) {
-                        content()
-                    }
-                }
-            }
-
         }
     }
 }
