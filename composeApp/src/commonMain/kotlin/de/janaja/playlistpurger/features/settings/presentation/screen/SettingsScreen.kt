@@ -1,7 +1,9 @@
 package de.janaja.playlistpurger.features.settings.presentation.screen
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,34 +23,37 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinViewModel(),
 ) {
     val settings by settingsViewModel.settings.collectAsState()
-    Column(
-        modifier
-    ) {
-        SwitchPreference(
-            value = settings.showSwipeFirst,
-            onValueChange = {
-                settingsViewModel.updateShowSwipeFirst(it)
-            },
-            title = { Text("Prefer Swipe View") },
-            summary = {
-                Text("When turned on, Swipe View is preferred over List View in Vote Screen ")
-            }
-        )
-        IconButtonPreference(
-            title = {
-                Text("Logout")
-            },
-            iconButtonIcon = {
-                Icon(
-                    painterResource(Res.drawable.baseline_logout_24),
-                    "logout"
-                )
-            },
-            summary = {
-                Text("Log out off your Spotify Account")
-            }
+
+    Scaffold { innerPadding ->
+        Column(
+            modifier.padding(innerPadding)
         ) {
-            settingsViewModel.logout()
+            SwitchPreference(
+                value = settings.showSwipeFirst,
+                onValueChange = {
+                    settingsViewModel.updateShowSwipeFirst(it)
+                },
+                title = { Text("Prefer Swipe View") },
+                summary = {
+                    Text("When turned on, Swipe View is preferred over List View in Vote Screen ")
+                }
+            )
+            IconButtonPreference(
+                title = {
+                    Text("Logout")
+                },
+                iconButtonIcon = {
+                    Icon(
+                        painterResource(Res.drawable.baseline_logout_24),
+                        "logout"
+                    )
+                },
+                summary = {
+                    Text("Log out off your Spotify Account")
+                }
+            ) {
+                settingsViewModel.logout()
+            }
         }
     }
 }

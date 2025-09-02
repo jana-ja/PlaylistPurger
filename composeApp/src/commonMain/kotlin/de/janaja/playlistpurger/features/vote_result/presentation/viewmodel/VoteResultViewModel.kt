@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import de.janaja.playlistpurger.core.domain.exception.DataException
-import de.janaja.playlistpurger.core.ui.VoteResultRoute
 import de.janaja.playlistpurger.core.ui.model.DataState
+import de.janaja.playlistpurger.core.ui.navigation.VoteResultRoute
 import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.ui.util.toStringResId
 import de.janaja.playlistpurger.features.vote_result.domain.usecase.GetTracksWithAllVotesUseCase
@@ -22,6 +22,7 @@ class VoteResultViewModel(
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<VoteResultRoute>()
     private val playlistId = args.playlistId
+    val playlistName = args.playlistName
 
     val dataState = getTracksWithAllVotesUseCase(playlistId)
         .map { result ->

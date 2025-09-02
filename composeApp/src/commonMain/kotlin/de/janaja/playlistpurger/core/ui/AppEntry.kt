@@ -3,6 +3,7 @@ package de.janaja.playlistpurger.core.ui
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import de.janaja.playlistpurger.core.ui.navigation.AppNavHost
 import de.janaja.playlistpurger.features.auth.domain.model.UserLoginState
 import de.janaja.playlistpurger.features.auth.presentation.screen.WelcomeScreen
 import de.janaja.playlistpurger.core.ui.theme.PlaylistPurgerTheme
@@ -22,7 +23,7 @@ fun AppEntry() {
             }
 
             is UserLoginState.LoggedIn -> {
-                MainAppScaffold()
+                AppNavHost()
             }
 
             UserLoginState.LoggedOut -> {
