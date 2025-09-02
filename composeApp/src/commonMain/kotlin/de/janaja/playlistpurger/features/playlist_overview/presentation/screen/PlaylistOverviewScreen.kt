@@ -2,6 +2,7 @@ package de.janaja.playlistpurger.features.playlist_overview.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,7 +57,8 @@ fun PlaylistOverviewScreen(
                         )
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                contentMaxHeight = 72.dp
             ) {
                 SearchTextField(
                     searchText = searchText,
@@ -78,7 +80,8 @@ fun PlaylistOverviewScreen(
 
             DataStateView(dataState) { data ->
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(top = 8.dp)
                 ) {
                     items(data, key = { it.id }) {
                         PlaylistItem(
