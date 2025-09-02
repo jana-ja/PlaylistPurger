@@ -17,6 +17,8 @@ import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import de.janaja.playlistpurger.shared.domain.repository.UserRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -64,11 +66,44 @@ class SpotifyTrackListRepo(
             val currentUserId = userFlow.value?.id
                 ?: return@withContext Result.failure(DataException.Auth.MissingCurrentUser)
 
-            val tracksResult = webApi.getTracksForPlaylist(playlistId)
+            val limit = 100
+            val tracksResult = webApi.getTracksForPlaylist(playlistId, limit)
+
 
             return@withContext tracksResult.fold(
                 onSuccess = { tracksResponse ->
-                    val tracksFromSpotify = tracksResponse.items
+                    // get up to 100 tracks
+                    val tracksFromSpotify = tracksResponse.items.toMutableList()
+                    val totalTracks = tracksResponse.total
+
+                    // get remaining tracks
+                    if (totalTracks > tracksFromSpotify.size) {
+                        val remainingTracks = totalTracks - tracksFromSpotify.size
+                        val remainingPages = (remainingTracks + limit - 1) / limit//ceil(remainingTracks.toFloat() / 100.0f)
+
+                        val pageFetchJobs = List(remainingPages) { pageIndex ->
+                            async {
+                                val offsetForPage = (pageIndex + 1) * limit
+                                webApi.getTracksForPlaylist(playlistId, limit, offsetForPage)
+                            }
+                        }
+
+                        // concat
+                        val allRemainingTracks = pageFetchJobs.awaitAll()
+                        allRemainingTracks.forEach { result ->
+                            result.fold(
+                                onSuccess = { he ->
+                                    tracksFromSpotify.addAll(he.items)
+                                },
+                                onFailure = {
+                                    return@withContext Result.failure(it)
+                                }
+                            )
+                        }
+                    }
+
+
+                    // merge with votes
                     val votesResult = voteApi.getUsersVotesForPlaylist(playlistId, currentUserId)
 
                     votesResult.fold(

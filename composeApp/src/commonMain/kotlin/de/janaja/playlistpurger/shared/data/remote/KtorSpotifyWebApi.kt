@@ -6,6 +6,7 @@ import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 
 class KtorSpotifyWebApi (
     private val httpClient: HttpClient
@@ -17,9 +18,12 @@ class KtorSpotifyWebApi (
         }
     }
 
-    override suspend fun getTracksForPlaylist(playlistId: String): Result<TracksResponseDto> {
+    override suspend fun getTracksForPlaylist(playlistId: String, limit: Int, offset: Int): Result<TracksResponseDto> {
         return safeCall {
-            httpClient.get("playlists/${playlistId}/tracks")
+            httpClient.get("playlists/${playlistId}/tracks") {
+                parameter("limit", limit)
+                parameter("offset", offset)
+            }
         }
     }
 
