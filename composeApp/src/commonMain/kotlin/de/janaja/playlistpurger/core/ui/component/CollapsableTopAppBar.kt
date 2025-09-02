@@ -2,12 +2,10 @@ package de.janaja.playlistpurger.core.ui.component
 
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -44,7 +41,7 @@ ScrollBehavior has state
 - state.contentOffset: Float: (ignore for now)
 
 
-scrollbehavior.state must now the maxHeight and minHeight to calculate collapsedFraction and heightOffset
+scrollbehavior.state must know the maxHeight and minHeight to calculate collapsedFraction and heightOffset
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,24 +88,19 @@ fun CollapsableTopAppBar(
     val currentFilterUiHeight = lerp(contentMaxHeight, 0.dp, scrollBehavior.state.collapsedFraction)
 
     // color
-    val color = colors.scrolledContainerColor//androidx.compose.ui.graphics.lerp(
-//        colors.containerColor,
-//        colors.scrolledContainerColor,
-//        FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
-//    )
+    val color = androidx.compose.ui.graphics.lerp(
+        colors.containerColor,
+        colors.scrolledContainerColor,
+        FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
+    )
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .height(currentAppBarHeight),
-
-        color = color,
-//        tonalElevation = if (scrollBehavior.state.collapsedFraction < 1f) 2.dp else 0.dp // Example
+        color = color
     ) {
         Box {
-
-//            Column {
-//                Box(Modifier.heightIn(max = collapsedHeight))//.requiredHeight(collapsedHeight))
                 /*
                 inset of TopAppBar
                 navIcon has 4.dp horizontal padding, nothing more
@@ -126,7 +118,6 @@ fun CollapsableTopAppBar(
 //                                    -(expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
                             },
                         contentAlignment = Alignment.BottomCenter
-//                        .clipToBounds()
                     ) {
                         // for fixed height
                         Box(
@@ -137,7 +128,6 @@ fun CollapsableTopAppBar(
                     }
                 }
 
-//            }
             TopAppBar(
                 navigationIcon = navigationIcon,
                 title = title,
