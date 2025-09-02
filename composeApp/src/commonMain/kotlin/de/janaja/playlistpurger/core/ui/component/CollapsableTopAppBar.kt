@@ -6,12 +6,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -23,9 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import de.janaja.playlistpurger.core.util.Log
+import de.janaja.playlistpurger.core.util.Log.Companion.d
+import kotlinx.coroutines.NonCancellable.start
+import kotlinx.serialization.json.JsonNull.content
 
 /*
 val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -50,16 +61,19 @@ scrollbehavior.state must now the maxHeight and minHeight to calculate collapsed
 @Composable
 fun CollapsableTopAppBar(
     title: @Composable (() -> Unit),
-    actions: @Composable (RowScope.() -> Unit) = {},
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
+    navigationIcon: @Composable (() -> Unit)? = null,
+    actions: @Composable (RowScope.() -> Unit) = {},
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
     contentMaxHeight: Dp = 80.dp,
     content: @Composable (() -> Unit)
 ) {
     val density = LocalDensity.current
 
-    val topInset = TopAppBarDefaults.windowInsets.asPaddingValues(density).calculateTopPadding()
+    val windowInsetsPadding = TopAppBarDefaults.windowInsets.asPaddingValues(density)
+
+    val topInset = windowInsetsPadding.calculateTopPadding()
     // min size of TopBar
     val collapsedHeight = TopAppBarDefaults.TopAppBarExpandedHeight + topInset
     // max size of TopBar
@@ -93,7 +107,8 @@ fun CollapsableTopAppBar(
         colors.scrolledContainerColor,
         FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
     )
-
+    Log.d("jhs", "${TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal).asPaddingValues(density)}")
+Log.d("jhs", "${windowInsetsPadding.calculateStartPadding(LocalLayoutDirection.current)}")
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -104,16 +119,24 @@ fun CollapsableTopAppBar(
     ) {
         Column {
             TopAppBar(
+                navigationIcon = navigationIcon ?: {},
                 title = title,
                 actions = actions,
                 colors = TopAppBarDefaults.mediumTopAppBarColors()
                     .copy(containerColor = color, scrolledContainerColor = color)
             )
+            /*
+            inset of TopAppBar
+            navIcon has 4.dp horizontal padding, nothing more
+            title has 4.dp horizontal padding + max(width of navIcon, TopAppBarTitleInset = 16.dp - TopAppBarHorizontalPadding = 12.dp)
+             */
             if (currentFilterUiHeight > 0.dp) { // Only compose if there's space
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .windowInsetsPadding(TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal)) // TODO why are horizontal insets not working?
+                        // WindowInsets horizontal padding is 0.dp, TopAppBar seems to be using something else
+                        .padding(horizontal = if (navigationIcon != null) 4.dp else 12.dp)
+//                        .padding(TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Horizontal).asPaddingValues(density))
 //                        .height(currentFilterUiHeight)
 //                        .requiredHeight(expandedHeight-collapsedHeight)
                         .graphicsLayer {
