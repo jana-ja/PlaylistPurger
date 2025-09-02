@@ -120,7 +120,7 @@ fun CollapsableTopAppBar(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp)
+                        .padding(horizontal = 12.dp)
                         .graphicsLayer {
                             alpha = 1f - scrollBehavior.state.collapsedFraction
                             translationY = - (expandedHeightPx - collapsedHeightPx) * scrollBehavior.state.collapsedFraction / 2
