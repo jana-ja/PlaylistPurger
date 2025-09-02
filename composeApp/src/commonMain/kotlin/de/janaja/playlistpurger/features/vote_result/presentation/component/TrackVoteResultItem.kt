@@ -157,7 +157,7 @@ fun TrackVoteResultItem(
                         )
 
 //                // TODO show max result?
-                        VoteOptionIcon(voteResult.resultOption)
+                        VoteOptionIcon(voteResult.resultOption, Modifier.padding(end = 16.dp))
 
                     }
                 }

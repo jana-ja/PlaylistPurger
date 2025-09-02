@@ -17,7 +17,7 @@ fun VoteOptionResultOverview(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("$voteCount")
         VoteOptionIcon(voteOption)
+        Text("$voteCount")
     }
 }

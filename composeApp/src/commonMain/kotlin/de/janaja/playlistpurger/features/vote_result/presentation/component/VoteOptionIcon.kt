@@ -26,7 +26,7 @@ fun VoteOptionIcon(
         ),
         contentDescription = voteOption?.contentDescription
             ?: "no final result yet",
-        modifier = modifier.padding(end = 16.dp).size(42.dp)
+        modifier = modifier.size(42.dp)
             .border(1.dp, Color.Black, CircleShape).padding(8.dp)
     )
 }

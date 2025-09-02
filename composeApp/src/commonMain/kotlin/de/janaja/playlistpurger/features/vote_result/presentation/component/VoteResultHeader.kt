@@ -44,9 +44,9 @@ fun VoteResultHeader(
                 }
             }
 
-            Spacer(Modifier.height(4.dp))
-
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
                 VoteOptionResultOverview(
                     votesByVoteOption[VoteOption.KEEP]?.size ?: 0,
                     VoteOption.KEEP
