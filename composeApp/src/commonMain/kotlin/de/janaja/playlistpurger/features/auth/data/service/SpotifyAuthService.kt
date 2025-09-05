@@ -45,7 +45,7 @@ class SpotifyAuthService(
 
     override fun getAuthenticationUrl(): String {
         val urlString = "https://accounts.spotify.com/de/authorize?" +
-                "scope=playlist-read-private" +
+                "scope=playlist-read-private user-modify-playback-state" +
                 "&response_type=code" +
                 "&redirect_uri=${spotifyClientCredentials.redirectUri}" + // asdf%3A%2F%2Fcallback
                 "&client_id=${spotifyClientCredentials.clientId}" +

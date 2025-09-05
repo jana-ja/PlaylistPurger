@@ -13,6 +13,8 @@ import de.janaja.playlistpurger.core.ui.util.toStringResId
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.ObserveTracksWithOwnVotesUseCase
+import de.janaja.playlistpurger.features.track_voting.domain.usecase.PauseUseCase
+import de.janaja.playlistpurger.features.track_voting.domain.usecase.PlayTrackUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.UpsertVoteUseCase
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
@@ -33,6 +35,8 @@ class TrackListVoteViewModel(
     observeTracksWithOwnVotesUseCase: ObserveTracksWithOwnVotesUseCase,
     private val upsertVoteUseCase: UpsertVoteUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val playTrackUseCase: PlayTrackUseCase,
+    private val pauseUseCase: PauseUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val TAG = "TrackListViewModel"
@@ -84,6 +88,11 @@ class TrackListVoteViewModel(
         unvotedTracks.map { list ->
             listOfNotNull(list.getOrNull(0), list.getOrNull(1))
         }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                emptyList()
+            )
 
     val allTracksCount = allTracks
         .map { it.count() }
@@ -92,6 +101,9 @@ class TrackListVoteViewModel(
         .combine(unvotedTracks) { allCount, unvotedTracks ->
             allCount - unvotedTracks.count()
         }
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
 
     // ui states
     private val _swipeModeOn = MutableStateFlow(true)
@@ -115,6 +127,10 @@ class TrackListVoteViewModel(
             Log.d(TAG, "onChangeVote: $track")
 
             val result = upsertVoteUseCase(playlistId, track.id, newVote)
+            // TODO check if is playing? check if successful?
+            if (_isPlaying.value) {
+                pauseSwipeTrack()
+            }
             result.onFailure {
                 // TODO error handling
                 // upsert failed, old value was already restored
@@ -128,6 +144,51 @@ class TrackListVoteViewModel(
         // TODO darf nicht passieren dass das null ist, dann wäre gültiger down swipe passiert, aber swipe card sollte das blocken
         VoteOption.fromSwipeDirection(dir)?.let {
             onChangeVote(track, it)
+        }
+    }
+
+    fun playPauseSwipeTrack() {
+        if (_isPlaying.value)
+            pauseSwipeTrack()
+        else
+            playSwipeTrack()
+    }
+
+    private fun playSwipeTrack() {
+        // TODO currently doesnt resume the song if i click play a second time
+        val state = dataState.value
+        val track = swipeTracks.value.firstOrNull()
+
+        if (state is DataState.Ready<List<Track>> && track != null) {
+            viewModelScope.launch {
+                Log.d("TrackListVoteViewModel", "$playlistId, ${track.name} mit ${track.id}")
+                val playResult = playTrackUseCase(playlistId, track)
+                playResult.fold(
+                    onSuccess = {
+                        _isPlaying.value = true
+                    },
+                    onFailure = {
+                        // TODO error message with snackbar
+                        // TODO add specific player state exception types
+                    }
+                )
+            }
+        } else {
+            // TODO show errors with snackbar
+        }
+    }
+
+    private fun pauseSwipeTrack() {
+        viewModelScope.launch {
+            val pauseResult = pauseUseCase()
+            pauseResult.fold(
+                onSuccess = {
+                    _isPlaying.value = false
+                },
+                onFailure = {
+                    // TODO error message with snackbar
+                }
+            )
         }
     }
 }

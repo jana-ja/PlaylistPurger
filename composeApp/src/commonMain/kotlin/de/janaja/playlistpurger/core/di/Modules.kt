@@ -14,7 +14,9 @@ import de.janaja.playlistpurger.shared.data.remote.KtorSpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.MyVoteApi
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
+import de.janaja.playlistpurger.shared.data.repo.SpotifyPlayerRepo
 import de.janaja.playlistpurger.shared.data.repo.SpotifyTrackListRepo
+import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +62,10 @@ val coreModule = module {
 //    singleOf(::TrackListRepoImpl)
     single<TrackListRepo> {
         SpotifyTrackListRepo(get(), get(), get())
+    }
+
+    single<PlayerRepo> {
+        SpotifyPlayerRepo(get())
     }
 
     // DataStore - module specific

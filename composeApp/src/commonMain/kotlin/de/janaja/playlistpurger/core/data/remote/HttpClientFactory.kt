@@ -108,7 +108,7 @@ object HttpClientFactory {
                     println(message)
                 }
             }
-            level = LogLevel.INFO
+            level = LogLevel.BODY
         }
         defaultRequest {
             contentType(ContentType.Application.Json)
