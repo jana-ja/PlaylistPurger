@@ -11,20 +11,35 @@ import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.shared.domain.model.Track
 import org.jetbrains.compose.resources.painterResource
 import playlistpurger.composeapp.generated.resources.Res
+import playlistpurger.composeapp.generated.resources.baseline_forward_10_24
 import playlistpurger.composeapp.generated.resources.baseline_pause_24
 import playlistpurger.composeapp.generated.resources.baseline_play_arrow_24
+import playlistpurger.composeapp.generated.resources.baseline_replay_10_24
 
 @Composable
 fun PlayerControls(
     track: Track?,
     isPlaying: Boolean,
     onClickPlayPause: () -> Unit,
+    onClickForward: () -> Unit,
+    onClickRewind: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        IconButton(
+            onClick = onClickRewind,
+            enabled = track != null
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.baseline_replay_10_24),
+                contentDescription = "Rewind Track 10 seconds",
+                modifier = Modifier.size(40.dp)
+            )
+        }
+
         IconButton(
             onClick = onClickPlayPause,
             enabled = track != null
@@ -39,6 +54,15 @@ fun PlayerControls(
             )
         }
 
-        // TODO add skip 5 or 10 sec button
+        IconButton(
+            onClick = onClickForward,
+            enabled = track != null
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.baseline_forward_10_24),
+                contentDescription = "Forward Track 10 seconds",
+                modifier = Modifier.size(40.dp)
+            )
+        }
     }
 }

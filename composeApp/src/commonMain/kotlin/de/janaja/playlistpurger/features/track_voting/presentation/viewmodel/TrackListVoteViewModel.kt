@@ -12,6 +12,7 @@ import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.ui.util.toStringResId
 import de.janaja.playlistpurger.core.util.Log
 import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
+import de.janaja.playlistpurger.features.track_voting.domain.usecase.AdjustPlaybackPositionUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.ObserveTracksWithOwnVotesUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.PauseUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.PlayTrackUseCase
@@ -37,6 +38,7 @@ class TrackListVoteViewModel(
     private val observeSettingsUseCase: ObserveSettingsUseCase,
     private val playTrackUseCase: PlayTrackUseCase,
     private val pauseUseCase: PauseUseCase,
+    private val adjustPlaybackPositionUseCase: AdjustPlaybackPositionUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val TAG = "TrackListViewModel"
@@ -189,6 +191,24 @@ class TrackListVoteViewModel(
                     // TODO error message with snackbar
                 }
             )
+        }
+    }
+
+    fun forwardTrack() {
+        viewModelScope.launch {
+            val result = adjustPlaybackPositionUseCase(10)
+            result.onFailure {
+                // TODO error message with snackbar
+            }
+        }
+    }
+
+    fun rewindTrack() {
+        viewModelScope.launch {
+            val result = adjustPlaybackPositionUseCase(-10)
+            result.onFailure {
+                // TODO error message with snackbar
+            }
         }
     }
 }

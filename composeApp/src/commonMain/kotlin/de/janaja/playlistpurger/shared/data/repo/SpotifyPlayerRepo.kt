@@ -1,6 +1,8 @@
 package de.janaja.playlistpurger.shared.data.repo
 
+import de.janaja.playlistpurger.shared.data.model.toPlayerState
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
+import de.janaja.playlistpurger.shared.domain.model.PlayerState
 import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
 
 class SpotifyPlayerRepo(
@@ -18,6 +20,16 @@ class SpotifyPlayerRepo(
     override suspend fun pause(): Result<Unit> {
         return webApi.pauseTrack()
             .map { }
+    }
+
+    override suspend fun seekPosition(newPosMs: Long): Result<Unit> {
+        return webApi.seekPosition(newPosMs)
+            .map { }
+    }
+
+    override suspend fun getPlayerState(): Result<PlayerState> {
+        return webApi.getPlayerState()
+            .map { it.toPlayerState() }
     }
 
 }

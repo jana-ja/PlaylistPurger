@@ -4,6 +4,7 @@ import de.janaja.playlistpurger.core.data.remote.safeCall
 import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
 import de.janaja.playlistpurger.shared.data.model.PlayRequestOffset
 import de.janaja.playlistpurger.shared.data.model.PlayRequest
+import de.janaja.playlistpurger.shared.data.model.PlayerStateDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 import io.ktor.client.HttpClient
@@ -60,6 +61,20 @@ class KtorSpotifyWebApi(
     override suspend fun pauseTrack(): Result<Unit?> {
         return safeCall {
             httpClient.put("me/player/pause")
+        }
+    }
+
+    override suspend fun seekPosition(newPosMs: Long): Result<Unit?> {
+        return safeCall {
+            httpClient.put("me/player/seek") {
+                parameter("position_ms", newPosMs)
+            }
+        }
+    }
+
+    override suspend fun getPlayerState(): Result<PlayerStateDto> {
+        return safeCall {
+            httpClient.get("me/player")
         }
     }
 }

@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.DataStateView
 import de.janaja.playlistpurger.core.ui.component.IconSwitch
@@ -30,11 +25,7 @@ import de.janaja.playlistpurger.features.track_voting.presentation.component.Pla
 import de.janaja.playlistpurger.features.track_voting.presentation.component.SwipeVoteTrackStack
 import de.janaja.playlistpurger.features.track_voting.presentation.component.TrackItem
 import de.janaja.playlistpurger.features.track_voting.presentation.viewmodel.TrackListVoteViewModel
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import playlistpurger.composeapp.generated.resources.Res
-import playlistpurger.composeapp.generated.resources.allDrawableResources
-import playlistpurger.composeapp.generated.resources.baseline_pause_24
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +87,13 @@ fun TrackListVoteScreen(
 
                     PlayerControls(
                         onClickPlayPause = {
-                                trackListVoteViewModel.playPauseSwipeTrack()
+                            trackListVoteViewModel.playPauseSwipeTrack()
+                        },
+                        onClickForward = {
+                            trackListVoteViewModel.forwardTrack()
+                        },
+                        onClickRewind = {
+                            trackListVoteViewModel.rewindTrack()
                         },
                         isPlaying = isPlaying,
                         track = swipeableTracks.firstOrNull(),

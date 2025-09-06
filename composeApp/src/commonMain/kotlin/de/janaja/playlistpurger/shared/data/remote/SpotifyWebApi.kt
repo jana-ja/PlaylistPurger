@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
+import de.janaja.playlistpurger.shared.data.model.PlayerStateDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 import io.ktor.client.statement.HttpResponse
@@ -17,4 +18,8 @@ interface SpotifyWebApi {
     suspend fun playTrack(playlistId: String, trackId: String): Result<Unit?>
 
     suspend fun pauseTrack(): Result<Unit?>
+
+    suspend fun seekPosition(newPosMs: Long): Result<Unit?>
+
+    suspend fun getPlayerState(): Result<PlayerStateDto>
 }
