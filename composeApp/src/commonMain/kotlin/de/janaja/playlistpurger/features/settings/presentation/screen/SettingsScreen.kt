@@ -2,9 +2,14 @@ package de.janaja.playlistpurger.features.settings.presentation.screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,14 +22,29 @@ import org.koin.compose.viewmodel.koinViewModel
 import playlistpurger.composeapp.generated.resources.Res
 import playlistpurger.composeapp.generated.resources.baseline_logout_24
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel = koinViewModel(),
 ) {
     val settings by settingsViewModel.settings.collectAsState()
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Settings")
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, "navigate bacl")
+                    }
+                },
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier.padding(innerPadding)
         ) {

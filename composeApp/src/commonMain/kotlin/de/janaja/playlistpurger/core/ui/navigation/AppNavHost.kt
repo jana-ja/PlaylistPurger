@@ -39,15 +39,21 @@ fun AppNavHost(
         }
 
         composable<TrackListRoute> {
-            TrackListVoteScreen()
+            TrackListVoteScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
         composable<VoteResultRoute> {
-            VoteResultScreen()
+            VoteResultScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
         composable<SettingsRoute> {
-            SettingsScreen()
+            SettingsScreen(
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
     }
