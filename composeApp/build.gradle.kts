@@ -105,8 +105,8 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             // ktor logging
             implementation(libs.ktor.client.logging)
-            // kotlin date time
-            implementation(libs.kotlinx.datetime)
+//            // kotlin date time
+//            implementation(libs.kotlinx.datetime)
         }
         nativeMain.dependencies {
             // ktor
