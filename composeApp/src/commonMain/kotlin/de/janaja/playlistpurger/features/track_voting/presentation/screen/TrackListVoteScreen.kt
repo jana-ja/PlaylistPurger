@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +45,14 @@ fun TrackListVoteScreen(
     val votedTracksCount by trackListVoteViewModel.votedTracksCount.collectAsState(0)
 
     val isPlaying by trackListVoteViewModel.isPlaying.collectAsState()
+
+    // TODO global player state?
+    DisposableEffect(Unit) {
+        onDispose {
+            if (isPlaying)
+                trackListVoteViewModel.playPauseSwipeTrack()
+        }
+    }
 
     Scaffold(
         topBar = {
