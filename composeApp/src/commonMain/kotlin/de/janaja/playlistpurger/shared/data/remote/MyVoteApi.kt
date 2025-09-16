@@ -16,7 +16,7 @@ class MyVoteApi(
 ): VoteApi {
 
 //    private val baseUrl = "http://10.0.2.2:8080/api/v1/" // in manifest: android:usesCleartextTraffic="true"
-    private val baseUrl = "http://217.154.117.3:8080/api/v1/"
+    private val baseUrl = "https://janaja.space/api/v1/"
 
     override suspend fun getUsersVotesForPlaylist(
         playlistId: String,
