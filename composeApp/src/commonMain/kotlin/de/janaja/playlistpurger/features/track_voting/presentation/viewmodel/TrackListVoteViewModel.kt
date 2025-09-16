@@ -185,6 +185,7 @@ class TrackListVoteViewModel(
 
     private fun playSwipeTrack() {
         // TODO currently doesnt resume the song if i click play a second time
+        //  need to track if its the same song, then dont send body
         val state = dataState.value
         val track = swipeTracks.value.firstOrNull()
         val selectedDevice = selectedDevice.value
