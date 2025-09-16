@@ -1,6 +1,6 @@
-package de.janaja.playlistpurger.shared.data.model
+package de.janaja.playlistpurger.features.player.data.model
 
-import de.janaja.playlistpurger.shared.domain.model.Device
+import de.janaja.playlistpurger.features.player.domain.model.Device
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package de.janaja.playlistpurger.shared.domain.model
+package de.janaja.playlistpurger.features.player.domain.model
 
 data class PlayerState(
     val device: Device,

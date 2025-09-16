@@ -1,5 +1,6 @@
-package de.janaja.playlistpurger.shared.data.model
+package de.janaja.playlistpurger.features.player.data.model
 
+import de.janaja.playlistpurger.features.player.data.model.PlayRequestOffset
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

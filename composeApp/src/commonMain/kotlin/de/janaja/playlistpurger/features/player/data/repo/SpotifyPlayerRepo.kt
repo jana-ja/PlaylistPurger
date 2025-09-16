@@ -1,9 +1,9 @@
-package de.janaja.playlistpurger.shared.data.repo
+package de.janaja.playlistpurger.features.player.data.repo
 
-import de.janaja.playlistpurger.shared.data.model.toPlayerState
+import de.janaja.playlistpurger.features.player.data.model.toPlayerState
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
-import de.janaja.playlistpurger.shared.domain.model.PlayerState
-import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
+import de.janaja.playlistpurger.features.player.domain.model.PlayerState
+import de.janaja.playlistpurger.features.player.domain.repo.PlayerRepo
 
 class SpotifyPlayerRepo(
     private val webApi: SpotifyWebApi

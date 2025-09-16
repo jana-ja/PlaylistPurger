@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.features.track_voting.domain.usecase
 
+import de.janaja.playlistpurger.features.player.domain.repo.PlayerRepo
 import de.janaja.playlistpurger.shared.domain.model.Track
-import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
 
 class PlayTrackUseCase(
     private val playerRepo: PlayerRepo

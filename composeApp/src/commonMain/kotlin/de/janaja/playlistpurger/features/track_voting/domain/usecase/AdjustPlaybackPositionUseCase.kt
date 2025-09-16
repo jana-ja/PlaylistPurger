@@ -1,7 +1,7 @@
 package de.janaja.playlistpurger.features.track_voting.domain.usecase
 
 import de.janaja.playlistpurger.core.util.Log
-import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
+import de.janaja.playlistpurger.features.player.domain.repo.PlayerRepo
 import kotlin.math.max
 
 class AdjustPlaybackPositionUseCase(

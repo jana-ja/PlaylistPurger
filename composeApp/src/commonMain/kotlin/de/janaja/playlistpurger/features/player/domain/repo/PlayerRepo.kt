@@ -1,6 +1,6 @@
-package de.janaja.playlistpurger.shared.domain.repository
+package de.janaja.playlistpurger.features.player.domain.repo
 
-import de.janaja.playlistpurger.shared.domain.model.PlayerState
+import de.janaja.playlistpurger.features.player.domain.model.PlayerState
 
 interface PlayerRepo {
     suspend fun play(playlistId: String, trackId: String): Result<Unit>

@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.features.track_voting.domain.usecase
 
-import de.janaja.playlistpurger.shared.domain.repository.PlayerRepo
+import de.janaja.playlistpurger.features.player.domain.repo.PlayerRepo
+
 
 class PauseUseCase(
     private val playerRepo: PlayerRepo

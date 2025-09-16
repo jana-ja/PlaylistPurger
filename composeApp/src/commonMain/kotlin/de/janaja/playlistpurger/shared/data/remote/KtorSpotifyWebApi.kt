@@ -2,9 +2,9 @@ package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.core.data.remote.safeCall
 import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
-import de.janaja.playlistpurger.shared.data.model.PlayRequestOffset
-import de.janaja.playlistpurger.shared.data.model.PlayRequest
-import de.janaja.playlistpurger.shared.data.model.PlayerStateDto
+import de.janaja.playlistpurger.features.player.data.model.PlayRequestOffset
+import de.janaja.playlistpurger.features.player.data.model.PlayRequest
+import de.janaja.playlistpurger.features.player.data.model.PlayerStateDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
 import de.janaja.playlistpurger.shared.data.model.UserFullDto
 import io.ktor.client.HttpClient
@@ -12,7 +12,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
 
 class KtorSpotifyWebApi(
     private val httpClient: HttpClient
