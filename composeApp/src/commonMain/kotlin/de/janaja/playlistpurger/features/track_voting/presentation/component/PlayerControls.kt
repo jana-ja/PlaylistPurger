@@ -130,36 +130,51 @@ fun PlayerControls(
                 deviceDropDownExpanded = false
             }
         ) {
-            // TODO add possibility to reload
-            if (availableDevices.isEmpty()) {
-                Text("No devices available. Please open Spotify on any connected device")
-            } else {
-                if (selectedDevice == null) {
-                    Text("Please select a device")
-                }
-                Column(modifier.selectableGroup()) {
-                    availableDevices.forEach { device ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .selectable(
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Available Devices:",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                // TODO add possibility to reload
+                if (availableDevices.isEmpty()) {
+                    Text(
+                        "No devices available. Please open Spotify on any connected device and refresh",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                } else {
+                    if (selectedDevice == null) {
+                        Text(
+                            "Please select a device",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Column(modifier.selectableGroup()) {
+                        availableDevices.forEach { device ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .selectable(
+                                        selected = (device.id == selectedDevice?.id),
+                                        onClick = { onDeviceChange(device) },
+                                        role = Role.RadioButton
+                                    )
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
                                     selected = (device.id == selectedDevice?.id),
-                                    onClick = { onDeviceChange(device) },
-                                    role = Role.RadioButton
+                                    onClick = null // null recommended for accessibility with screen readers
                                 )
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (device.id == selectedDevice?.id),
-                                onClick = null // null recommended for accessibility with screen readers
-                            )
-                            Text(
-                                text = device.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
+                                Text(
+                                    text = device.name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
                         }
                     }
                 }
