@@ -43,13 +43,17 @@ import playlistpurger.composeapp.generated.resources.baseline_pause_24
 import playlistpurger.composeapp.generated.resources.baseline_play_arrow_24
 import playlistpurger.composeapp.generated.resources.baseline_replay_10_24
 import playlistpurger.composeapp.generated.resources.baseline_speaker_24
+import playlistpurger.composeapp.generated.resources.outline_refresh_24
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// TODO add own viewmodel, only pass track?
+//  or move device selection to own component?
 fun PlayerControls(
     selectedDevice: Device?,
     availableDevices: List<Device>,
     onDeviceChange: (Device) -> Unit,
+    onRefreshDevices: () -> Unit,
     track: Track?,
     isPlaying: Boolean,
     onClickPlayPause: () -> Unit,
@@ -131,14 +135,27 @@ fun PlayerControls(
             }
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    "Available Devices:",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                // TODO add possibility to reload
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Available Devices:",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    IconButton(
+                        onClick = onRefreshDevices
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.outline_refresh_24),
+                            contentDescription = "Refresh Devices"
+                        )
+                    }
+                }
+
                 if (availableDevices.isEmpty()) {
                     Text(
                         "No devices available. Please open Spotify on any connected device and refresh",

@@ -114,6 +114,9 @@ fun TrackListVoteScreen(
                         onDeviceChange = {
                             trackListVoteViewModel.onDeviceChange(it)
                         },
+                        onRefreshDevices = {
+                            trackListVoteViewModel.getAvailableDevices()
+                        },
                         onClickPlayPause = {
                             trackListVoteViewModel.playPauseSwipeTrack()
                         },

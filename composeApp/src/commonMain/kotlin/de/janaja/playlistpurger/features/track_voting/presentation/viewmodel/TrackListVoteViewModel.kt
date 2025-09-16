@@ -166,7 +166,7 @@ class TrackListVoteViewModel(
             playSwipeTrack()
     }
 
-    private fun getAvailableDevices() {
+    fun getAvailableDevices() {
         viewModelScope.launch {
             val result = getAvailableDevicesUseCase()
             result.fold(
