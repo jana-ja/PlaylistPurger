@@ -127,7 +127,7 @@ fun TrackListVoteScreen(
                         track = swipeableTracks.firstOrNull(),
                     )
 
-                    Spacer(Modifier.height(100.dp))
+                    Spacer(Modifier.height(24.dp))
 
                 } else {
                     LazyColumn(

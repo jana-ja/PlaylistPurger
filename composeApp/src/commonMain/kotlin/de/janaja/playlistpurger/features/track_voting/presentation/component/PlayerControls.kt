@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -61,17 +62,22 @@ fun PlayerControls(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
-        IconButton(onClick = {
-            deviceDropDownExpanded = true
-        }) {
+        IconButton(
+            modifier = Modifier.size(40.dp).padding(2.dp),
+            onClick = {
+                deviceDropDownExpanded = true
+            },
+//            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFF0000FF))
+        ) {
             Icon(
                 painter = painterResource(Res.drawable.baseline_speaker_24),
                 contentDescription = "Open device menu",
                 tint = if (selectedDevice != null) Color(0xFF00FF00) else Color(0xFFFF0000),
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -115,7 +121,7 @@ fun PlayerControls(
             }
         }
 
-        Box(Modifier.size(32.dp))
+        Box(Modifier.size(40.dp))
     }
 
     if (deviceDropDownExpanded) {
