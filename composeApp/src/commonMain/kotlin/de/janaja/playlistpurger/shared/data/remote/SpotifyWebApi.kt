@@ -1,5 +1,6 @@
 package de.janaja.playlistpurger.shared.data.remote
 
+import de.janaja.playlistpurger.features.player.data.model.DevicesResponseDto
 import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
 import de.janaja.playlistpurger.features.player.data.model.PlayerStateDto
 import de.janaja.playlistpurger.shared.data.model.TracksResponseDto
@@ -13,6 +14,8 @@ interface SpotifyWebApi {
     suspend fun getCurrentUser(): Result<UserFullDto>
 
     suspend fun getUserForId(userId: String): Result<UserFullDto>
+
+    suspend fun getAvailableDevices(): Result<DevicesResponseDto>
 
     suspend fun playTrack(playlistId: String, trackId: String): Result<Unit?>
 

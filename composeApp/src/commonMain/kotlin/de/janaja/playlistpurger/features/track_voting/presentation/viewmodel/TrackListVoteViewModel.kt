@@ -11,8 +11,10 @@ import de.janaja.playlistpurger.core.ui.navigation.TrackListRoute
 import de.janaja.playlistpurger.core.ui.util.UiText
 import de.janaja.playlistpurger.core.ui.util.toStringResId
 import de.janaja.playlistpurger.core.util.Log
+import de.janaja.playlistpurger.features.player.domain.model.Device
 import de.janaja.playlistpurger.features.settings.domain.usecase.ObserveSettingsUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.AdjustPlaybackPositionUseCase
+import de.janaja.playlistpurger.features.track_voting.domain.usecase.GetAvailableDevicesUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.ObserveTracksWithOwnVotesUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.PauseUseCase
 import de.janaja.playlistpurger.features.track_voting.domain.usecase.PlayTrackUseCase
@@ -36,6 +38,7 @@ class TrackListVoteViewModel(
     observeTracksWithOwnVotesUseCase: ObserveTracksWithOwnVotesUseCase,
     private val upsertVoteUseCase: UpsertVoteUseCase,
     private val observeSettingsUseCase: ObserveSettingsUseCase,
+    private val getAvailableDevicesUseCase: GetAvailableDevicesUseCase,
     private val playTrackUseCase: PlayTrackUseCase,
     private val pauseUseCase: PauseUseCase,
     private val adjustPlaybackPositionUseCase: AdjustPlaybackPositionUseCase,
@@ -104,6 +107,12 @@ class TrackListVoteViewModel(
             allCount - unvotedTracks.count()
         }
 
+    private val _availableDevices = MutableStateFlow(listOf<Device>())
+    val availableDevices = _availableDevices.asStateFlow()
+
+    private var _selectedDevice = MutableStateFlow<Device?>(null)
+    val selectedDevice = _selectedDevice.asStateFlow()
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
@@ -117,6 +126,7 @@ class TrackListVoteViewModel(
             observeSettingsUseCase().first().let {
                 _swipeModeOn.value = it.showSwipeFirst
             }
+            getAvailableDevices()
         }
     }
 
@@ -154,6 +164,23 @@ class TrackListVoteViewModel(
             pauseSwipeTrack()
         else
             playSwipeTrack()
+    }
+
+    private fun getAvailableDevices() {
+        viewModelScope.launch {
+            val result = getAvailableDevicesUseCase()
+            result.fold(
+                onSuccess = { devices ->
+                    _availableDevices.value = devices
+                    // if one of the devices is selected -> write in stateflow
+                    _selectedDevice.value = devices.find { it.isActive }
+                },
+                onFailure = {
+                    Log.e(TAG, "getAvailableDevices: ", it)
+                    // TODO error message with snackbar
+                }
+            )
+        }
     }
 
     private fun playSwipeTrack() {
@@ -210,5 +237,10 @@ class TrackListVoteViewModel(
                 // TODO error message with snackbar
             }
         }
+    }
+
+    fun onDeviceChange(device: Device?) {
+        _selectedDevice.value = device
+        // TODO check if currently is playing and change device
     }
 }

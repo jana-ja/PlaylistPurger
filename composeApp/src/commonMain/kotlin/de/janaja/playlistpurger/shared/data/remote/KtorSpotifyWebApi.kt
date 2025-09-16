@@ -1,6 +1,7 @@
 package de.janaja.playlistpurger.shared.data.remote
 
 import de.janaja.playlistpurger.core.data.remote.safeCall
+import de.janaja.playlistpurger.features.player.data.model.DevicesResponseDto
 import de.janaja.playlistpurger.features.playlist_overview.data.model.PlaylistResponseDto
 import de.janaja.playlistpurger.features.player.data.model.PlayRequestOffset
 import de.janaja.playlistpurger.features.player.data.model.PlayRequest
@@ -44,6 +45,11 @@ class KtorSpotifyWebApi(
         }
 
     }
+
+    override suspend fun getAvailableDevices(): Result<DevicesResponseDto> =
+        safeCall {
+            httpClient.get("me/player/devices")
+        }
 
     // https://api.spotify.com/v1/me/player/play
     override suspend fun playTrack(contextUri: String, trackUri: String): Result<Unit?> {

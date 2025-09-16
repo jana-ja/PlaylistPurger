@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,9 @@ fun TrackListVoteScreen(
     val votedTracksCount by trackListVoteViewModel.votedTracksCount.collectAsState(0)
 
     val isPlaying by trackListVoteViewModel.isPlaying.collectAsState()
+
+    val selectedDevice by trackListVoteViewModel.selectedDevice.collectAsState()
+    val availableDevices by trackListVoteViewModel.availableDevices.collectAsState()
 
     // TODO global player state?
     DisposableEffect(Unit) {
@@ -105,6 +109,11 @@ fun TrackListVoteScreen(
                     Spacer(Modifier.weight(1f))
 
                     PlayerControls(
+                        selectedDevice = selectedDevice,
+                        availableDevices = availableDevices,
+                        onDeviceChange = {
+                            trackListVoteViewModel.onDeviceChange(it)
+                        },
                         onClickPlayPause = {
                             trackListVoteViewModel.playPauseSwipeTrack()
                         },
@@ -118,7 +127,7 @@ fun TrackListVoteScreen(
                         track = swipeableTracks.firstOrNull(),
                     )
 
-                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.height(100.dp))
 
                 } else {
                     LazyColumn(
