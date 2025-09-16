@@ -17,10 +17,11 @@ class SpotifyPlayerRepo(
         }
     }
 
-    override suspend fun play(playlistId: String, trackId: String): Result<Unit> {
+    override suspend fun play(playlistId: String, trackId: String, deviceId: String): Result<Unit> {
         return webApi.playTrack(
-            playlistId = "spotify:playlist:${playlistId}",
-            trackId = "spotify:track:${trackId}"
+            contextUri = "spotify:playlist:${playlistId}",
+            trackUri = "spotify:track:${trackId}",
+            deviceId = deviceId
         ).map { }
     }
 

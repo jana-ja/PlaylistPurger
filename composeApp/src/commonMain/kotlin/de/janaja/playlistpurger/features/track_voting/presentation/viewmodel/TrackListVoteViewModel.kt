@@ -187,11 +187,12 @@ class TrackListVoteViewModel(
         // TODO currently doesnt resume the song if i click play a second time
         val state = dataState.value
         val track = swipeTracks.value.firstOrNull()
+        val selectedDevice = selectedDevice.value
 
-        if (state is DataState.Ready<List<Track>> && track != null) {
+        if (state is DataState.Ready<List<Track>> && track != null && selectedDevice != null) {
             viewModelScope.launch {
-                Log.d("TrackListVoteViewModel", "$playlistId, ${track.name} mit ${track.id}")
-                val playResult = playTrackUseCase(playlistId, track)
+                Log.d("TrackListVoteViewModel", "$playlistId, ${track.name} mit ${track.id} on device ${selectedDevice.name}")
+                val playResult = playTrackUseCase(playlistId, track, selectedDevice.id)
                 playResult.fold(
                     onSuccess = {
                         _isPlaying.value = true

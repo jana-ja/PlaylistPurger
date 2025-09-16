@@ -52,9 +52,10 @@ class KtorSpotifyWebApi(
         }
 
     // https://api.spotify.com/v1/me/player/play
-    override suspend fun playTrack(contextUri: String, trackUri: String): Result<Unit?> {
+    override suspend fun playTrack(contextUri: String, trackUri: String, deviceId: String): Result<Unit?> {
         return safeCall<Unit?> {
             httpClient.put("me/player/play") {
+                parameter("device_id", deviceId)
                 setBody(
                     PlayRequest(contextUri, PlayRequestOffset(trackUri))
                 )

@@ -7,7 +7,7 @@ class PlayTrackUseCase(
     private val playerRepo: PlayerRepo
 ) {
     // TODO play only track or with playlist?
-    suspend operator fun invoke(playlistId: String, track: Track): Result<Unit> {
-        return playerRepo.play(playlistId, track.id)
+    suspend operator fun invoke(playlistId: String, track: Track, deviceId: String): Result<Unit> {
+        return playerRepo.play(playlistId, track.id, deviceId)
     }
 }

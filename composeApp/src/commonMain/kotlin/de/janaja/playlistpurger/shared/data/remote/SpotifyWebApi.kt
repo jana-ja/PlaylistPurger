@@ -17,7 +17,7 @@ interface SpotifyWebApi {
 
     suspend fun getAvailableDevices(): Result<DevicesResponseDto>
 
-    suspend fun playTrack(playlistId: String, trackId: String): Result<Unit?>
+    suspend fun playTrack(contextUri: String, trackUri: String, deviceId: String): Result<Unit?>
 
     suspend fun pauseTrack(): Result<Unit?>
 
