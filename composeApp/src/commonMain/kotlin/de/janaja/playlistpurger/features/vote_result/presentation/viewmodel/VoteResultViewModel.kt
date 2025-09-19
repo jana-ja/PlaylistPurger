@@ -32,9 +32,9 @@ class VoteResultViewModel(
                 },
                 onFailure = { e ->
                     if (e is DataException) {
-                        DataState.Error(e.toStringResId())
+                        DataState.Error(UiText.DynamicString("${e.message}: ${e.cause}"))//e.toStringResId())
                     } else {
-                        DataState.Error(UiText.StringResourceId(Res.string.generic_error_message))
+                        DataState.Error(UiText.DynamicString("${e.message}: ${e.cause}"))//UiText.StringResourceId(Res.string.generic_error_message))
                     }
                 }
             )
