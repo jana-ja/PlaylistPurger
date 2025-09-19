@@ -3,4 +3,10 @@
     <string name="no_internet_error_message">An error occurred, please check your internet connection and try again</string>
     <string name="server_side_error_message">a service side error occurred. please try again later</string>
     <string name="too_many_requests_error_message">there have been too many requests in a short amount of time. please try again later</string>
+    <string name="missing_access_token">there have been too many requests in a short amount of time. please try again later</string>
+    <string name="missing_current_user">Current user is missing.</string>
+    <string name="missing_refresh_token">Refresh Token is Missing</string>
+    <string name="token_not_ready">Token is not Ready yet</string>
+    <string name="invalid_access_token">Access Token is invalid</string>
+    <string name="serialization_error">Error serializing object from API</string>
 </resources>
