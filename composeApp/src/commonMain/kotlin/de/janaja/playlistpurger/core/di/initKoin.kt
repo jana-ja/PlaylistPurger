@@ -19,7 +19,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             settingsModule,
             trackVotingModule,
             voteResultModule,
-            platformModule // must come last
+            platformModule
         )
     }
 }
