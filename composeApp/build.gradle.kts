@@ -14,7 +14,6 @@ val clientId = localProperties.getProperty("CLIENT_ID") ?: ""
 
 plugins {
     alias(libs.plugins.android.application)
-//    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     // cmp
     alias(libs.plugins.kotlinMultiplatform)
@@ -47,22 +46,6 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
-//                    implementation(libs.androidx.core.ktx)
-//        implementation(libs.androidx.lifecycle.runtime.ktx)
-//        implementation(libs.androidx.activity.compose)
-//        implementation(platform(libs.androidx.compose.bom))
-//        implementation(libs.androidx.ui)
-//        implementation(libs.androidx.ui.graphics)
-//        implementation(libs.androidx.ui.tooling.preview)
-//        implementation(libs.androidx.material3)
-//        testImplementation(libs.junit)
-//        androidTestImplementation(libs.androidx.junit)
-//        androidTestImplementation(libs.androidx.espresso.core)
-//        androidTestImplementation(platform(libs.androidx.compose.bom))
-//        androidTestImplementation(libs.androidx.ui.test.junit4)
-//        debugImplementation(libs.androidx.ui.tooling)
-//        debugImplementation(libs.androidx.ui.test.manifest)
             // koin
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
@@ -105,8 +88,6 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             // ktor logging
             implementation(libs.ktor.client.logging)
-//            // kotlin date time
-//            implementation(libs.kotlinx.datetime)
         }
         nativeMain.dependencies {
             // ktor
@@ -167,9 +148,6 @@ android {
 }
 
 dependencies {
-    // todo bleiben die hier? - nö
-
     // cmp
     debugImplementation(compose.uiTooling)
-
 }
