@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.features.vote_result.domain.usecase
 
-import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.domain.model.PlaylistVoteResults
 import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

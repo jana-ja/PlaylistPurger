@@ -7,7 +7,8 @@ import de.janaja.playlistpurger.shared.data.model.toTrack
 import de.janaja.playlistpurger.shared.data.model.toUserDetails
 import de.janaja.playlistpurger.shared.data.remote.SpotifyWebApi
 import de.janaja.playlistpurger.shared.data.remote.VoteApi
-import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.domain.model.TrackWithVoteResult
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.Vote
@@ -194,9 +195,9 @@ class SpotifyTrackListRepo(
                         null
                     }
 
-                    Pair(
-                        it,
-                        VoteResult(
+                    TrackWithVoteResult(
+                        track = it,
+                        voteResult = VoteResult(
                             votes,
                             optionWithMostVotes
                         )
@@ -206,7 +207,7 @@ class SpotifyTrackListRepo(
                     PlaylistVoteResults(
                         playlistId = playlistId,
                         collaborators = (userMap.values.toList() + tracksWithOwnVotes.map { it.addedBy }.distinct()).distinct(),
-                        tracksWithVotes = tracksWithVotes
+                        tracksWithVoteResult = tracksWithVotes
                     )
                 )
             },

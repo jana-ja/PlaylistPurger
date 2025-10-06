@@ -1,6 +1,6 @@
 package de.janaja.playlistpurger.shared.domain.repository
 
-import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.domain.model.PlaylistVoteResults
 import de.janaja.playlistpurger.shared.domain.model.Track
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import kotlinx.coroutines.flow.Flow

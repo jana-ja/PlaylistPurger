@@ -61,6 +61,7 @@ fun VoteResultScreen(
                 if (state is DataState.Ready)
                     VoteResultHeader(
                         playlistVoteResults = state.data,
+                        onClickVoteOption = voteResultViewModel::onClickVoteOptionHeader,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
             }
@@ -81,7 +82,7 @@ fun VoteResultScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(data.tracksWithVotes) { (track, voteResult) ->
+                    items(data.tracksWithVoteResult) { (track, voteResult) ->
                         TrackVoteResultItem(
                             track = track,
                             voteResult = voteResult

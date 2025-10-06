@@ -1,41 +1,33 @@
 package de.janaja.playlistpurger.features.vote_result.presentation.component
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key.Companion.M
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.CircleUserImage
-import de.janaja.playlistpurger.shared.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.domain.model.PlaylistVoteResults
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 
 @Composable
 fun VoteResultHeader(
     playlistVoteResults: PlaylistVoteResults,
+    onClickVoteOption: (VoteOption?) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     // TODO so eine map gibt es jeweils schon im TrackListRepo, zu PlaylistVoteResults hinzufügen?
-    val votesByVoteOption = playlistVoteResults.tracksWithVotes.map { it.second }.groupBy { it.resultOption }
+    val votesByVoteOption = playlistVoteResults.tracksWithVoteResult.map { it.voteResult }.groupBy { it.resultOption }
 
     val gridPadding = remember { 4 }
     val userImgSize = remember { 32 }
@@ -69,19 +61,31 @@ fun VoteResultHeader(
                 ) {
                     VoteOptionResultOverview(
                         votesByVoteOption[VoteOption.KEEP]?.size ?: 0,
-                        VoteOption.KEEP
+                        VoteOption.KEEP,
+                        modifier = Modifier.clickable {
+                            onClickVoteOption(VoteOption.KEEP)
+                        }
                     )
                     VoteOptionResultOverview(
                         votesByVoteOption[VoteOption.DONT_CARE]?.size ?: 0,
-                        VoteOption.DONT_CARE
+                        VoteOption.DONT_CARE,
+                        modifier = Modifier.clickable {
+                            onClickVoteOption(VoteOption.DONT_CARE)
+                        }
                     )
                     VoteOptionResultOverview(
                         votesByVoteOption[VoteOption.REMOVE]?.size ?: 0,
-                        VoteOption.REMOVE
+                        VoteOption.REMOVE,
+                        modifier = Modifier.clickable {
+                            onClickVoteOption(VoteOption.REMOVE)
+                        }
                     )
                     VoteOptionResultOverview(
                         votesByVoteOption[null]?.size ?: 0,
-                        null
+                        null,
+                        modifier = Modifier.clickable {
+                            onClickVoteOption(null)
+                        }
                     )
                 }
             }
