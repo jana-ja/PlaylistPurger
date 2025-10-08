@@ -33,13 +33,6 @@ class KtorSpotifyWebApi(
             }
         }
     }
-    /*
-    erst auswerten wenn > hälfte abgestimmt hat
-    ergebnis auch oben in karte anzeigen
-    nur pos neg aufwiegen, neutrale votes sidn egal
-    filtern nach person
-    zahl wie viele songs grade angezeigt werden
-     */
 
     override suspend fun addTracksToPlaylist(playlistId: String, uris: List<String>): Result<Unit> {
         return safeCall<Unit> {
@@ -51,7 +44,6 @@ class KtorSpotifyWebApi(
                 )
             }
         }
-
     }
 
     override suspend fun getCurrentUser(): Result<UserFullDto> {
