@@ -185,15 +185,27 @@ class SpotifyTrackListRepo(
                 val allVotesByTrackId = voteList.groupBy { it.trackId }
                 val tracksWithVotes = tracksWithOwnVotes.map {
                     val votes = allVotesByTrackId[it.id] ?: emptyList()
-                    val votesByVoteOption = votes.groupBy { it.voteOption }
-                    val maxVoteCount: Int? = votesByVoteOption.values.maxOfOrNull { userList -> userList.size }
-                    val optionWithMostVotes: VoteOption? = if (maxVoteCount != null) {
-                        val options =
-                            votesByVoteOption.filter { entry -> entry.value.size == maxVoteCount }.map { it.key }
-                        if (options.size == 1) options[0] else null
-                    } else {
+                    // new logic:
+                    //  if not more than half have votes -> ?
+                    //  only consider keep and remove, dont care is not important
+                    //  if keep = pass -> dont care
+                    val optionWithMostVotes = if (votes.size <= userMap.size / 2) {
                         null
+                    } else {
+                        val votesByVoteOption = votes.groupBy { it.voteOption }.mapValues {
+                            it.value.size
+                        }
+                        val keepCount = votesByVoteOption[VoteOption.KEEP] ?: 0
+                        val removeCount = votesByVoteOption[VoteOption.REMOVE] ?: 0
+                        if (keepCount > removeCount) {
+                            VoteOption.KEEP
+                        } else if (keepCount < removeCount) {
+                            VoteOption.REMOVE
+                        } else {
+                            VoteOption.DONT_CARE
+                        }
                     }
+
 
                     TrackWithVoteResult(
                         track = it,
