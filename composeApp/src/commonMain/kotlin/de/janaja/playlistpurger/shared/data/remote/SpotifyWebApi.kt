@@ -11,6 +11,8 @@ interface SpotifyWebApi {
 
     suspend fun getTracksForPlaylist(playlistId: String, limit: Int, offset: Int = 0): Result<TracksResponseDto>
 
+    suspend fun addTracksToPlaylist(playlistId: String, uris: List<String>): Result<Unit>
+
     suspend fun getCurrentUser(): Result<UserFullDto>
 
     suspend fun getUserForId(userId: String): Result<UserFullDto>

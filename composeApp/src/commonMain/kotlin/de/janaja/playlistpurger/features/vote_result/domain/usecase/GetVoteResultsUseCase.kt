@@ -5,7 +5,7 @@ import de.janaja.playlistpurger.shared.domain.repository.TrackListRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class GetTracksWithAllVotesUseCase(
+class GetVoteResultsUseCase(
     private val trackListRepo: TrackListRepo,
 ) {
     // this returns flow so result can be combined with filtering easily

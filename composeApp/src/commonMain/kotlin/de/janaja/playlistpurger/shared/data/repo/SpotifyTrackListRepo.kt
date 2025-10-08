@@ -203,9 +203,13 @@ class SpotifyTrackListRepo(
                         )
                     )
                 }
+                val votesByVoteOption = tracksWithVotes.map { it.voteResult }.groupBy { it.resultOption }
                 Result.success(
                     PlaylistVoteResults(
                         playlistId = playlistId,
+                        stats = votesByVoteOption.mapValues {
+                            it.value.size
+                        },
                         collaborators = (userMap.values.toList() + tracksWithOwnVotes.map { it.addedBy }.distinct()).distinct(),
                         tracksWithVoteResult = tracksWithVotes
                     )

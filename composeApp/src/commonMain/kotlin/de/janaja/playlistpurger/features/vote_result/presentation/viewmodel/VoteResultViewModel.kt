@@ -8,8 +8,10 @@ import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.core.ui.navigation.VoteResultRoute
 import de.janaja.playlistpurger.core.ui.util.UiText
+import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
+import de.janaja.playlistpurger.features.playlist_overview.presentation.viewmodel.Filter
 import de.janaja.playlistpurger.features.vote_result.domain.model.TrackWithVoteResult
-import de.janaja.playlistpurger.features.vote_result.domain.usecase.GetTracksWithAllVotesUseCase
+import de.janaja.playlistpurger.features.vote_result.domain.usecase.GetVoteResultsUseCase
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,6 +42,13 @@ data class VoteOptionFilter(val voteOption: VoteOption?): TrackWithVoteResultFil
     }
 }
 
+data class TrackNameFilter(val query: String) :
+    TrackWithVoteResultFilter {
+    override fun matches(track: TrackWithVoteResult): Boolean {
+        return track.track.name.lowercase().contains(query.lowercase())
+    }
+}
+
 data object NoFilter : TrackWithVoteResultFilter {
     override fun matches(track: TrackWithVoteResult): Boolean {
         return true
@@ -48,7 +57,7 @@ data object NoFilter : TrackWithVoteResultFilter {
 
 class VoteResultViewModel(
     savedStateHandle: SavedStateHandle,
-    getTracksWithAllVotesUseCase: GetTracksWithAllVotesUseCase
+    getVoteResultsUseCase: GetVoteResultsUseCase
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<VoteResultRoute>()
     private val playlistId = args.playlistId
@@ -57,12 +66,15 @@ class VoteResultViewModel(
     private val _activeFilters = MutableStateFlow<List<TrackWithVoteResultFilter>>(listOf(NoFilter))
     val activeFilters: StateFlow<List<TrackWithVoteResultFilter>> = _activeFilters.asStateFlow()
 
-    val dataState = getTracksWithAllVotesUseCase(playlistId)
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    val dataState = getVoteResultsUseCase(playlistId)
         .combine(_activeFilters) { result, filters ->
             result.fold(
                 onSuccess = { result ->
                     val filteredResult = result.tracksWithVoteResult.filter { track ->
-                        filters.any { filter ->
+                        filters.all { filter ->
                             if (filter is NoFilter) true else filter.matches(track)
                         }
                     }
@@ -88,7 +100,26 @@ class VoteResultViewModel(
         if (_activeFilters.value.contains(filter)) {
             removeFilter(filter)
         } else {
-            addFilter(filter)
+            _activeFilters.value = (_activeFilters.value.filterNot { it is VoteOptionFilter } + filter)
+        }
+    }
+
+    fun onClickUserHeader(userId: String) {
+        val filter = UserFilter(userId)
+        if (_activeFilters.value.contains(filter)) {
+            removeFilter(filter)
+        } else {
+            _activeFilters.value = (_activeFilters.value.filterNot { it is UserFilter } + filter)
+        }
+    }
+
+    fun onSearchTextChange(value: String) {
+        _searchQuery.value = value
+
+        if (_searchQuery.value.isNotBlank()) {
+            _activeFilters.value = (_activeFilters.value.filterNot { it is TrackNameFilter } + TrackNameFilter(value))
+        } else {
+            _activeFilters.value = _activeFilters.value.filterNot { it is TrackNameFilter }
         }
     }
 

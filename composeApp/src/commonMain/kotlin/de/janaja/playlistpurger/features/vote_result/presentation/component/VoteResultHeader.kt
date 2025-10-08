@@ -1,5 +1,7 @@
 package de.janaja.playlistpurger.features.vote_result.presentation.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,82 +16,86 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.CircleUserImage
-import de.janaja.playlistpurger.features.vote_result.domain.model.PlaylistVoteResults
+import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.TrackWithVoteResultFilter
+import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.UserFilter
+import de.janaja.playlistpurger.features.vote_result.presentation.viewmodel.VoteOptionFilter
+import de.janaja.playlistpurger.shared.domain.model.UserDetails
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
 
 @Composable
 fun VoteResultHeader(
-    playlistVoteResults: PlaylistVoteResults,
+    collaborators: List<UserDetails>,
+    stats: Map<VoteOption?, Int>,
+    onClickUser: (String) -> Unit,
     onClickVoteOption: (VoteOption?) -> Unit,
+    activeFilters: List<TrackWithVoteResultFilter>,
     modifier: Modifier = Modifier
 ) {
 
     // TODO so eine map gibt es jeweils schon im TrackListRepo, zu PlaylistVoteResults hinzufügen?
-    val votesByVoteOption = playlistVoteResults.tracksWithVoteResult.map { it.voteResult }.groupBy { it.resultOption }
+//    val votesByVoteOption = playlistVoteResults.tracksWithVoteResult.map { it.voteResult }.groupBy { it.resultOption }
 
     val gridPadding = remember { 4 }
     val userImgSize = remember { 32 }
 
-        Column(
-            modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row {
-                LazyHorizontalGrid(
-                    rows = GridCells.Fixed(2),
-                    modifier = Modifier.weight(1f).height((2*userImgSize + gridPadding).dp),
-                    verticalArrangement = Arrangement.spacedBy(gridPadding.dp),
-                    horizontalArrangement = Arrangement.spacedBy(gridPadding.dp)
-                ) {
-                    items(playlistVoteResults.collaborators) { user ->
+    val userFilter = activeFilters.find { it is UserFilter } as UserFilter?
+    val voteOptionFilter = activeFilters.find { it is VoteOptionFilter } as VoteOptionFilter?
+
+
+    Column(
+        modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row {
+            LazyHorizontalGrid(
+                rows = GridCells.Fixed(2),
+                modifier = Modifier.weight(1f).height((2 * userImgSize + gridPadding).dp),
+                verticalArrangement = Arrangement.spacedBy(gridPadding.dp),
+                horizontalArrangement = Arrangement.spacedBy(gridPadding.dp)
+            ) {
+                items(collaborators) { user ->
 //                        Text(user.id.first().toString())
 //                        Box(Modifier.size(4.dp).background(Color.Red).padding(2.dp)) {}
-                        CircleUserImage(
-                            user,
-                            modifier = Modifier
-                                .size(userImgSize.dp)
-                        )
+                    val mod = if (userFilter?.userId == user.id) {
+                        Modifier.border(width = 2.dp, color = Color.Green)
+                    } else {
+                        Modifier
                     }
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    VoteOptionResultOverview(
-                        votesByVoteOption[VoteOption.KEEP]?.size ?: 0,
-                        VoteOption.KEEP,
-                        modifier = Modifier.clickable {
-                            onClickVoteOption(VoteOption.KEEP)
-                        }
-                    )
-                    VoteOptionResultOverview(
-                        votesByVoteOption[VoteOption.DONT_CARE]?.size ?: 0,
-                        VoteOption.DONT_CARE,
-                        modifier = Modifier.clickable {
-                            onClickVoteOption(VoteOption.DONT_CARE)
-                        }
-                    )
-                    VoteOptionResultOverview(
-                        votesByVoteOption[VoteOption.REMOVE]?.size ?: 0,
-                        VoteOption.REMOVE,
-                        modifier = Modifier.clickable {
-                            onClickVoteOption(VoteOption.REMOVE)
-                        }
-                    )
-                    VoteOptionResultOverview(
-                        votesByVoteOption[null]?.size ?: 0,
-                        null,
-                        modifier = Modifier.clickable {
-                            onClickVoteOption(null)
-                        }
+                    CircleUserImage(
+                        user,
+                        modifier = mod
+                            .size(userImgSize.dp)
+                            .clickable {
+                                onClickUser(user.id)
+                            }
                     )
                 }
             }
 
-
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                (VoteOption.entries + null).forEach { option ->
+                    val mod = if (voteOptionFilter != null && voteOptionFilter.voteOption == option) {
+                        Modifier.border(width = 2.dp, color = Color.Green)
+                    } else {
+                        Modifier
+                    }
+                    VoteOptionResultOverview(
+                        stats[option] ?: 0,
+//                        votesByVoteOption[option]?.size ?: 0,
+                        option,
+                        modifier = mod.clickable {
+                            onClickVoteOption(option)
+                        }
+                    )
+                }
+            }
         }
+    }
 }

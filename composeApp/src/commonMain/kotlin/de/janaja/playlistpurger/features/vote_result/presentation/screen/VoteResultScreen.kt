@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +26,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import de.janaja.playlistpurger.core.ui.component.CollapsableTopAppBar
 import de.janaja.playlistpurger.core.ui.component.DataStateView
+import de.janaja.playlistpurger.core.ui.component.SearchTextField
 import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.features.vote_result.presentation.component.TrackVoteResultItem
 import de.janaja.playlistpurger.features.vote_result.presentation.component.VoteResultHeader
@@ -41,6 +43,8 @@ fun VoteResultScreen(
 
     val playlistName = voteResultViewModel.playlistName
     val dataState by voteResultViewModel.dataState.collectAsState()
+    val searchQuery by voteResultViewModel.searchQuery.collectAsState()
+    val activeFilters by voteResultViewModel.activeFilters.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     // song mit den vote dingern mit anzahl der votes, wenn alle abgestimmt haben ist grün hinterlegt oder so
@@ -55,15 +59,27 @@ fun VoteResultScreen(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                contentMaxHeight = 125.dp
+                contentMaxHeight = 165.dp // 125 war vorher, jetzt + 56 von searchbar
             ) {
                 val state = dataState
-                if (state is DataState.Ready)
-                    VoteResultHeader(
-                        playlistVoteResults = state.data,
-                        onClickVoteOption = voteResultViewModel::onClickVoteOptionHeader,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
+                if (state is DataState.Ready) {
+                    Column {
+                        VoteResultHeader(
+                            state.data.collaborators,
+                            state.data.stats,
+                            onClickUser = voteResultViewModel::onClickUserHeader,
+                            onClickVoteOption = voteResultViewModel::onClickVoteOptionHeader,
+                            activeFilters = activeFilters,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                        SearchTextField(
+                            searchText = searchQuery,
+                            onSearchTextChange = voteResultViewModel::onSearchTextChange,
+                            onSearchImeAction = { },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -79,6 +95,7 @@ fun VoteResultScreen(
                 dataState
             ) { data ->
 
+                Text("${data.tracksWithVoteResult.size}", Modifier.align(Alignment.Start))
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
