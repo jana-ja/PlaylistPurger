@@ -123,12 +123,17 @@ fun TrackVoteResultItem(
                 }
 
                 if (textColumnSize.height > 0) {
+                    VoteOptionIcon(
+                        voteResult.resultOption, Modifier.size(
+                        width = with(density) { (textColumnSize.height / 1.5f).toDp() },
+                        height = with(density) { (textColumnSize.height / 1.5f).toDp() }
+                    ))
                     CircleUserImage(
                         track.addedBy,
                         modifier = Modifier
                             .size(
-                                width = with(density) { (textColumnSize.height/1.5f).toDp() },
-                                height = with(density) { (textColumnSize.height/1.5f).toDp() }
+                                width = with(density) { (textColumnSize.height / 1.5f).toDp() },
+                                height = with(density) { (textColumnSize.height / 1.5f).toDp() }
                             )
                     )
                 } else {
@@ -157,7 +162,8 @@ fun TrackVoteResultItem(
                         )
 
 //                // TODO show max result?
-                        VoteOptionIcon(voteResult.resultOption, Modifier.padding(end = 16.dp))
+
+//                        VoteOptionIcon(voteResult.resultOption, Modifier.padding(end = 16.dp))
 
                     }
                 }
