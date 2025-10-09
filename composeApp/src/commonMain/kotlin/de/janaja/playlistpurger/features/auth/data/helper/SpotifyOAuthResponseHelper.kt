@@ -31,7 +31,7 @@ class SpotifyOAuthResponseHelper(
      * @param url
      */
     override fun handleResponseUrl(url: String) {
-        Log.d(TAG, "randleResponseUrl: $url")
+        Log.d(TAG, "handleResponseUrl: $url")
         // should look like "asdf://callback?code=..."
         // or               "asdf://callback?error=..."
 

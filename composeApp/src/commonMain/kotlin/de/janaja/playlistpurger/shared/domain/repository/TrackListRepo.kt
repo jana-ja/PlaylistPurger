@@ -28,4 +28,6 @@ interface TrackListRepo {
     suspend fun upsertVote(playlistId: String, trackId: String, newVote: VoteOption): Result<Unit>
 
     suspend fun loadTracksWithAllVotes(playlistId: String): Result<PlaylistVoteResults>
+
+    suspend fun saveRemoveSongsToPlaylist(playlistId: String, songs: List<Track>): Result<Unit>
 }

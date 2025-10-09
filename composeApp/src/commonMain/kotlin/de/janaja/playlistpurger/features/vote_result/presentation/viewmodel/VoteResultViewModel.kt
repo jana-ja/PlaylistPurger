@@ -8,16 +8,22 @@ import de.janaja.playlistpurger.core.domain.exception.DataException
 import de.janaja.playlistpurger.core.ui.model.DataState
 import de.janaja.playlistpurger.core.ui.navigation.VoteResultRoute
 import de.janaja.playlistpurger.core.ui.util.UiText
+import de.janaja.playlistpurger.core.util.Log.Companion.e
 import de.janaja.playlistpurger.features.playlist_overview.domain.model.Playlist
+import de.janaja.playlistpurger.features.playlist_overview.domain.usecase.GetPlaylistsUseCase
 import de.janaja.playlistpurger.features.playlist_overview.presentation.viewmodel.Filter
 import de.janaja.playlistpurger.features.vote_result.domain.model.TrackWithVoteResult
 import de.janaja.playlistpurger.features.vote_result.domain.usecase.GetVoteResultsUseCase
+import de.janaja.playlistpurger.features.vote_result.domain.usecase.SaveRemoveSongsUseCase
 import de.janaja.playlistpurger.shared.domain.model.VoteOption
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
@@ -57,17 +63,35 @@ data object NoFilter : TrackWithVoteResultFilter {
 
 class VoteResultViewModel(
     savedStateHandle: SavedStateHandle,
-    getVoteResultsUseCase: GetVoteResultsUseCase
+    getVoteResultsUseCase: GetVoteResultsUseCase,
+    getAllPlaylistsUseCase: GetPlaylistsUseCase,
+    private val saveRemoveSongsUseCase: SaveRemoveSongsUseCase
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<VoteResultRoute>()
     private val playlistId = args.playlistId
     val playlistName = args.playlistName
+
+    private val _toast = MutableSharedFlow<String>()
+    val toast = _toast.asSharedFlow()
 
     private val _activeFilters = MutableStateFlow<List<TrackWithVoteResultFilter>>(listOf(NoFilter))
     val activeFilters: StateFlow<List<TrackWithVoteResultFilter>> = _activeFilters.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
+
+    val allPlaylists = getAllPlaylistsUseCase()
+        .map { result ->
+            result.fold(
+                onSuccess = { it },
+                onFailure = { emptyList() }
+            )
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
 
     val dataState = getVoteResultsUseCase(playlistId)
         .combine(_activeFilters) { result, filters ->
@@ -138,6 +162,34 @@ class VoteResultViewModel(
     fun removeFilterType(filterType: KClass<out TrackWithVoteResultFilter>) {
         viewModelScope.launch {
             _activeFilters.value = _activeFilters.value.filterNot { filterType.isInstance(it) }.ifEmpty { listOf(NoFilter) }
+        }
+    }
+
+    fun saveRemoveCandidates(selectedPlaylist: Playlist) {
+
+        viewModelScope.launch {
+            val data = dataState.value
+            if (data !is DataState.Ready) {
+                _toast.emit("Error when saving songs: not loaded")
+                return@launch
+            }
+            // get songs that should be removed
+            val songsToRemove = data.data.tracksWithVoteResult.filter {
+                it.voteResult.resultOption == VoteOption.REMOVE
+            }.map { it.track }
+
+            val result = saveRemoveSongsUseCase(playlistId = selectedPlaylist.id, songsToRemove)
+
+            result.fold(
+                onSuccess = {
+                    _toast.emit("Successfully saved songs to playlist")
+
+                },
+                onFailure = {
+                    _toast.emit("Error when saving songs: ${it.message}")
+
+                }
+            )
         }
     }
 }

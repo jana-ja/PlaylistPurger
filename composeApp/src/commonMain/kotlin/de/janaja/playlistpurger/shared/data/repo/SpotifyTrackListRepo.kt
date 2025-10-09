@@ -80,7 +80,8 @@ class SpotifyTrackListRepo(
                     // get remaining tracks
                     if (totalTracks > tracksFromSpotify.size) {
                         val remainingTracks = totalTracks - tracksFromSpotify.size
-                        val remainingPages = (remainingTracks + limit - 1) / limit//ceil(remainingTracks.toFloat() / 100.0f)
+                        val remainingPages =
+                            (remainingTracks + limit - 1) / limit//ceil(remainingTracks.toFloat() / 100.0f)
 
                         val pageFetchJobs = List(remainingPages) { pageIndex ->
                             async {
@@ -222,7 +223,8 @@ class SpotifyTrackListRepo(
                         stats = votesByVoteOption.mapValues {
                             it.value.size
                         },
-                        collaborators = (userMap.values.toList() + tracksWithOwnVotes.map { it.addedBy }.distinct()).distinct(),
+                        collaborators = (userMap.values.toList() + tracksWithOwnVotes.map { it.addedBy }
+                            .distinct()).distinct(),
                         tracksWithVoteResult = tracksWithVotes
                     )
                 )
@@ -299,6 +301,11 @@ class SpotifyTrackListRepo(
                 Result.failure(DataException.Remote.Unknown)
 
             }
+        )
+    }
+
+    override suspend fun saveRemoveSongsToPlaylist(playlistId: String, songs: List<Track>): Result<Unit> {
+        return webApi.addTracksToPlaylist(playlistId, songs.map { "spotify:track:${it.id}" }
         )
     }
 }
